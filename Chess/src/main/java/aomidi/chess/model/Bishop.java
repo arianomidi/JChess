@@ -1,6 +1,7 @@
 package aomidi.chess.model;
 
 import static aomidi.chess.model.Util.*;
+import static java.lang.Math.abs;
 
 public class Bishop extends Piece {
 
@@ -13,7 +14,16 @@ public class Bishop extends Piece {
 
     @Override
     public boolean validMove(Tile tile) {
-        return false;
+        int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
+        int new_x = tile.getX(), new_y = tile.getY();
+        int diff_in_y = new_y - cur_y;
+        int diff_in_x = new_x - cur_x;
+
+        if (abs(diff_in_x) == abs(diff_in_y) && diff_in_x != 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

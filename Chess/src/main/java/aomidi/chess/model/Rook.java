@@ -7,16 +7,34 @@ public class Rook extends Piece {
         super(tile, color);
     }
 
+    // Getters
     @Override
     public Util.PieceType getPieceType() {
         return PieceType.Rook;
     }
 
+    // Checkers
     @Override
-    public boolean validMove(Tile tile) {
+    public boolean validMove(Tile tile){
+        int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
+        int new_x = tile.getX(), new_y = tile.getY();
+        int diff_in_y = new_y - cur_y;
+        int diff_in_x = new_x - cur_x;
+
+        if (diff_in_x == 0){
+            if (diff_in_y != 0){
+                return true;
+            }
+        } else if (diff_in_y == 0){
+            if (diff_in_x != 0){
+                return true;
+            }
+        }
+
         return false;
     }
 
+    // Other
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);

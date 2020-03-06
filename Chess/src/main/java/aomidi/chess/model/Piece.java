@@ -61,9 +61,8 @@ public abstract class Piece {
     public boolean attack(Tile tile){
         if (validAttack(tile)){
             tile.getPiece().delete();
-
             // Move piece to new tile
-            return moveTo(tile, true);
+            return this.moveTo(tile, true);
         } else {
             //throw new IllegalArgumentException("Piece cant move to tile: " + tile);
             return false;

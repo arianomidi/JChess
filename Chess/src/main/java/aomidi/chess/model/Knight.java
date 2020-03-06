@@ -2,8 +2,10 @@ package aomidi.chess.model;
 
 import static aomidi.chess.model.Util.*;
 import static aomidi.chess.model.Util.bold;
+import static java.lang.Math.abs;
 
 public class Knight extends Piece {
+
     public Knight(Tile tile, Util.Color color) {
         super(tile, color);
     }
@@ -12,8 +14,19 @@ public class Knight extends Piece {
     public Util.PieceType getPieceType() { return PieceType.Knight; }
 
     @Override
-    public boolean validMove(Tile tile) {
-        return false;
+    public boolean validMove(Tile tile){
+        int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
+        int new_x = tile.getX(), new_y = tile.getY();
+        int diff_in_y = new_y - cur_y;
+        int diff_in_x = new_x - cur_x;
+
+        if (abs(diff_in_x) == 1 && abs(diff_in_y) == 2){
+            return true;
+        } else if (abs(diff_in_x) == 2 && abs(diff_in_y) == 1){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

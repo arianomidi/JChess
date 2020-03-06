@@ -9,7 +9,7 @@ public class ChessApplication {
         Chess chess = new Chess();
         Game game = chess.getGame();
         Board board = game.getBoard();
-        System.out.println(board.toSymbol());
+        System.out.println(board.toString());
 
         while (true) {
             chess.movePiece();

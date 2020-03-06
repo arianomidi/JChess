@@ -2,6 +2,7 @@ package aomidi.chess.model;
 
 import aomidi.chess.model.Util.Color;
 
+import static aomidi.chess.model.Util.boldAndUnderline;
 import static aomidi.chess.model.Util.letterToInt;
 
 public class Game {
@@ -35,7 +36,8 @@ public class Game {
 
     // Checkers
     public boolean validMove(Piece piece, Tile new_tile){
-        boolean isPieceBlocking = board.hasPieceBetweenTiles( piece.getPosition(), new_tile);
+        boolean isPieceBlocking = board.hasPieceBetweenTiles(piece.getPosition(), new_tile);
+        boolean hasPieceOnTile = board.hasPieceAt(new_tile.getX(), new_tile.getY());
 
         if (isPieceBlocking)
             throw new IllegalArgumentException(piece.toSimpleString() + " is blocked from getting to " + new_tile);
@@ -43,12 +45,38 @@ public class Game {
         return !isPieceBlocking;
     }
 
-    // Action
-    public boolean move(Piece piece, Tile new_tile){
-        if (validMove(piece, new_tile)){
-            return piece.moveTo(new_tile);
+    public boolean validAttack(Piece piece, Tile new_tile){
+        Piece pieceOnTile = board.getPieceAt(new_tile.getX(), new_tile.getY());
+        boolean canReachTile = validMove(piece, new_tile);
+
+        if (canReachTile) {
+            if (pieceOnTile.getColor() == piece.getColor()) {
+                throw new IllegalArgumentException("There is already a "+ piece.getColor() + " piece on " + new_tile);
+            } else {
+                return piece.attack(new_tile);
+            }
         } else {
             return false;
+        }
+    }
+
+    // Action
+    public boolean move(Piece piece, Tile new_tile){
+        boolean hasPieceOnTile = board.hasPieceAt(new_tile.getX(), new_tile.getY());
+
+        // Attack or Move
+        if (hasPieceOnTile){
+            if (validAttack(piece, new_tile)){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (validMove(piece, new_tile)) {
+                return piece.moveTo(new_tile);
+            } else {
+                return false;
+            }
         }
     }
 

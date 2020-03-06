@@ -48,32 +48,40 @@ public class Board {
     }
 
     public void addStartingPieces(){
-        // Pawns
-        for(int file = 1; file <= 8; file++){
-            addPieceAt(new Pawn(getTileAt(file,2), Color.White), file, 2);
-            addPieceAt(new Pawn(getTileAt(file,7), Color.Black), file, 7);
-        }
-        // Rooks
-        for (int file = 1; file <= 8; file += 7){
-            addPieceAt(new Rook(getTileAt(file,1), Color.White), file, 1);
-            addPieceAt(new Rook(getTileAt(file,8), Color.Black), file, 8);
-        }
-        // Knights
-        for (int file = 2; file <= 7; file += 5){
-            addPieceAt(new Knight(getTileAt(file,1), Color.White), file, 1);
-            addPieceAt(new Knight(getTileAt(file,8), Color.Black), file, 8);
-        }
-        // Bishops
-        for (int file = 3; file <= 6; file += 3){
-            addPieceAt(new Bishop(getTileAt(file,1), Color.White), file, 1);
-            addPieceAt(new Bishop(getTileAt(file,8), Color.Black), file, 8);
-        }
         // Queens
         addPieceAt(new Queen(getTileAt(4,1), Color.White), 4, 1);
         addPieceAt(new Queen(getTileAt(4,8), Color.Black), 4, 8);
-        // King
-        addPieceAt(new King(getTileAt(5,1), Color.White), 5, 1);
-        addPieceAt(new King(getTileAt(5,8), Color.Black), 5, 8);
+        // Pawns
+        for(int file = 1; file <= 8; file += 2){
+            addPieceAt(new Pawn(getTileAt(file,2), Color.White), file, 2);
+            addPieceAt(new Pawn(getTileAt(file,6), Color.White), file, 6);
+        }
+//        // Pawns
+//        for(int file = 1; file <= 8; file++){
+//            addPieceAt(new Pawn(getTileAt(file,2), Color.White), file, 2);
+//            addPieceAt(new Pawn(getTileAt(file,7), Color.Black), file, 7);
+//        }
+//        // Rooks
+//        for (int file = 1; file <= 8; file += 7){
+//            addPieceAt(new Rook(getTileAt(file,1), Color.White), file, 1);
+//            addPieceAt(new Rook(getTileAt(file,8), Color.Black), file, 8);
+//        }
+//        // Knights
+//        for (int file = 2; file <= 7; file += 5){
+//            addPieceAt(new Knight(getTileAt(file,1), Color.White), file, 1);
+//            addPieceAt(new Knight(getTileAt(file,8), Color.Black), file, 8);
+//        }
+//        // Bishops
+//        for (int file = 3; file <= 6; file += 3){
+//            addPieceAt(new Bishop(getTileAt(file,1), Color.White), file, 1);
+//            addPieceAt(new Bishop(getTileAt(file,8), Color.Black), file, 8);
+//        }
+//        // Queens
+//        addPieceAt(new Queen(getTileAt(4,1), Color.White), 4, 1);
+//        addPieceAt(new Queen(getTileAt(4,8), Color.Black), 4, 8);
+//        // King
+//        addPieceAt(new King(getTileAt(5,1), Color.White), 5, 1);
+//        addPieceAt(new King(getTileAt(5,8), Color.Black), 5, 8);
     }
 
     // Getters
@@ -127,22 +135,36 @@ public class Board {
         boolean existsPiece = false;
 
         if (diff_x == 0){
-            for (int i = 1; i <= abs(diff_y); i++){
+            for (int i = 1; i < abs(diff_y); i++){
                 existsPiece = this.hasPieceAt(cur_x, cur_y + i * Integer.signum(diff_y));
+                if (existsPiece){
+                    break;
+                }
             }
         } else if (diff_y == 0){
-            for (int i = 1; i <= abs(diff_x); i++){
+            for (int i = 1; i < abs(diff_x); i++){
                 existsPiece = this.hasPieceAt(cur_x + i * Integer.signum(diff_x), cur_y);
+                if (existsPiece){
+                    break;
+                }
             }
         } else if (abs(diff_x) == abs(diff_y)){
-            for (int i = 1; i <= abs(diff_x); i++){
+            for (int i = 1; i < abs(diff_x); i++){
                 existsPiece = this.hasPieceAt(cur_x + i * Integer.signum(diff_x), cur_y + i * Integer.signum(diff_y));
+                if (existsPiece){
+                    break;
+                }
             }
         } else {
             return false;     // Knight's
         }
 
         return existsPiece;
+    }
+
+    public Color colorOfEnemyPieceAt(Tile tile){
+        Color enemy_color = tile.getPiece().getColor();
+        return enemy_color;
     }
 
     public boolean hasPieceAt(Integer x, Integer y){
