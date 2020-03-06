@@ -7,13 +7,9 @@ public class ChessApplication {
     // Main
     public static void main(String[] args) {
         Chess chess = new Chess();
-        Game game = chess.getGame();
-        Board board = game.getBoard();
-        System.out.println(board.toSymbol());
 
-        while (true) {
-            chess.movePiece();
-        }
+        chess.startGame();
+
     }
 
 }

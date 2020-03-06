@@ -3,7 +3,8 @@ package aomidi.chess.model;
 import java.util.Scanner;
 
 public class Util {
-    // Enumerations
+    // ----------- Enumeration -------------
+
     public enum Color {
         Black,
         White
@@ -29,8 +30,8 @@ public class Util {
         H
     }
 
+    // ----------- Conversion Functions -------------
 
-    // Helper Functions
     public static String intToLetter(int file) {
         switch (file) {
             case 1:
@@ -126,7 +127,8 @@ public class Util {
         return input;
     }
 
-    // String Manipulation
+    // ---------- String Manipulation ------------
+
     public static String bold(String string){
         return "\033[0;1m" + string + "\033[0;0m";
     }

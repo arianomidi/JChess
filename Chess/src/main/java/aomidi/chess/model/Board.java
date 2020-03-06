@@ -96,7 +96,7 @@ public class Board {
     // ----------- Getters -------------
 
     public Tile getTileAt(String file, Integer rank){
-        return this.tiles.get(file).get(rank - 1);
+        return this.tiles.get(file.toUpperCase()).get(rank - 1);
     }
 
     public Tile getTileAt(Integer file, Integer rank){
@@ -280,6 +280,10 @@ public class Board {
         }
 
         return false;
+    }
+
+    public boolean isChecked(Player player){
+        return isChecked(getKing(player.getColor()));
     }
 
     // ----------- Others -------------
