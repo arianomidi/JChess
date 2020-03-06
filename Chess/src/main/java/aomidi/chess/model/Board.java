@@ -49,14 +49,17 @@ public class Board {
     }
 
     public void addStartingPieces(){
-        // Queens
+        // Kings
         addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
         addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
         // Rooks
-        for (int file = 8; file <= 8; file += 7){
+        for (int file = 1; file <= 8; file += 7){
             addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
             addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
         }
+        // Pawns
+        addPieceAt(new Pawn(getTileAt(7,1), Color.White, this), 7, 1);
+        addPieceAt(new Pawn(getTileAt(7,8), Color.Black, this), 7, 8);
 //        // Pawns
 //        for(int file = 1; file <= 8; file++){
 //            addPieceAt(new Pawn(getTileAt(file,2), Color.White, this), file, 2);

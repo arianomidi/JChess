@@ -37,7 +37,6 @@ public class Game {
     // Checkers
     public boolean validMove(Piece piece, Tile new_tile){
         boolean isPieceBlocking = board.hasPieceBetweenTiles(piece.getPosition(), new_tile);
-        boolean hasPieceOnTile = board.hasPieceAt(new_tile.getX(), new_tile.getY());
 
         if (isPieceBlocking)
             throw new IllegalArgumentException(piece.toSimpleString() + " is blocked from getting to " + new_tile);

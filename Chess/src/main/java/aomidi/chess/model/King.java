@@ -25,59 +25,71 @@ public class King extends Piece {
         int diff_in_y = new_y - cur_y;
         int diff_in_x = new_x - cur_x;
 
-        if (abs(diff_in_x) <= 1 || abs(diff_in_y) <= 1 ){
-            if (diff_in_y != 0 && diff_in_x != 0){
+        if ( abs(diff_in_x) <= 1 && abs(diff_in_y) <= 1 ){
+            if (diff_in_y != 0 || diff_in_x != 0){
                 return true;
             }
         }
+
         // Short Castle Clause
-        if (diff_in_x == 2 && diff_in_y == 0){
-            System.out.print(canCastle(tile, "short"));
-        }
+        if (diff_in_x == 2 && diff_in_y == 0)
+            return canCastle(tile, "short");
+        // Long Castle Clause
+        if (diff_in_x == -2 && diff_in_y == 0)
+            return canCastle(tile, "long");
+
         return false;
     }
 
     public boolean canCastle(Tile tile, String type){
-        if (this.firstMove){
-            Tile e1 = this.getPosition();
-            Board board = this.getBoard();
-            if (type.compareTo("short") == 0){
-                Tile f1 = board.getTileAt("f", 1);
-                Tile g1 = board.getTileAt("g", 1);
-                Tile h1 = board.getTileAt("h", 1);
+        String error = "";
 
-                if (!f1.hasPiece() && !g1.hasPiece() && tile.equals(g1)){
-                    if (h1.getPiece() instanceof Rook && ((Rook) h1.getPiece()).isFirstMove()){
+        if (!this.firstMove)
+            error = "King has moved";
+        else {
+            int rank;
+            if (this.getColor() == Color.White) {
+                rank = 1;
+            } else {
+                rank = 8;
+            }
+
+            Board board = this.getBoard();
+            if (type.compareTo("short") == 0) {
+                Tile f_tile = board.getTileAt("F", rank);
+                Tile g_tile = board.getTileAt("G", rank);
+                Tile h_tile = board.getTileAt("H", rank);
+
+                if (tile.equals(g_tile)) {
+                    Piece piece = h_tile.getPiece();
+                    if (piece instanceof Rook && ((Rook) piece).isFirstMove()) {
+                        piece.moveTo(f_tile, true);
                         return true;
+                    } else {
+                        error = "Rook has moved";
                     }
+                }
+            } else if (type.compareTo("long") == 0) {
+                Tile a_tile = board.getTileAt("A", rank);
+                Tile b_tile = board.getTileAt("B", rank);
+                Tile c_tile = board.getTileAt("C", rank);
+                Tile d_tile = board.getTileAt("D", rank);
+
+                if (tile.equals(c_tile) && !b_tile.hasPiece()) {
+                    Piece piece = a_tile.getPiece();
+                    if (piece instanceof Rook && ((Rook) piece).isFirstMove()) {
+                        piece.moveTo(d_tile, true);
+                        return true;
+                    } else {
+                        error = "Rook has moved";
+                    }
+                } else {
+                    error = "Piece on b1 is blocking the King";
                 }
             }
         }
-        return false;
-//
-//        if (this.firstMove){
-//            HashMap<String, Rook> rooks = this.getBoard().getRooks(this.getColor());
-//
-//            if(!rooks.isEmpty()){
-//                if (rooks.containsKey("short")) {
-//                    Rook shortRook = rooks.get("short");
-//                    if (shortRook.isFirstMove()) {
-//                        if (this.getBoard().getPieceAt(x + 1, y) == shortRook) {
-//                            return true;
-//                        }
-//                    }
-//                }
-//                if (rooks.containsKey("long")) {
-//                    Rook longRook = rooks.get("long");
-//                    if (longRook.isFirstMove()) {
-//                        if (this.getBoard().getPieceAt(x - 1, y) == longRook) {
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false;
+
+        throw new IllegalArgumentException("Cannot Castle: " + error);
     }
 
     // Action

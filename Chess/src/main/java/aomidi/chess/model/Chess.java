@@ -8,6 +8,7 @@ import static aomidi.chess.model.Util.letterToInt;
 public class Chess {
     private Game game;
     private Board board;
+    private King king;
     private String error;
     private boolean firstMove;
 
@@ -66,9 +67,23 @@ public class Chess {
     }
 
     public Tile testTileInput(String new_tile){
-        int new_x = letterToInt(String.valueOf(new_tile.charAt(0)));
-        int new_y = new_tile.charAt(1) - '0';
-        Tile move_tile = board.getTileAt(new_x, new_y);
+        Tile move_tile;
+        // Test if castle was init else treat like regular move
+        if (new_tile.toUpperCase().compareTo("O-O") == 0){
+            if (this.game.getTurn() == Util.Color.White)
+                move_tile = board.getTileAt(7,1);
+            else
+                move_tile = board.getTileAt(7,8);
+        } else if (new_tile.toUpperCase().compareTo("O-O-O") == 0){
+            if (this.game.getTurn() == Util.Color.White)
+                move_tile = board.getTileAt(3,1);
+            else
+                move_tile = board.getTileAt(3,8);
+        } else {
+            int new_x = letterToInt(String.valueOf(new_tile.charAt(0)));
+            int new_y = new_tile.charAt(1) - '0';
+            move_tile = board.getTileAt(new_x, new_y);
+        }
 
         if (move_tile == null){
             throw new NullPointerException("Tile " + new_tile + " does not exist");
