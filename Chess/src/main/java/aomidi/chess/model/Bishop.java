@@ -5,8 +5,8 @@ import static java.lang.Math.abs;
 
 public class Bishop extends Piece {
 
-    public Bishop(Tile tile, Util.Color color) {
-        super(tile, color);
+    public Bishop(Tile tile, Util.Color color, Board board) {
+        super(tile, color, board);
     }
 
     @Override

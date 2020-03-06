@@ -6,8 +6,8 @@ import static java.lang.Math.abs;
 
 public class Queen extends Piece{
 
-    public Queen(Tile tile, Util.Color color) {
-        super(tile, color);
+    public Queen(Tile tile, Util.Color color, Board board) {
+        super(tile, color, board);
     }
 
     @Override

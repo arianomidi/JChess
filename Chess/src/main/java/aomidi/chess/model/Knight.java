@@ -6,8 +6,8 @@ import static java.lang.Math.abs;
 
 public class Knight extends Piece {
 
-    public Knight(Tile tile, Util.Color color) {
-        super(tile, color);
+    public Knight(Tile tile, Util.Color color, Board board) {
+        super(tile, color, board);
     }
 
     @Override

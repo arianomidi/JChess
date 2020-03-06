@@ -8,12 +8,14 @@ import static aomidi.chess.model.Util.*;
 public abstract class Piece {
     private Tile tile;
     private Color color;
+    private Board board;
     private boolean inPlay;
 
     // Constructors
-    public Piece(Tile tile, Color color) {
+    public Piece(Tile tile, Color color, Board board) {
         this.tile = tile;
         this.color = color;
+        this.board = board;
         this.inPlay = true;
 
         if (!this.tile.setPiece(this)) {
@@ -25,6 +27,8 @@ public abstract class Piece {
     public Tile getPosition(){ return this.tile; }
 
     public Color getColor(){ return this.color; }
+
+    public Board getBoard(){ return this.board; }
 
     public abstract PieceType getPieceType();
 

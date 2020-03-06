@@ -11,8 +11,8 @@ import static java.lang.Math.abs;
 public class Pawn extends Piece {
     private boolean firstMove;
 
-    public Pawn(Tile tile, Color color) {
-        super(tile, color);
+    public Pawn(Tile tile, Color color, Board board) {
+        super(tile, color, board);
         this.firstMove = true;
     }
 

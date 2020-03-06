@@ -3,8 +3,11 @@ package aomidi.chess.model;
 import static aomidi.chess.model.Util.*;
 
 public class Rook extends Piece {
-    public Rook(Tile tile, Util.Color color) {
-        super(tile, color);
+    private boolean firstMove;
+
+    public Rook(Tile tile, Color color, Board board) {
+        super(tile, color, board);
+        this.firstMove = true;
     }
 
     // Getters
@@ -12,6 +15,8 @@ public class Rook extends Piece {
     public Util.PieceType getPieceType() {
         return PieceType.Rook;
     }
+
+    public boolean isFirstMove(){ return this.firstMove; }
 
     // Checkers
     @Override
@@ -32,6 +37,17 @@ public class Rook extends Piece {
         }
 
         return false;
+    }
+
+    // Actions
+    @Override
+    public boolean moveTo(Tile tile) {
+        if (super.moveTo(tile)){
+            this.firstMove = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // Other
