@@ -2,16 +2,20 @@ package aomidi.chess.model;
 
 import static aomidi.chess.model.Util.*;
 import static java.lang.Math.abs;
+import aomidi.chess.model.Util.PieceType;
 
 public class Bishop extends Piece {
 
+    // ----------- Constructor -------------
     public Bishop(Tile tile, Util.Color color, Board board) {
         super(tile, color, board);
     }
 
-    @Override
-    public Util.PieceType getPieceType() { return Util.PieceType.Bishop; }
+    // ----------- Getters -------------
 
+    public PieceType getPieceType() { return Util.PieceType.Bishop; }
+
+    // ----------- Checkers -------------
     @Override
     public boolean validMove(Tile tile) {
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
@@ -26,6 +30,16 @@ public class Bishop extends Piece {
         }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj instanceof Bishop) {
+            return super.equals(obj);
+        } else {
+            return false;
+        }
+    }
+
+    // ----------- Others -------------
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);

@@ -37,7 +37,7 @@ public class Chess {
         }
 
         if (pieceMoved){
-            System.out.println(this.board.toString());
+            System.out.println(this.board.toSymbol());
             if (game.getTurn() == Util.Color.White){
                 game.setTurn(Util.Color.Black);
             } else {

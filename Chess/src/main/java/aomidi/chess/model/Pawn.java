@@ -11,33 +11,37 @@ import static java.lang.Math.abs;
 public class Pawn extends Piece {
     private boolean firstMove;
 
+    // ----------- Constructor -------------
     public Pawn(Tile tile, Color color, Board board) {
         super(tile, color, board);
         this.firstMove = true;
     }
 
-    // Getters
+    // ----------- Getters -------------
+
     public PieceType getPieceType(){ return PieceType.Pawn; }
 
-    // Setters
+    public boolean isFirstMove(){ return firstMove; }
+
+    // ----------- Setters -------------
+
     public boolean setFirstMove(boolean b){
         this.firstMove = b;
         return true;
     }
 
-    // Checkers
-    public boolean isFirstMove(){ return firstMove; }
+    // ----------- Checkers -------------
 
     public boolean validMove(Tile tile){
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
         int new_x = tile.getX(), new_y = tile.getY();
         int diff_in_y = new_y - cur_y;
 
-        // If color is white diff in y should be less than 0
-        if (this.getColor() == Color.Black){
+        // Difference in y for Black is negative as pieces move down the board
+        if (this.getColor() == Color.Black)
             diff_in_y = -diff_in_y;
-        }
 
+        // If its the first move then pawn is allowed to move 2 squares else move only 1 square
         if (this.isFirstMove()){
             if (cur_x == new_x && 0 < diff_in_y && diff_in_y <= 2 ){
                 return true;
@@ -51,18 +55,20 @@ public class Pawn extends Piece {
         return false;
     }
 
+    // Pawn attack is different to move
     @Override
     public boolean validAttack(Tile tile){
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
         int new_x = tile.getX(), new_y = tile.getY();
         int diff_in_y = new_y - cur_y, diff_in_x = cur_x - new_x;
 
-        // If color is white diff in y should be less than 0 (attacking backwards)
+        // Difference in y for Black is negative as pieces attack downwards
         if (this.getColor() == Color.Black){
             diff_in_y = -diff_in_y;
         }
 
-        if (abs(diff_in_x) == 1 && 0 < diff_in_y && diff_in_y <= 1){
+        // If attack is diagonal 1 square ahead return true
+        if (abs(diff_in_x) == 1 && diff_in_y == 1){
             return true;
         } else {
             return false;
@@ -78,7 +84,7 @@ public class Pawn extends Piece {
         }
     }
 
-    // Action
+    // ----------- Action -------------
     @Override
     public boolean moveTo(Tile tile) {
         if (super.moveTo(tile)){
@@ -89,6 +95,8 @@ public class Pawn extends Piece {
         }
     }
 
+    // ----------- Others -------------
+    @Override
     public String toSymbol(int column){
         String string = this.getPosition().getSymbol(column);
 

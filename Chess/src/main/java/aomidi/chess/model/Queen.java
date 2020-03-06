@@ -3,16 +3,20 @@ package aomidi.chess.model;
 import static aomidi.chess.model.Util.*;
 import static aomidi.chess.model.Util.bold;
 import static java.lang.Math.abs;
+import aomidi.chess.model.Util.PieceType;
 
 public class Queen extends Piece{
 
+    // ----------- Constructor -------------
     public Queen(Tile tile, Util.Color color, Board board) {
         super(tile, color, board);
     }
 
-    @Override
-    public Util.PieceType getPieceType() { return Util.PieceType.Queen; }
+    // ----------- Getters -------------
 
+    public PieceType getPieceType() { return Util.PieceType.Queen; }
+
+    // ----------- Checkers -------------
     @Override
     public boolean validMove(Tile tile){
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
@@ -36,6 +40,16 @@ public class Queen extends Piece{
 
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj instanceof Queen) {
+            return super.equals(obj);
+        } else {
+            return false;
+        }
+    }
+
+    // ----------- Others -------------
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);

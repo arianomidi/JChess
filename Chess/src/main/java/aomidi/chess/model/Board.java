@@ -48,46 +48,46 @@ public class Board {
     }
 
     public void addStartingPieces(){
-        // Kings
-        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
-        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
-        // Rooks
-        for (int file = 1; file <= 8; file += 7){
-            addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
-            addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
-        }
-        // Bishops
-        for (int file = 3; file <= 6; file += 3){
-            addPieceAt(new Bishop(getTileAt(file,1), Color.White, this), file, 1);
-            addPieceAt(new Bishop(getTileAt(file,8), Color.Black, this), file, 8);
-        }
-        addPieceAt(new Bishop(getTileAt("H",4), Color.Black, this), 8, 4);
-//        // Pawns
-//        for(int file = 1; file <= 8; file++){
-//            addPieceAt(new Pawn(getTileAt(file,2), Color.White, this), file, 2);
-//            addPieceAt(new Pawn(getTileAt(file,7), Color.Black, this), file, 7);
-//        }
+//        // Kings
+//        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
+//        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
 //        // Rooks
 //        for (int file = 1; file <= 8; file += 7){
 //            addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
 //            addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
-//        }
-//        // Knights
-//        for (int file = 2; file <= 7; file += 5){
-//            addPieceAt(new Knight(getTileAt(file,1), Color.White, this), file, 1);
-//            addPieceAt(new Knight(getTileAt(file,8), Color.Black, this), file, 8);
 //        }
 //        // Bishops
 //        for (int file = 3; file <= 6; file += 3){
 //            addPieceAt(new Bishop(getTileAt(file,1), Color.White, this), file, 1);
 //            addPieceAt(new Bishop(getTileAt(file,8), Color.Black, this), file, 8);
 //        }
-//        // Queens
-//        addPieceAt(new Queen(getTileAt(4,1), Color.White, this), 4, 1);
-//        addPieceAt(new Queen(getTileAt(4,8), Color.Black, this), 4, 8);
-//        // King
-//        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
-//        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
+//        addPieceAt(new Bishop(getTileAt("H",4), Color.Black, this), 8, 4);
+        // Pawns
+        for(int file = 1; file <= 8; file++){
+            addPieceAt(new Pawn(getTileAt(file,2), Color.White, this), file, 2);
+            addPieceAt(new Pawn(getTileAt(file,7), Color.Black, this), file, 7);
+        }
+        // Rooks
+        for (int file = 1; file <= 8; file += 7){
+            addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
+            addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
+        }
+        // Knights
+        for (int file = 2; file <= 7; file += 5){
+            addPieceAt(new Knight(getTileAt(file,1), Color.White, this), file, 1);
+            addPieceAt(new Knight(getTileAt(file,8), Color.Black, this), file, 8);
+        }
+        // Bishops
+        for (int file = 3; file <= 6; file += 3){
+            addPieceAt(new Bishop(getTileAt(file,1), Color.White, this), file, 1);
+            addPieceAt(new Bishop(getTileAt(file,8), Color.Black, this), file, 8);
+        }
+        // Queens
+        addPieceAt(new Queen(getTileAt(4,1), Color.White, this), 4, 1);
+        addPieceAt(new Queen(getTileAt(4,8), Color.Black, this), 4, 8);
+        // King
+        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
+        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
     }
 
     // Getters

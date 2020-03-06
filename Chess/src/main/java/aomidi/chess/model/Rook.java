@@ -1,16 +1,18 @@
 package aomidi.chess.model;
 
 import static aomidi.chess.model.Util.*;
+import aomidi.chess.model.Util.PieceType;
 
 public class Rook extends Piece {
     private boolean firstMove;
 
+    // ----------- Constructor -------------
     public Rook(Tile tile, Color color, Board board) {
         super(tile, color, board);
         this.firstMove = true;
     }
 
-    // Getters
+    // ----------- Getters -------------
     @Override
     public Util.PieceType getPieceType() {
         return PieceType.Rook;
@@ -18,7 +20,7 @@ public class Rook extends Piece {
 
     public boolean isFirstMove(){ return this.firstMove; }
 
-    // Checkers
+    // ----------- Checkers -------------
     @Override
     public boolean validMove(Tile tile){
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
@@ -39,7 +41,16 @@ public class Rook extends Piece {
         return false;
     }
 
-    // Actions
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj instanceof Rook && ((Rook) obj).isFirstMove() == this.firstMove) {
+            return super.equals(obj);
+        } else {
+            return false;
+        }
+    }
+
+    // ----------- Actions -------------
     @Override
     public boolean moveTo(Tile tile) {
         if (super.moveTo(tile)){
@@ -50,7 +61,7 @@ public class Rook extends Piece {
         }
     }
 
-    // Other
+    // ----------- Others -------------
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);

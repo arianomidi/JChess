@@ -1,23 +1,24 @@
 package aomidi.chess.model;
 
-import java.util.HashMap;
-
 import static aomidi.chess.model.Util.*;
 import static java.lang.Math.abs;
 
 public class King extends Piece {
     private boolean firstMove;
 
+    // ----------- Constructor -------------
     public King(Tile tile, Color color, Board board) {
         super(tile, color, board);
         this.firstMove = true;
     }
 
-    //Getters
+    // ----------- Getters -------------
     @Override
     public PieceType getPieceType() { return PieceType.King; }
 
-    // Checkers
+    public boolean isFirstMove(){ return this.firstMove; }
+
+    // ----------- Checkers -------------
     @Override
     public boolean validMove(Tile tile){
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
@@ -92,7 +93,16 @@ public class King extends Piece {
         throw new IllegalArgumentException("Cannot Castle: " + error);
     }
 
-    // Action
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj instanceof King && ((King) obj).isFirstMove() == this.firstMove) {
+            return super.equals(obj);
+        } else {
+            return false;
+        }
+    }
+
+    // ----------- Actions -------------
     @Override
     public boolean moveTo(Tile tile) {
         if (super.moveTo(tile)){
@@ -103,7 +113,7 @@ public class King extends Piece {
         }
     }
 
-    // Other
+    // ----------- Other -------------
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);

@@ -11,7 +11,8 @@ public abstract class Piece {
     private Board board;
     private boolean inPlay;
 
-    // Constructors
+    // ----------- Constructors -------------
+
     public Piece(Tile tile, Color color, Board board) {
         this.tile = tile;
         this.color = color;
@@ -23,16 +24,21 @@ public abstract class Piece {
         }
     }
 
-    // Getters
+    // ----------- Getters -------------
+
     public Tile getPosition(){ return this.tile; }
 
     public Color getColor(){ return this.color; }
 
     public Board getBoard(){ return this.board; }
 
+    public boolean isInPlay() { return this.inPlay; }
+
     public abstract PieceType getPieceType();
 
-    // Action
+    // ----------- Actions -------------
+
+    // If it's a valid move then move piece to new tile and remove from current tile
     public boolean moveTo(Tile tile){
         if (validMove(tile)){
             this.tile.removePiece();
@@ -47,6 +53,7 @@ public abstract class Piece {
         }
     }
 
+    // Overide moveTo for Pawn Attack and Castling
     public boolean moveTo(Tile tile, boolean overide){
         if (overide){
             this.tile.removePiece();
@@ -56,12 +63,11 @@ public abstract class Piece {
             this.tile.setPiece(this);
 
             return true;
-        } else {
-            //throw new IllegalArgumentException("Piece cant move to tile: " + tile);
-            return false;
         }
+        return false;
     }
 
+    // Attack only if its a valid attack
     public boolean attack(Tile tile){
         if (validAttack(tile)){
             tile.getPiece().delete();
@@ -73,13 +79,16 @@ public abstract class Piece {
         }
     }
 
-    // Checkers
+    // ----------- Checkers -------------
+
+    // Valid Attack = Valid Move unless overridden
     public boolean validAttack(Tile tile){
         return validMove(tile);
     }
 
     public abstract boolean validMove(Tile tile);
 
+    // Equals
     public boolean equals(Object obj) {
         if ( obj instanceof Piece && ((Piece) obj).getPosition().equals(this.tile) && ((Piece) obj).getColor() == this.color) {
             return true;
@@ -88,7 +97,8 @@ public abstract class Piece {
         }
     }
 
-    // Others
+    // ----------- Others -------------
+
     public String toString(){
         return this.toSimpleString() + "-" + getColorLetter(this.getColor());
     }
