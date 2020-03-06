@@ -44,6 +44,15 @@ public class Chess {
                 game.setTurn(Util.Color.White);
             }
             this.firstMove = true;
+
+            // Check Case
+            if (board.isChecked(board.getKing(Util.Color.White))){
+                System.out.println("Check: White");
+            }
+            if (board.isChecked(board.getKing(Util.Color.Black))){
+                System.out.println("Check: Black");
+            }
+
         } else {
             System.out.println("\033[0;1m" + "Move Again:" + "\033[0;0m");
         }

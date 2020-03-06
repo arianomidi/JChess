@@ -108,6 +108,17 @@ public class Util {
         }
     }
 
+    public static Color getOpposingColor(Color color){
+        switch (color) {
+            case Black:
+                return Color.White;
+            case White:
+                return Color.Black;
+            default:
+                throw new java.lang.IllegalArgumentException("Illegal Color: " + color);
+        }
+    }
+
     public static String input(String msg){
         System.out.println(msg);
         Scanner scan = new Scanner(System.in);

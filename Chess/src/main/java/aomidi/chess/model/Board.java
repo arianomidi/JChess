@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static aomidi.chess.model.Util.bold;
-import static aomidi.chess.model.Util.intToLetter;
+import static aomidi.chess.model.Util.*;
 import static java.lang.Math.abs;
 
 import aomidi.chess.model.Util.Color;
@@ -23,8 +22,8 @@ public class Board {
         this.allPieces = new ArrayList<Piece>();
         this.blackPieces = new ArrayList<Piece>();
         this.whitePieces = new ArrayList<Piece>();
-
         this.tiles = new HashMap<String, ArrayList<Tile>>();
+
         // Init tiles
         for(int file = 1; file <= 8; file++){
             ArrayList<Tile> row = new ArrayList<Tile>();
@@ -44,7 +43,7 @@ public class Board {
             // Add file to specific letter
             this.tiles.put(intToLetter(file), row);
         }
-
+        // Add Pieces
         this.addStartingPieces();
     }
 
@@ -57,9 +56,12 @@ public class Board {
             addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
             addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
         }
-        // Pawns
-        addPieceAt(new Pawn(getTileAt(7,1), Color.White, this), 7, 1);
-        addPieceAt(new Pawn(getTileAt(7,8), Color.Black, this), 7, 8);
+        // Bishops
+        for (int file = 3; file <= 6; file += 3){
+            addPieceAt(new Bishop(getTileAt(file,1), Color.White, this), file, 1);
+            addPieceAt(new Bishop(getTileAt(file,8), Color.Black, this), file, 8);
+        }
+        addPieceAt(new Bishop(getTileAt("H",4), Color.Black, this), 8, 4);
 //        // Pawns
 //        for(int file = 1; file <= 8; file++){
 //            addPieceAt(new Pawn(getTileAt(file,2), Color.White, this), file, 2);
@@ -106,6 +108,59 @@ public class Board {
     }
 
     public Game getGame() { return game; }
+
+    public King getKing(Color color){
+        if (color == Color.White){
+            for (Piece p : this.whitePieces){
+                if (p instanceof King){
+                    return (King) p;
+                }
+            }
+        } else if (color == Color.Black){
+            for (Piece p : this.blackPieces){
+                if (p instanceof King){
+                    return (King) p;
+                }
+            }
+        }
+
+        throw new NullPointerException("No King found for " + color);
+    }
+
+    public Piece getPieceBetweenTiles(Tile cur_tile, Tile new_tile){
+        int cur_x = cur_tile.getX(), cur_y = cur_tile.getY();
+        int new_x = new_tile.getX(), new_y = new_tile.getY();
+        int diff_x = new_x - cur_x , diff_y = new_y - cur_y;
+
+        boolean existsPiece = false;
+
+        if (diff_x == 0){
+            for (int i = 1; i < abs(diff_y); i++){
+                existsPiece = this.hasPieceAt(cur_x, cur_y + i * Integer.signum(diff_y));
+                if (existsPiece){
+                    return this.getPieceAt(cur_x, cur_y + i * Integer.signum(diff_y));
+                }
+            }
+        } else if (diff_y == 0){
+            for (int i = 1; i < abs(diff_x); i++){
+                existsPiece = this.hasPieceAt(cur_x + i * Integer.signum(diff_x), cur_y);
+                if (existsPiece){
+                    return this.getPieceAt(cur_x + i * Integer.signum(diff_x), cur_y);
+                }
+            }
+        } else if (abs(diff_x) == abs(diff_y)){
+            for (int i = 1; i < abs(diff_x); i++){
+                existsPiece = this.hasPieceAt(cur_x + i * Integer.signum(diff_x), cur_y + i * Integer.signum(diff_y));
+                if (existsPiece){
+                    return this.getPieceAt(cur_x + i * Integer.signum(diff_x), cur_y + i * Integer.signum(diff_y));
+                }
+            }
+        } else {
+            return null;     // Knight's
+        }
+
+        return null;
+    }
 
 //    public HashMap<String, Rook> getRooks(Color color){
 //        HashMap<String, Rook> rooks = new HashMap<String, Rook>();
@@ -198,10 +253,53 @@ public class Board {
         return existsPiece;
     }
 
-    public Color colorOfEnemyPieceAt(Tile tile){
-        Color enemy_color = tile.getPiece().getColor();
-        return enemy_color;
+    public boolean isAttackedFrom(Piece piece, int x_pos, int y_pos){
+        Tile tile = piece.getPosition();
+
+        Piece attacking_piece = getPieceBetweenTiles(tile, getTileAt(x_pos, y_pos));
+        if (attacking_piece == null)
+            attacking_piece = getPieceAt(x_pos, y_pos);
+
+        if (attacking_piece != null && attacking_piece.getColor() == getOpposingColor(piece.getColor())){
+            return attacking_piece.validAttack(tile);
+        }
+
+        return false;
     }
+
+    public boolean isChecked(King king){
+        Tile tile = king.getPosition();
+        int x = tile.getX(), y = tile.getY();
+        Piece piece;
+
+        // Rook Check
+        // From (x,1) -> (x,8) and (1,y) -> (8,y) there is an enemy piece without protection
+        if (isAttackedFrom(king, x, 1))
+            return true;
+        if (isAttackedFrom(king, x, 8))
+            return true;
+        if (isAttackedFrom(king, 1, y))
+            return true;
+        if (isAttackedFrom(king, 8, y))
+            return true;
+
+        // Diagonal Check
+        // If from (x,y) -> (1,y-x+1) and (1,y) -> (8,y) there is an enemy piece without protection
+        if (x <= y){
+            if (isAttackedFrom(king, 1, y-x+1))
+                return true;
+            if (isAttackedFrom(king, x+8-y, 8))
+                return true;
+        } else {
+            if (isAttackedFrom(king, 8, y-x+8))
+                return true;
+            if (isAttackedFrom(king, x+1-y, 1))
+                return true;
+        }
+
+        return false;
+    }
+
 
     public boolean hasPieceAt(Integer x, Integer y){
         return (getPieceAt(x, y) != null);
