@@ -16,7 +16,8 @@ public class Board {
     private ArrayList<Piece> blackPieces;
     private ArrayList<Piece> whitePieces;
 
-    // Constructors
+    // ----------- Constructors -------------
+
     public Board(Game game){
         this.game = game;
         this.allPieces = new ArrayList<Piece>();
@@ -48,21 +49,6 @@ public class Board {
     }
 
     public void addStartingPieces(){
-//        // Kings
-//        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
-//        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
-//        // Rooks
-//        for (int file = 1; file <= 8; file += 7){
-//            addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
-//            addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
-//        }
-//        // Bishops
-//        for (int file = 3; file <= 6; file += 3){
-//            addPieceAt(new Bishop(getTileAt(file,1), Color.White, this), file, 1);
-//            addPieceAt(new Bishop(getTileAt(file,8), Color.Black, this), file, 8);
-//        }
-//        addPieceAt(new Bishop(getTileAt("H",4), Color.Black, this), 8, 4);
-        // Pawns
         for(int file = 1; file <= 8; file++){
             addPieceAt(new Pawn(getTileAt(file,2), Color.White, this), file, 2);
             addPieceAt(new Pawn(getTileAt(file,7), Color.Black, this), file, 7);
@@ -90,7 +76,25 @@ public class Board {
         addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
     }
 
-    // Getters
+    public void addTestingPieces(){
+        // Kings
+        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
+        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
+        // Rooks
+        for (int file = 1; file <= 8; file += 7){
+            addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
+            addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
+        }
+        // Bishops
+        for (int file = 3; file <= 6; file += 3){
+            addPieceAt(new Bishop(getTileAt(file,1), Color.White, this), file, 1);
+            addPieceAt(new Bishop(getTileAt(file,8), Color.Black, this), file, 8);
+        }
+        addPieceAt(new Bishop(getTileAt("H",4), Color.Black, this), 8, 4);
+    }
+
+    // ----------- Getters -------------
+
     public Tile getTileAt(String file, Integer rank){
         return this.tiles.get(file).get(rank - 1);
     }
@@ -162,39 +166,8 @@ public class Board {
         return null;
     }
 
-//    public HashMap<String, Rook> getRooks(Color color){
-//        HashMap<String, Rook> rooks = new HashMap<String, Rook>();
-//
-//        if (color == Color.White){
-//            if(hasPieceAt("A", 1)){
-//                Piece p = getPieceAt("A", 1);
-//                if (p instanceof Rook){
-//                    rooks.put("long", (Rook) p);
-//                }
-//            } else if (hasPieceAt("H", 1)){
-//                Piece p = getPieceAt("H", 1);
-//                if (p instanceof Rook){
-//                    rooks.put("short", (Rook) p);
-//                }
-//            }
-//        } else if (color == Color.Black){
-//            if(hasPieceAt("A", 8)){
-//                Piece p = getPieceAt("A", 8);
-//                if (p instanceof Rook){
-//                    rooks.put("long", (Rook) p);
-//                }
-//            } else if (hasPieceAt("H", 8)){
-//                Piece p = getPieceAt("H", 8);
-//                if (p instanceof Rook){
-//                    rooks.put("short", (Rook) p);
-//                }
-//            }
-//        }
-//
-//        return rooks;
-//    }
+    // ----------- Setters -------------
 
-    // Setters
     public boolean addPieceAt(Piece piece, String x, Integer y){
         // Add to arrays
         allPieces.add(piece);
@@ -217,7 +190,16 @@ public class Board {
         return addPieceAt(piece, intToLetter(x), y);
     }
 
-    // Checkers
+    // ----------- Checkers -------------
+
+    public boolean hasPieceAt(Integer x, Integer y){
+        return (getPieceAt(x, y) != null);
+    }
+
+    public boolean hasPieceAt(String x, Integer y){
+        return (getPieceAt(x, y) != null);
+    }
+
     public boolean hasPieceBetweenTiles(Tile cur_tile, Tile new_tile){
         int cur_x = cur_tile.getX(), cur_y = cur_tile.getY();
         int new_x = new_tile.getX(), new_y = new_tile.getY();
@@ -300,16 +282,8 @@ public class Board {
         return false;
     }
 
+    // ----------- Others -------------
 
-    public boolean hasPieceAt(Integer x, Integer y){
-        return (getPieceAt(x, y) != null);
-    }
-
-    public boolean hasPieceAt(String x, Integer y){
-        return (getPieceAt(x, y) != null);
-    }
-
-    // Others
     public String toString(){
         String string = "";
 
@@ -351,7 +325,7 @@ public class Board {
                         string += getTileAt(file, 9 - rank).toSymbol(column);
                     } else {
                         if (column == 3){
-                            string += bold("   " + rank);
+                            string += bold("   " + (9 - rank));
                         }
                     }
                 }

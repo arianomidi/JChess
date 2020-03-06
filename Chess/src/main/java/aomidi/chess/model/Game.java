@@ -12,6 +12,7 @@ public class Game {
     private Player blackPlayer;
     private Color turn;
 
+    // ----------- Constructors -------------
     public Game(Chess chess){
         this.chess = chess;
         this.whitePlayer = new Player(Color.White, this);
@@ -20,7 +21,8 @@ public class Game {
         this.turn = Color.White;
     }
 
-    // Getters
+    // ----------- Getters -------------
+
     public Chess getChess() { return chess; }
 
     public Board getBoard() { return board; }
@@ -31,11 +33,14 @@ public class Game {
 
     public Color getTurn() { return turn; }
 
-    // Setters
+    // ----------- Setters -------------
+
     public void setTurn(Color color){ this.turn = color; }
 
-    // Checkers
+    // ----------- Checkers -------------
+
     public boolean validMove(Piece piece, Tile new_tile){
+        // If there is no piece between cur_piece and new tile then it can be moved
         boolean isPieceBlocking = board.hasPieceBetweenTiles(piece.getPosition(), new_tile);
 
         if (isPieceBlocking)
@@ -48,6 +53,7 @@ public class Game {
         Piece pieceOnTile = board.getPieceAt(new_tile.getX(), new_tile.getY());
         boolean canReachTile = validMove(piece, new_tile);
 
+        // If there is no piece between cur_piece and new_tile and the piece on new_tile is of opposite color then call attack
         if (canReachTile) {
             if (pieceOnTile.getColor() == piece.getColor()) {
                 throw new IllegalArgumentException("There is already a "+ piece.getColor() + " piece on " + new_tile);
@@ -59,11 +65,11 @@ public class Game {
         }
     }
 
-    // Action
+    // ----------- Action -------------
     public boolean move(Piece piece, Tile new_tile){
         boolean hasPieceOnTile = board.hasPieceAt(new_tile.getX(), new_tile.getY());
 
-        // Attack or Move
+        // Test attack if there's a piece on the tile, else test moveTo
         if (hasPieceOnTile){
             if (validAttack(piece, new_tile)){
                 return true;

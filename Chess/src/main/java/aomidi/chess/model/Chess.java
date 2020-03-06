@@ -8,9 +8,10 @@ import static aomidi.chess.model.Util.letterToInt;
 public class Chess {
     private Game game;
     private Board board;
-    private King king;
     private String error;
     private boolean firstMove;
+
+    // ----------- Constructors -------------
 
     public Chess(){
         this.game = new Game(this);
@@ -19,10 +20,12 @@ public class Chess {
         this.firstMove = true;
     }
 
-    // Getters
+    // ----------- Getters -------------
+
     public Game getGame() { return game; }
 
-    // Functions
+    // ----------- Actions -------------
+
     public void movePiece(){
         boolean pieceMoved = false;
         try {
@@ -58,7 +61,8 @@ public class Chess {
         }
     }
 
-    // Checkers
+    // ----------- Checkers -------------
+
     public Piece testPieceInput(String piece_moved){
         int cur_x = letterToInt(String.valueOf(piece_moved.charAt(1)));
         int cur_y = piece_moved.charAt(2) - '0';
@@ -100,8 +104,5 @@ public class Chess {
             return move_tile;
         }
     }
-
-
-
 
 }
