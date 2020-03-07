@@ -13,7 +13,7 @@ public class Chess {
     // ----------- Constructors -------------
 
     public Chess(){
-        this.test = false;
+        this.test = true;
 
         this.game = new Game(this);
         this.error = "";

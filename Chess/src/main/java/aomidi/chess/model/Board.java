@@ -45,7 +45,8 @@ public class Board {
             this.tiles.put(intToLetter(file), row);
         }
         // Add Pieces
-        this.addStartingPieces();
+        //this.addStartingPieces();
+        addTestingPieces();
     }
 
     public void addStartingPieces(){
@@ -77,20 +78,11 @@ public class Board {
     }
 
     public void addTestingPieces(){
-        // Kings
-        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
-        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
-        // Rooks
-        for (int file = 1; file <= 8; file += 7){
-            addPieceAt(new Rook(getTileAt(file,1), Color.White, this), file, 1);
-            addPieceAt(new Rook(getTileAt(file,8), Color.Black, this), file, 8);
+        // Knights
+        for (int file = 1; file <= 8; file += 2){
+            addPieceAt(new Knight(getTileAt(file,2), Color.White, this), file, 2);
+            addPieceAt(new Knight(getTileAt(file,7), Color.Black, this), file, 7);
         }
-        // Bishops
-        for (int file = 3; file <= 6; file += 3){
-            addPieceAt(new Bishop(getTileAt(file,1), Color.White, this), file, 1);
-            addPieceAt(new Bishop(getTileAt(file,8), Color.Black, this), file, 8);
-        }
-        addPieceAt(new Bishop(getTileAt("H",4), Color.Black, this), 8, 4);
     }
 
     // ----------- Getters -------------
@@ -129,6 +121,24 @@ public class Board {
         }
 
         throw new NullPointerException("No King found for " + color);
+    }
+
+    public ArrayList<Piece> getPiecesOfType (PieceType type, Color color){
+        ArrayList<Piece> return_pieces = new ArrayList<>();
+        ArrayList<Piece> pieces;
+
+        if (color == Color.White)
+            pieces = whitePieces;
+        else
+            pieces = blackPieces;
+
+        for (Piece p : pieces){
+            if (p.getPieceType() == type){
+                return_pieces.add(p);
+            }
+        }
+
+        return return_pieces;
     }
 
     public Piece getPieceBetweenTiles(Tile cur_tile, Tile new_tile){
@@ -188,6 +198,19 @@ public class Board {
 
     public boolean addPieceAt(Piece piece, Integer x, Integer y){
         return addPieceAt(piece, intToLetter(x), y);
+    }
+
+    public void removePieceAt(Tile tile){
+        if (tile.hasPiece()){
+            Color color = tile.getPiece().getColor();
+
+            if (color == Color.White){
+                this.whitePieces.remove(tile.getPiece());
+            } else {
+                this.blackPieces.remove(tile.getPiece());
+            }
+            this.allPieces.remove(tile.getPiece());
+        }
     }
 
     // ----------- Checkers -------------

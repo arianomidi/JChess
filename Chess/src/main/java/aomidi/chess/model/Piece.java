@@ -110,6 +110,8 @@ public abstract class Piece {
     public abstract String toSymbol(int column);
 
     public void delete(){
+        // remove piece from tile and board
+        this.board.removePieceAt(this.tile);
         this.tile.removePiece();
 
         this.inPlay = false;

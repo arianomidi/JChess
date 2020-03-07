@@ -1,24 +1,37 @@
 package aomidi.chess.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Move {
     private Game game;
     private Board board;
     private Util.Color player;
+    private Map<String, Object> move;
 
     // ----------- Constructors -------------
-    public Move(Util.Color player, Game game){
+    public Move(Map<String, Object> move, Util.Color player, Game game){
         this.game = game;
         this.board = game.getBoard();
         this.player = player;
+        this.move = move;
     }
 
     // ----------- Getters -------------
 
     public Util.Color getPlayerTurn() { return this.player; }
 
+    public Map<String, Object> getMove() {
+        return move;
+    }
+
     // ----------- Setters -------------
 
     public void setPlayerTurn(Util.Color color){ this.player = color; }
+
+    public void setMove(Map<String, Object> move) {
+        this.move = move;
+    }
 
     // ----------- Checkers -------------
 
@@ -50,7 +63,9 @@ public class Move {
 
     // ----------- Action -------------
 
-    public boolean move(Piece piece, Tile new_tile){
+    public boolean move(){
+        Piece piece = (Piece) move.get("piece");
+        Tile new_tile = (Tile) move.get("tile");
         boolean hasPieceOnTile = board.hasPieceAt(new_tile.getX(), new_tile.getY());
 
         // Test attack if there's a piece on the tile, else test moveTo
@@ -67,6 +82,15 @@ public class Move {
                 return false;
             }
         }
+    }
+
+    public boolean move(Piece piece, Tile tile){
+        Map<String, Object> new_move = new HashMap<>();
+        new_move.put("piece", piece);
+        new_move.put("tile", tile);
+        setMove(new_move);
+
+        return move();
     }
 
 }

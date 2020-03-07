@@ -120,14 +120,34 @@ public class Util {
         }
     }
 
+    // ----------- Checkers -------------
+
+    public static boolean isFile(Character s){
+        s = Character.toUpperCase(s);
+        switch (s){
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+                return true;
+            default:
+                return false;
+        }
+    }
+
+
+    // ---------- String Manipulation ------------
+
     public static String input(String msg){
         System.out.println(msg);
         Scanner scan = new Scanner(System.in);
         String input = scan.nextLine();
         return input;
     }
-
-    // ---------- String Manipulation ------------
 
     public static String bold(String string){
         return "\033[0;1m" + string + "\033[0;0m";
