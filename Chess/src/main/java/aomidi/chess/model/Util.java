@@ -139,6 +139,13 @@ public class Util {
         }
     }
 
+    public static boolean isRank(Character c){
+        if ('0' < c && c <= '8')
+            return true;
+        else
+            return false;
+    }
+
 
     // ---------- String Manipulation ------------
 

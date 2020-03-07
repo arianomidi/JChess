@@ -83,6 +83,9 @@ public class Board {
             addPieceAt(new Knight(getTileAt(file,2), Color.White, this), file, 2);
             addPieceAt(new Knight(getTileAt(file,7), Color.Black, this), file, 7);
         }
+        // King
+        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
+        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
     }
 
     // ----------- Getters -------------
@@ -137,6 +140,70 @@ public class Board {
                 return_pieces.add(p);
             }
         }
+
+        return return_pieces;
+    }
+
+    public ArrayList<Piece> getPiecesOfType (PieceType type, Character specified_char, Color color){
+        ArrayList<Piece> return_pieces = new ArrayList<>();
+        ArrayList<Piece> pieces = getPiecesOfType(type, color);
+
+        for (Piece p : pieces) {
+            if (p.getPieceType() == type){
+                if (isFile(specified_char) && p.getPosition().getX() == letterToInt(String.valueOf(specified_char))) {
+                    return_pieces.add(p);
+                } else if (isRank(specified_char) && p.getPosition().getY() == Integer.parseInt(String.valueOf(specified_char))) {
+                    return_pieces.add(p);
+                }
+            }
+        }
+        // If no Piece was found throw exception
+        if (return_pieces.size() == 0)
+            throw new IllegalArgumentException("Invalid Input");
+
+        return return_pieces;
+    }
+
+    public ArrayList<Piece> getPiecesOfTypeCanMoveTo (PieceType type, Color color, Tile tile){
+        ArrayList<Piece> return_pieces = new ArrayList<>();
+        ArrayList<Piece> pieces = getPiecesOfType(type, color);
+        Class piece_class;
+
+        // If no Piece was found throw exception
+        if (pieces.size() == 0)
+            throw new IllegalArgumentException("Invalid Input");
+        else
+            piece_class = pieces.get(0).getClass();
+
+        for (Piece p : pieces){
+            if (p.validMove(tile)){
+                return_pieces.add(p);
+            }
+        }
+
+        // If no Piece was found throw exception
+        if (return_pieces.size() == 0)
+            throw new IllegalArgumentException("Invalid Move: No " + type + " can reach " + tile);
+
+        return return_pieces;
+    }
+
+    public ArrayList<Piece> getPiecesOfTypeCanMoveTo (PieceType type, Character specified_char, Color color, Tile tile){
+        ArrayList<Piece> return_pieces = new ArrayList<>();
+        ArrayList<Piece> pieces = getPiecesOfTypeCanMoveTo(type, color, tile);
+
+        for (Piece p : pieces) {
+            if (p.getPieceType() == type){
+                if (isFile(specified_char) && p.getPosition().getX() == letterToInt(String.valueOf(specified_char))) {
+                    return_pieces.add(p);
+                } else if (isRank(specified_char) && p.getPosition().getY() == Integer.parseInt(String.valueOf(specified_char))) {
+                    return_pieces.add(p);
+                }
+            }
+        }
+        // If no Piece was found throw exception
+        if (return_pieces.size() == 0)
+            throw new IllegalArgumentException("Invalid Input");
 
         return return_pieces;
     }
