@@ -8,12 +8,14 @@ import static aomidi.chess.model.Util.letterToInt;
 public class Chess {
     private Game game;
     private boolean test;
+    private boolean flipBoard;
     private String error;
 
     // ----------- Constructors -------------
 
     public Chess(){
-        this.test = true;
+        this.test = false;
+        this.flipBoard = true;
 
         this.game = new Game(this);
         this.error = "";
@@ -25,6 +27,10 @@ public class Chess {
 
     public boolean isTest() {
         return test;
+    }
+
+    public boolean flipBoardSelected() {
+        return flipBoard;
     }
 
     // ----------- Main -------------

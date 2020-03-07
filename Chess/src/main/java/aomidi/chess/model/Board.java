@@ -45,8 +45,8 @@ public class Board {
             this.tiles.put(intToLetter(file), row);
         }
         // Add Pieces
-        //this.addStartingPieces();
-        addTestingPieces();
+        this.addStartingPieces();
+        //addTestingPieces();
     }
 
     public void addStartingPieces(){
@@ -78,10 +78,10 @@ public class Board {
     }
 
     public void addTestingPieces(){
-        // Knights
+        // Bishops
         for (int file = 1; file <= 8; file += 2){
-            addPieceAt(new Knight(getTileAt(file,2), Color.White, this), file, 2);
-            addPieceAt(new Knight(getTileAt(file,7), Color.Black, this), file, 7);
+            addPieceAt(new Bishop(getTileAt(file,2), Color.White, this), file, 2);
+            addPieceAt(new Bishop(getTileAt(file,7), Color.Black, this), file, 7);
         }
         // King
         addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
@@ -407,7 +407,7 @@ public class Board {
     }
 
     public String toSymbol(){
-        String string = "   ________________________________________________________________________________________________\n";
+        String string = "  " + underline("                                                                                                \n");
 
         for(int rank = 1; rank <= 8; rank++){
 
@@ -428,6 +428,34 @@ public class Board {
         }
         string += bold("\n       A           B           C           D           E           F           G           H\n");
         return string;
+    }
+
+    public String toSymbol(Color color){
+        if (color == Color.White){
+            return this.toSymbol();
+        } else {
+            String string = "  " + underline("                                                                                                \n");
+
+            for (int rank = 1; rank <= 8; rank++) {
+
+                for (int column = 1; column <= 6; column++) {
+                    for (int file = 0; file <= 9; file++) {
+                        if (file == 0) {
+                            string += " |";
+                        } else if (file != 9) {
+                            string += getTileAt(9 - file, rank).toSymbol(column);
+                        } else {
+                            if (column == 3) {
+                                string += bold("   " + (rank));
+                            }
+                        }
+                    }
+                    string += "\n";
+                }
+            }
+            string += bold("\n       H           G           F           E           D           C           B           A\n");
+            return string;
+        }
     }
 
 }

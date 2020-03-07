@@ -176,4 +176,15 @@ public class Util {
         return s;
     }
 
+    public static void sleep(int time){
+        try
+        {
+            Thread.sleep(time);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 }

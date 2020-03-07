@@ -14,6 +14,7 @@ import static aomidi.chess.model.Util.isFile;
 public class Game {
     private Chess chess;
     private List<Move> movesList;
+    private int numMoves;
     private Board board;
     private Player whitePlayer;
     private Player blackPlayer;
@@ -25,6 +26,7 @@ public class Game {
         this.chess = chess;
         this.board = new Board(this);
         this.movesList = new ArrayList<Move>();
+        this.numMoves = 1;
 
         this.whitePlayer = new Player(Color.White, this);
         this.blackPlayer = new Player(Color.Black, this);
@@ -120,7 +122,7 @@ public class Game {
     }
 
     // Return false if pieces cant move to same square
-    public boolean hasAmbiguousMoves(List<Piece> pieces, String tile) throws Exception {
+    public boolean hasAmbiguousMoves(List<Piece> pieces, String tile) throws IllegalArgumentException {
         String error = "";
 
         // Check if pieces is empty
@@ -149,69 +151,41 @@ public class Game {
 
     // ----------- Inputs -------------
 
-    public Piece testPieceInput(String piece_moved) throws Exception {
-        if (piece_moved.toLowerCase().compareTo("resign") == 0) {
-            gameOver = true;
-            throw new Exception(curPlayer.getColor() + " Resigns");
-        }
-
-        int cur_x = letterToInt(String.valueOf(piece_moved.charAt(1)));
-        int cur_y = piece_moved.charAt(2) - '0';
-        Piece piece = this.board.getPieceAt(cur_x, cur_y);
-
-        // Throw Errors before testing
-        if (piece == null) {
-            throw new NullPointerException(piece_moved + " does not exist");
-        }
-        if (piece.getColor() != curPlayer.getColor()) {
-            throw new IllegalArgumentException("You cannot move a " + piece.getColor() + " piece");
-        }
-
-        return piece;
-    }
-
-    public Tile testTileInput(String new_tile) {
-        Tile move_tile;
-        // Test if castle was init else treat like regular move
-        if (new_tile.toUpperCase().compareTo("O-O") == 0) {
-            if (curPlayer.getColor() == Util.Color.White)
-                move_tile = board.getTileAt(7, 1);
-            else
-                move_tile = board.getTileAt(7, 8);
-        } else if (new_tile.toUpperCase().compareTo("O-O-O") == 0) {
-            if (curPlayer.getColor() == Util.Color.White)
-                move_tile = board.getTileAt(3, 1);
-            else
-                move_tile = board.getTileAt(3, 8);
-        } else {
-            int new_x = letterToInt(String.valueOf(new_tile.charAt(0)));
-            int new_y = new_tile.charAt(1) - '0';
-            move_tile = board.getTileAt(new_x, new_y);
-        }
-
-        if (move_tile == null) {
-            throw new NullPointerException("Tile " + new_tile + " does not exist");
-        } else {
-            return move_tile;
-        }
-    }
-
     public Map<String, Object> getMoveInput(String string) throws Exception {
         Map<String, Object> move = new HashMap<>();
+        Tile move_tile;
+        Piece piece;
 
-        // Case: Resign
-        if (string.toLowerCase().compareTo("resign") == 0) {
-            gameOver = true;
-            throw new Exception(curPlayer.getColor() + " Resigns");
+        switch (string.toUpperCase()){
+            case "EXIT":
+                gameOver = true;
+                throw new Exception("Exit Game");
+            case "RESIGN":
+                gameOver = true;
+                throw new Exception(curPlayer.getColor() + " Resigns");
+            case "O-O":
+                if (curPlayer.getColor() == Util.Color.White)
+                    move_tile = board.getTileAt(7, 1);
+                else
+                    move_tile = board.getTileAt(7, 8);
+                piece = board.getKing(curPlayer.getColor());
+                break;
+            case "O-O-O":
+                if (curPlayer.getColor() == Util.Color.White)
+                    move_tile = board.getTileAt(3, 1);
+                else
+                    move_tile = board.getTileAt(3, 8);
+                piece = board.getKing(curPlayer.getColor());
+                break;
+            default:
+                // Get Move to Tile and Piece
+                move_tile = getInputtedTile(string);
+                piece = getInputtedPiece(string, move_tile);
+
+                // Throw Errors before testing
+                if (piece.getColor() != curPlayer.getColor())
+                    throw new IllegalArgumentException("You cannot move a " + piece.getColor() + " piece");
         }
-
-        // Get Move to Tile and Piece
-        Tile move_tile = getInputtedTile(string);
-        Piece piece = getInputtedPiece(string, move_tile);
-
-        // Throw Errors before testing
-        if (piece.getColor() != curPlayer.getColor())
-            throw new IllegalArgumentException("You cannot move a " + piece.getColor() + " piece");
 
         move.put("piece", piece);
         move.put("tile", move_tile);
@@ -221,8 +195,8 @@ public class Game {
     public Piece getInputtedPiece(String string, Tile move_tile) throws Exception {
         Piece piece;
 
-        // Pawn Case:
-        if (isFile(string.charAt(0))) {
+        // Pawn Case: string length is 2 or 3 containing x
+        if (isFile(string.charAt(0)) && (string.length() == 2) || (string.length() == 4 && string.contains("x"))) {
             int dir = -1;
             if (curPlayer.getColor() == Color.White)
                 dir = 1;
@@ -242,10 +216,9 @@ public class Game {
                 }
             }
         }
-
         // Knight Case:
-        else if (Character.toUpperCase(string.charAt(0)) == 'N') {
-            List<Piece> valid_knights = new ArrayList<>();
+        if (Character.toUpperCase(string.charAt(0)) == 'N') {
+            List<Piece> valid_knights;
 
             // Simple Move or Take
             if (string.length() == 3 || (string.length() == 4 && Character.toLowerCase(string.charAt(1)) == 'x')) {
@@ -267,13 +240,13 @@ public class Game {
             }
         }
         // Bishop Case:
-        else if (Character.toUpperCase(string.charAt(0)) == 'B') {
-            List<Piece> valid_bishops = new ArrayList<>();
+        if (Character.toUpperCase(string.charAt(0)) == 'B') {
+            List<Piece> valid_bishops;
 
             // Simple Move or Take
             if (string.length() == 3 || (string.length() == 4 && Character.toLowerCase(string.charAt(1)) == 'x')) {
                 // Valid Bishops
-                valid_bishops = board.getPiecesOfTypeCanMoveTo(PieceType.Knight, curPlayer.getColor(), move_tile);
+                valid_bishops = board.getPiecesOfTypeCanMoveTo(PieceType.Bishop, curPlayer.getColor(), move_tile);
 
                 // Check for Ambiguous Moves
                 if (!hasAmbiguousMoves(valid_bishops, string.substring(string.length() - 2))) ;
@@ -282,15 +255,52 @@ public class Game {
             // Specified Move or Take
             else if (string.length() == 4 || (string.length() == 5 && Character.toLowerCase(string.charAt(2)) == 'x')) {
                 Character specified_char = Character.toLowerCase(string.charAt(1));
-                valid_bishops = board.getPiecesOfTypeCanMoveTo(PieceType.Knight, specified_char, curPlayer.getColor(), move_tile);
+                valid_bishops = board.getPiecesOfTypeCanMoveTo(PieceType.Bishop, specified_char, curPlayer.getColor(), move_tile);
 
                 // Check for Ambiguous Moves
                 if (!hasAmbiguousMoves(valid_bishops, string.substring(string.length() - 2))) ;
                 return valid_bishops.get(0);
             }
         }
+        // Queen Case:
+        if (Character.toUpperCase(string.charAt(0)) == 'Q') {
+            List<Piece> valid_queen;
 
-        throw new IllegalArgumentException("Invalid Move");
+            // Simple Move or Take
+            if (string.length() == 3 || (string.length() == 4 && Character.toLowerCase(string.charAt(1)) == 'x')) {
+                // Valid Bishops
+                valid_queen = board.getPiecesOfTypeCanMoveTo(PieceType.Queen, curPlayer.getColor(), move_tile);
+
+                // Check for Ambiguous Moves
+                if (!hasAmbiguousMoves(valid_queen, string.substring(string.length() - 2))) ;
+                return valid_queen.get(0);
+            }
+            // Specified Move or Take
+            else if (string.length() == 4 || (string.length() == 5 && Character.toLowerCase(string.charAt(2)) == 'x')) {
+                Character specified_char = Character.toLowerCase(string.charAt(1));
+                valid_queen = board.getPiecesOfTypeCanMoveTo(PieceType.Queen, specified_char, curPlayer.getColor(), move_tile);
+
+                // Check for Ambiguous Moves
+                if (!hasAmbiguousMoves(valid_queen, string.substring(string.length() - 2))) ;
+                return valid_queen.get(0);
+            }
+        }
+        // King Case:
+        if (Character.toUpperCase(string.charAt(0)) == 'K') {
+            List<Piece> valid_king;
+
+            // Move or Take
+            if (string.length() == 3 || (string.length() == 4 && Character.toLowerCase(string.charAt(1)) == 'x')) {
+                // Valid Bishops
+                valid_king = board.getPiecesOfTypeCanMoveTo(PieceType.King, curPlayer.getColor(), move_tile);
+
+                // Check for Ambiguous Moves
+                if (!hasAmbiguousMoves(valid_king, string.substring(string.length() - 2))) ;
+                return valid_king.get(0);
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid Input");
     }
 
     public Tile getInputtedTile (String string){
@@ -323,7 +333,7 @@ public class Game {
                 System.out.println("\033[0;1m" + "Move Again:" + "\033[0;0m");
             }
             // Try to move to piece
-            Move move = new Move(getMoveInput(input(" * Select Piece: ")), curPlayer.getColor(), this);
+            Move move = new Move(getMoveInput(input(" * Enter Move: ")), curPlayer.getColor(), this);
             pieceMoved = move.move();
 
             //pieceMoved = move.move(testPieceInput(input(" * Select Piece: ")), testTileInput(input(" * Move to: ")));
@@ -352,6 +362,7 @@ public class Game {
 
         while (!isGameOver()) {
             if (pieceMoved) {
+                this.numMoves += 1;
                 printBoard();
                 // Reset players moves
                 curPlayer.setFirstMove(true);
@@ -371,14 +382,24 @@ public class Game {
         System.out.println("\033[0;1m" + "Game Over: " + getWinner() + " Wins" + "\033[0;0m");
     }
 
-
     // ----------- Others -------------
 
     private void printBoard() {
         if (!this.chess.isTest())
-            System.out.println(this.board.toSymbol());
+            if (this.chess.flipBoardSelected()) {
+                System.out.println(this.board.toSymbol(curPlayer.getColor()));
+                if (numMoves != 1) {
+                    System.out.print("\n\n");
+                    sleep(1500);
+                    System.out.print("\n\n\n");
+                    System.out.println(this.board.toSymbol(getOpposingPlayer().getColor()));
+                }
+            }
+            else
+                System.out.println(this.board.toSymbol());
         else
             System.out.println(this.board.toString());
     }
+
 }
 
