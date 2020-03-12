@@ -82,9 +82,9 @@ public class Queen extends Piece{
                 }
             case 6:
                 if (this.getColor() == Util.Color.White) {
-                    return replaceString(string, boldAndUnderline("{   }") + "\033[0;4m   |\033[0;0m", 10, string.length());
+                    return replaceString(string, bold("{___}") + "\033[4m", 8, 12);
                 } else {
-                    return replaceString(string, boldAndUnderline("{/X\\}") + "\033[0;4m   |\033[0;0m", 10, string.length());
+                    return replaceString(string, bold("{") + boldAndUnderline("/X\\")+ bold("}") + "\033[4m", 8, 12);
                 }
             default:
                 throw new IllegalArgumentException("Column out of range: " + column);

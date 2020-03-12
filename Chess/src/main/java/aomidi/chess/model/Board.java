@@ -46,7 +46,7 @@ public class Board {
         }
         // Add Pieces
         this.addStartingPieces();
-        //addTestingPieces();
+        //this.addTestingPieces();
     }
 
     public void addStartingPieces(){
@@ -243,6 +243,10 @@ public class Board {
         return null;
     }
 
+//    public ArrayList<Tile> getTilesBetween(Piece p1, Piece p2){
+//
+//    }
+
     // ----------- Setters -------------
 
     public boolean addPieceAt(Piece piece, String x, Integer y){
@@ -325,6 +329,10 @@ public class Board {
         return existsPiece;
     }
 
+    public boolean isAttacking(Piece piece1, Piece piece2){
+        return !hasPieceBetweenTiles(piece1.getPosition(), piece2.getPosition()) && piece1.validMove(piece2.getPosition());
+    }
+
     public boolean isAttackedFrom(Piece piece, int x_pos, int y_pos){
         Tile tile = piece.getPosition();
 
@@ -340,37 +348,53 @@ public class Board {
     }
 
     public boolean isChecked(King king){
-        Tile tile = king.getPosition();
-        int x = tile.getX(), y = tile.getY();
-        Piece piece;
+        ArrayList<Piece> attacking_pieces;
+        if (king.getColor() == Color.White)
+            attacking_pieces = blackPieces;
+        else
+            attacking_pieces = whitePieces;
 
-        // Rook Check
-        // From (x,1) -> (x,8) and (1,y) -> (8,y) there is an enemy piece without protection
-        if (isAttackedFrom(king, x, 1))
-            return true;
-        if (isAttackedFrom(king, x, 8))
-            return true;
-        if (isAttackedFrom(king, 1, y))
-            return true;
-        if (isAttackedFrom(king, 8, y))
-            return true;
-
-        // Diagonal Check
-        // If from (x,y) -> (1,y-x+1) and (1,y) -> (8,y) there is an enemy piece without protection
-        if (x <= y){
-            if (isAttackedFrom(king, 1, y-x+1))
+        for (Piece p: attacking_pieces){
+            if (isAttacking(p, king) == true){
                 return true;
-            if (isAttackedFrom(king, x+8-y, 8))
-                return true;
-        } else {
-            if (isAttackedFrom(king, 8, y-x+8))
-                return true;
-            if (isAttackedFrom(king, x+1-y, 1))
-                return true;
+            }
         }
 
         return false;
     }
+
+//    public boolean isChecked(King king){
+//        Tile tile = king.getPosition();
+//        int x = tile.getX(), y = tile.getY();
+//        Piece piece;
+//
+//        // Rook Check
+//        // From (x,1) -> (x,8) and (1,y) -> (8,y) there is an enemy piece without protection
+//        if (isAttackedFrom(king, x, 1))
+//            return true;
+//        if (isAttackedFrom(king, x, 8))
+//            return true;
+//        if (isAttackedFrom(king, 1, y))
+//            return true;
+//        if (isAttackedFrom(king, 8, y))
+//            return true;
+//
+//        // Diagonal Check
+//        // If from (x,y) -> (1,y-x+1) and (1,y) -> (8,y) there is an enemy piece without protection
+//        if (x <= y){
+//            if (isAttackedFrom(king, 1, y-x+1))
+//                return true;
+//            if (isAttackedFrom(king, x+8-y, 8))
+//                return true;
+//        } else {
+//            if (isAttackedFrom(king, 8, y-x+8))
+//                return true;
+//            if (isAttackedFrom(king, x+1-y, 1))
+//                return true;
+//        }
+//
+//        return false;
+//    }
 
     public boolean isChecked(Player player){
         return isChecked(getKing(player.getColor()));
@@ -407,7 +431,7 @@ public class Board {
     }
 
     public String toSymbol(){
-        String string = "  " + underline("                                                                                                \n");
+        String string = Chess.getBoardColor() + "  " + underline("                                                                                                \n");
 
         for(int rank = 1; rank <= 8; rank++){
 
@@ -434,7 +458,7 @@ public class Board {
         if (color == Color.White){
             return this.toSymbol();
         } else {
-            String string = "  " + underline("                                                                                                \n");
+            String string = Chess.getBoardColor() + "  " + underline("                                                                                                \n");
 
             for (int rank = 1; rank <= 8; rank++) {
 

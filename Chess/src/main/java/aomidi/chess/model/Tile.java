@@ -79,14 +79,14 @@ public class Tile {
             case 4:
             case 5:
                 if (this.getColor() == Color.White)
-                    return "           |";
+                    return Chess.getBoardColor() + "           |";
                 else
-                    return " / / / / / |";
+                    return Chess.getBoardColor() + " / / / / / |";
             case 6:
                 if (this.getColor() == Color.White)
-                    return underline("           |");
+                    return Chess.getBoardColor() + underline("           |");
                 else
-                    return underline(" / / / / / |");
+                    return Chess.getBoardColor() + underline(" / / / / / |");
             default:
                 throw new IllegalArgumentException("Column out of range: " + column);
         }

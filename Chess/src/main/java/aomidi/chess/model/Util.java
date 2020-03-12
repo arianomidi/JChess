@@ -157,23 +157,23 @@ public class Util {
     }
 
     public static String bold(String string){
-        return "\033[0;1m" + string + "\033[0;0m";
+        return "\033[0;1m" + string + Chess.getBoardColor();
     }
 
     public static String underline(String string){
-        return "\033[0;4m" + string + "\033[0;0m";
+        return "\033[4m" + string + Chess.getBoardColor();
     }
 
     public static String boldAndUnderline(String string){
-        return"\033[1;4m" + string + "\033[0;0m";
+        return "\033[0m\033[1;4m" + string + Chess.getBoardColor();
     }
 
     public static String replaceString(String string, String substring, int from, int to){
         int strlen = string.length();
-        String s1 = string.substring(0, from - 1);
-        String s2 = string.substring(to, strlen);
+        String s1 = string.substring(0, from - 1 + Chess.getLen());
+        String s2 = string.substring(to + Chess.getLen(), strlen);
         String s = s1 + substring + s2;
-        return s;
+        return s + Chess.getBoardColor();
     }
 
     public static void sleep(int time){
