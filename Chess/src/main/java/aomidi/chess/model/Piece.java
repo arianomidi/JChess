@@ -19,8 +19,8 @@ public abstract class Piece {
         this.board = board;
         this.inPlay = true;
 
-        if (!this.tile.setPiece(this)) {
-            throw new IllegalArgumentException("This tile already has a piece");
+        if (!this.board.addPieceAt(this, tile)) {
+            throw new IllegalArgumentException("Already a Piece on tile " + tile);
         }
     }
 

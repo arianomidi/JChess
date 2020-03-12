@@ -57,9 +57,9 @@ public class King extends Piece {
 
             Board board = this.getBoard();
             if (type.compareTo("short") == 0) {
-                Tile f_tile = board.getTileAt("F", rank);
-                Tile g_tile = board.getTileAt("G", rank);
-                Tile h_tile = board.getTileAt("H", rank);
+                Tile f_tile = board.getTileAt(6, rank);
+                Tile g_tile = board.getTileAt(7, rank);
+                Tile h_tile = board.getTileAt(8, rank);
 
                 if (tile.equals(g_tile)) {
                     Piece piece = h_tile.getPiece();
@@ -71,10 +71,10 @@ public class King extends Piece {
                     }
                 }
             } else if (type.compareTo("long") == 0) {
-                Tile a_tile = board.getTileAt("A", rank);
-                Tile b_tile = board.getTileAt("B", rank);
-                Tile c_tile = board.getTileAt("C", rank);
-                Tile d_tile = board.getTileAt("D", rank);
+                Tile a_tile = board.getTileAt(1, rank);
+                Tile b_tile = board.getTileAt(2, rank);
+                Tile c_tile = board.getTileAt(3, rank);
+                Tile d_tile = board.getTileAt(4, rank);
 
                 if (tile.equals(c_tile) && !b_tile.hasPiece()) {
                     Piece piece = a_tile.getPiece();

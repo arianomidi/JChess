@@ -45,8 +45,10 @@ public class Board {
             this.tiles.put(intToLetter(file), row);
         }
         // Add Pieces
-        this.addStartingPieces();
-        //this.addTestingPieces();
+        if (!game.getChess().isTest())
+            this.addStartingPieces();
+        else
+            this.addTestingPieces();
     }
 
     public void addStartingPieces(){
@@ -78,33 +80,17 @@ public class Board {
     }
 
     public void addTestingPieces(){
-        // Bishops
-        for (int file = 1; file <= 8; file += 2){
-            addPieceAt(new Bishop(getTileAt(file,2), Color.White, this), file, 2);
-            addPieceAt(new Bishop(getTileAt(file,7), Color.Black, this), file, 7);
+        // Pawns
+        for (int file = 1; file <= 3; file += 1){
+            new Pawn(getTileAt(file,7), Color.White, this);
+            new Pawn(getTileAt(file,2), Color.Black, this);
         }
         // King
-        addPieceAt(new King(getTileAt(5,1), Color.White, this), 5, 1);
-        addPieceAt(new King(getTileAt(5,8), Color.Black, this), 5, 8);
+        new King(getTileAt(5,1), Color.White, this);
+        new King(getTileAt(5,8), Color.Black, this);
     }
 
     // ----------- Getters -------------
-
-    public Tile getTileAt(String file, Integer rank){
-        return this.tiles.get(file.toUpperCase()).get(rank - 1);
-    }
-
-    public Tile getTileAt(Integer file, Integer rank){
-        return this.tiles.get(intToLetter(file)).get(rank - 1);
-    }
-
-    public Piece getPieceAt(String x, Integer y){
-        return getTileAt(x, y).getPiece();
-    }
-
-    public Piece getPieceAt(Integer x, Integer y){
-        return getTileAt(intToLetter(x), y).getPiece();
-    }
 
     public Game getGame() { return game; }
 
@@ -125,6 +111,15 @@ public class Board {
 
         throw new NullPointerException("No King found for " + color);
     }
+
+    public Tile getTileAt(Integer file, Integer rank){
+        return this.tiles.get(intToLetter(file)).get(rank - 1);
+    }
+
+    public Piece getPieceAt(Integer x, Integer y){
+        return getTileAt(x, y).getPiece();
+    }
+
 
     public ArrayList<Piece> getPiecesOfType (PieceType type, Color color){
         ArrayList<Piece> return_pieces = new ArrayList<>();
@@ -249,7 +244,7 @@ public class Board {
 
     // ----------- Setters -------------
 
-    public boolean addPieceAt(Piece piece, String x, Integer y){
+    public boolean addPieceAt(Piece piece, Integer x, Integer y){
         // Add to arrays
         allPieces.add(piece);
         if (piece.getColor() == Color.White){
@@ -259,7 +254,7 @@ public class Board {
         }
 
         Tile tile = getTileAt(x, y);
-        if (! tile.hasPiece()){
+        if (!tile.hasPiece()){
             tile.setPiece(piece);
             return true;
         } else {
@@ -267,8 +262,8 @@ public class Board {
         }
     }
 
-    public boolean addPieceAt(Piece piece, Integer x, Integer y){
-        return addPieceAt(piece, intToLetter(x), y);
+    public boolean addPieceAt(Piece piece, Tile tile){
+        return addPieceAt(piece, tile.getX(), tile.getY());
     }
 
     public void removePieceAt(Tile tile){
@@ -281,16 +276,14 @@ public class Board {
                 this.blackPieces.remove(tile.getPiece());
             }
             this.allPieces.remove(tile.getPiece());
+
+            tile.removePiece();
         }
     }
 
     // ----------- Checkers -------------
 
     public boolean hasPieceAt(Integer x, Integer y){
-        return (getPieceAt(x, y) != null);
-    }
-
-    public boolean hasPieceAt(String x, Integer y){
         return (getPieceAt(x, y) != null);
     }
 
@@ -330,7 +323,7 @@ public class Board {
     }
 
     public boolean isAttacking(Piece piece1, Piece piece2){
-        return !hasPieceBetweenTiles(piece1.getPosition(), piece2.getPosition()) && piece1.validMove(piece2.getPosition());
+        return !hasPieceBetweenTiles(piece1.getPosition(), piece2.getPosition()) && piece1.validAttack(piece2.getPosition());
     }
 
     public boolean isAttackedFrom(Piece piece, int x_pos, int y_pos){
@@ -347,57 +340,22 @@ public class Board {
         return false;
     }
 
-    public boolean isChecked(King king){
+    public boolean isChecked(Player player){
+        King king = getKing(player.getColor());
         ArrayList<Piece> attacking_pieces;
+
         if (king.getColor() == Color.White)
             attacking_pieces = blackPieces;
         else
             attacking_pieces = whitePieces;
 
         for (Piece p: attacking_pieces){
-            if (isAttacking(p, king) == true){
+            if (isAttacking(p, king)){
                 return true;
             }
         }
 
         return false;
-    }
-
-//    public boolean isChecked(King king){
-//        Tile tile = king.getPosition();
-//        int x = tile.getX(), y = tile.getY();
-//        Piece piece;
-//
-//        // Rook Check
-//        // From (x,1) -> (x,8) and (1,y) -> (8,y) there is an enemy piece without protection
-//        if (isAttackedFrom(king, x, 1))
-//            return true;
-//        if (isAttackedFrom(king, x, 8))
-//            return true;
-//        if (isAttackedFrom(king, 1, y))
-//            return true;
-//        if (isAttackedFrom(king, 8, y))
-//            return true;
-//
-//        // Diagonal Check
-//        // If from (x,y) -> (1,y-x+1) and (1,y) -> (8,y) there is an enemy piece without protection
-//        if (x <= y){
-//            if (isAttackedFrom(king, 1, y-x+1))
-//                return true;
-//            if (isAttackedFrom(king, x+8-y, 8))
-//                return true;
-//        } else {
-//            if (isAttackedFrom(king, 8, y-x+8))
-//                return true;
-//            if (isAttackedFrom(king, x+1-y, 1))
-//                return true;
-//        }
-//
-//        return false;
-//    }
-
-    public boolean isChecked(Player player){
-        return isChecked(getKing(player.getColor()));
     }
 
     // ----------- Others -------------

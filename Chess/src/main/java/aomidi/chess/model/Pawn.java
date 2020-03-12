@@ -89,6 +89,14 @@ public class Pawn extends Piece {
     public boolean moveTo(Tile tile) {
         if (super.moveTo(tile)){
             this.firstMove = false;
+
+            // Upgrading Pawns
+            if (tile.getY() == 8 || tile.getY() == 1){
+                Color color = this.getColor();
+                this.delete();
+
+                new Queen(tile, color, this.getBoard());
+            }
             return true;
         } else {
             return false;

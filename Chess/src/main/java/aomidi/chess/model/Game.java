@@ -25,7 +25,7 @@ public class Game {
     public Game(Chess chess) {
         this.chess = chess;
         this.board = new Board(this);
-        this.movesList = new ArrayList<Move>();
+        this.movesList = new ArrayList<>();
         this.numMoves = 1;
 
         this.whitePlayer = new Player(Color.White, this);
@@ -121,7 +121,7 @@ public class Game {
         return false;
     }
 
-    // Return false if pieces cant move to same square
+    // Return false if pieces can move to same square
     public boolean hasAmbiguousMoves(List<Piece> pieces, String tile) throws IllegalArgumentException {
         String error = "";
 
@@ -196,7 +196,7 @@ public class Game {
         Piece piece;
 
         // Pawn Case: string length is 2 or 3 containing x
-        if (isFile(string.charAt(0)) && (string.length() == 2) || (string.length() == 4 && string.contains("x"))) {
+        if (isFile(string.charAt(0)) && ((string.length() == 2) || (string.length() == 4 && string.contains("x")))) {
             int dir = -1;
             if (curPlayer.getColor() == Color.White)
                 dir = 1;
@@ -260,6 +260,29 @@ public class Game {
                 // Check for Ambiguous Moves
                 if (!hasAmbiguousMoves(valid_bishops, string.substring(string.length() - 2))) ;
                 return valid_bishops.get(0);
+            }
+        }
+        // Rook Case:
+        if (Character.toUpperCase(string.charAt(0)) == 'R') {
+            List<Piece> valid_rooks;
+
+            // Simple Move or Take
+            if (string.length() == 3 || (string.length() == 4 && Character.toLowerCase(string.charAt(1)) == 'x')) {
+                // Valid Bishops
+                valid_rooks = board.getPiecesOfTypeCanMoveTo(PieceType.Rook, curPlayer.getColor(), move_tile);
+
+                // Check for Ambiguous Moves
+                if (!hasAmbiguousMoves(valid_rooks, string.substring(string.length() - 2))) ;
+                return valid_rooks.get(0);
+            }
+            // Specified Move or Take
+            else if (string.length() == 4 || (string.length() == 5 && Character.toLowerCase(string.charAt(2)) == 'x')) {
+                Character specified_char = Character.toLowerCase(string.charAt(1));
+                valid_rooks = board.getPiecesOfTypeCanMoveTo(PieceType.Rook, specified_char, curPlayer.getColor(), move_tile);
+
+                // Check for Ambiguous Moves
+                if (!hasAmbiguousMoves(valid_rooks, string.substring(string.length() - 2))) ;
+                return valid_rooks.get(0);
             }
         }
         // Queen Case:
@@ -344,17 +367,6 @@ public class Game {
         return pieceMoved;
     }
 
-    public void printChecks () {
-        if (playerUnderCheck(whitePlayer)) {
-            whitePlayer.setChecked(true);
-            System.out.println("Check: White");
-        }
-        if (playerUnderCheck(blackPlayer)) {
-            blackPlayer.setChecked(true);
-            System.out.println("Check: Black");
-        }
-    }
-
     // ----------- Main Function -------------
 
     public void playGame () {
@@ -384,8 +396,19 @@ public class Game {
 
     // ----------- Others -------------
 
+    public void printChecks () {
+        if (playerUnderCheck(whitePlayer)) {
+            whitePlayer.setChecked(true);
+            System.out.println("\033[0mCheck: White");
+        }
+        if (playerUnderCheck(blackPlayer)) {
+            blackPlayer.setChecked(true);
+            System.out.println("\033[0mCheck: Black");
+        }
+    }
+
     private void printBoard() {
-        if (!this.chess.isTest())
+//        if (!this.chess.isTest())
             if (this.chess.flipBoardSelected()) {
                 System.out.println(this.board.toSymbol(curPlayer.getColor()));
                 if (numMoves != 1) {
@@ -397,8 +420,8 @@ public class Game {
             }
             else
                 System.out.println(this.board.toSymbol());
-        else
-            System.out.println(this.board.toString());
+//        else
+//            System.out.println(this.board.toString());
     }
 
 }
