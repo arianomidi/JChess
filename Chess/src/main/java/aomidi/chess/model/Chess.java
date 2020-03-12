@@ -15,7 +15,7 @@ public class Chess {
     // ----------- Constructors -------------
 
     public Chess(){
-        this.test = true;
+        this.test = false;
         this.flipBoard = true;
         // Grey:37 Green:32 Black:30
         this.boardColor = "32m";
