@@ -105,13 +105,19 @@ public class Move {
         // Test attack if there's a piece on the tile, else test moveTo
         if (hasPieceOnTile){
             if (validAttack(piece, new_tile)){
+                addToMoveList();
                 return true;
             } else {
                 return false;
             }
         } else {
             if (validMove(piece, new_tile)) {
-                return piece.moveTo(new_tile);
+                boolean moved = piece.moveTo(new_tile);
+
+                if (moved)
+                    addToMoveList();
+
+                return moved;
             } else {
                 return false;
             }
@@ -125,6 +131,16 @@ public class Move {
         setMove(new_move);
 
         return move();
+    }
+
+    // ----------- Other -------------
+
+    public void addToMoveList(){
+        game.addMove(this);
+    }
+
+    public String toString(){
+        return (String) move.get("string");
     }
 
 }

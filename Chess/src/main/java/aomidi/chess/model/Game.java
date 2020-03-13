@@ -82,14 +82,30 @@ public class Game {
         }
     }
 
+    // ----------- Setters -------------
+
+    public void addMove(Move move){
+        movesList.add(move);
+    }
+
     // ----------- Checkers -------------
 
     public boolean isCheckmate() {
         if (whitePlayer.isKingChecked() && whitePlayer.wasKingChecked()) {
+            // Change last move notation to checkmate
+            Move last_move = movesList.get(movesList.size() - 1);
+            String new_move_str = (String) last_move.getMove().get("string");
+            last_move.getMove().replace("string", replaceString(new_move_str, "#", new_move_str.length() - 1));
+
             gameOver = true;
             System.out.println(boldAndUnderline("Checkmate: Black Wins\n") + "\033[0m");
             return true;
         } else if (blackPlayer.isKingChecked() && blackPlayer.wasKingChecked()) {
+            // Change last move notation to checkmate
+            Move last_move = movesList.get(movesList.size() - 1);
+            String new_move_str = (String) last_move.getMove().get("string");
+            last_move.getMove().replace("string", replaceString(new_move_str, "#", new_move_str.length() - 1));
+
             gameOver = true;
             System.out.println(boldAndUnderline("Checkmate: White Wins\n") + "\033[0m");
             return true;
@@ -194,6 +210,7 @@ public class Game {
 
         move.put("piece", piece);
         move.put("tile", move_tile);
+        move.put("string", string);
         return move;
     }
 
@@ -389,25 +406,35 @@ public class Game {
                 printChecks();
 
                 if (isCheckmate()) {
+                    printMoves();
                     return;
                 }
             }
             pieceMoved = playerTurn(curPlayer);
         }
 
-        System.out.println(boldAndUnderline("Game Over:" + getWinner() + " Wins") + "\033[0;0m");
+        System.out.println(boldAndUnderline("Game Over:" + getWinner() + " Wins\n") + "\033[0;0m");
+        printMoves();
     }
 
     // ----------- Others -------------
 
-    public void printChecks () {
+    private void printChecks () {
         if (playerUnderCheck(whitePlayer)) {
             whitePlayer.setChecked(true);
+            // Change last move notation to check
+            Move last_move = movesList.get(movesList.size() - 1);
+            last_move.getMove().replace("string", ((String) last_move.getMove().get("string")) + "+");
+
             System.out.println("\033[0;1mCheck: White\n");
         } else
             whitePlayer.setChecked(false);
         if (playerUnderCheck(blackPlayer)) {
             blackPlayer.setChecked(true);
+            // Change last move notation to check
+            Move last_move = movesList.get(movesList.size() - 1);
+            last_move.getMove().replace("string", ((String) last_move.getMove().get("string")) + "+");
+
             System.out.println("\033[0;1mCheck: Black\n");
         } else
             blackPlayer.setChecked(false);
@@ -428,6 +455,17 @@ public class Game {
                 System.out.println(this.board.toSymbol());
 //        else
 //            System.out.println(this.board.toString());
+    }
+
+    private void printMoves() {
+        for (int i = 0; i < movesList.size(); i++){
+            if (i % 2 == 0) {
+                Integer move_num = (i / 2) + 1;
+                System.out.print(bold(move_num.toString() + ". ") + "\033[0;0m");
+            }
+            System.out.print(movesList.get(i) + " ");
+        }
+        System.out.println("\n");
     }
 
 }

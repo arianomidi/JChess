@@ -176,6 +176,14 @@ public class Util {
         return s + Chess.getBoardColor();
     }
 
+    public static String replaceString(String string, String substring, int from){
+        int strlen = string.length();
+        String s1 = string.substring(0, from);
+        String s2 = string.substring(from + substring.length(), strlen);
+        String s = s1 + substring + s2;
+        return s;
+    }
+
     public static void sleep(int time){
         try
         {
