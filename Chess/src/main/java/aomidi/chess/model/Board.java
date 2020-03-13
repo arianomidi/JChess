@@ -81,14 +81,17 @@ public class Board {
     }
 
     public void addTestingPieces(){
-        // Pawns
-        for (int file = 1; file <= 3; file += 1){
-            new Pawn(getTileAt(file,7), Color.White, this);
-            new Pawn(getTileAt(file,2), Color.Black, this);
-        }
+        // Bishop
+        new Bishop(getTileAt(5,2), Color.White, this);
+        new Bishop(getTileAt(5,7), Color.Black, this);
+        new Bishop(getTileAt(7,6), Color.Black, this);
+        // Queen
+        new Queen(getTileAt(3,5), Color.White, this);
+        new Queen(getTileAt(7,4), Color.Black, this);
         // King
         new King(getTileAt(5,1), Color.White, this);
         new King(getTileAt(5,8), Color.Black, this);
+
     }
 
     // ----------- Getters -------------
@@ -121,6 +124,13 @@ public class Board {
         return getTileAt(x, y).getPiece();
     }
 
+    public ArrayList<Piece> getOpposingPieces(Color color){
+        if (getOpposingColor(color) == Color.White)
+            return whitePieces;
+        else
+            return blackPieces;
+
+    }
 
     public ArrayList<Piece> getPiecesOfType (PieceType type, Color color){
         ArrayList<Piece> return_pieces = new ArrayList<>();
@@ -239,9 +249,46 @@ public class Board {
         return null;
     }
 
-//    public ArrayList<Tile> getTilesBetween(Piece p1, Piece p2){
-//
-//    }
+    // P1 is king
+    public ArrayList<Tile> getTilesBetween(Piece p1, Piece p2){
+        int p1_x = p1.getPosition().getX(), p1_y =  p1.getPosition().getY();
+        int p2_x = p2.getPosition().getX(), new_y = p2.getPosition().getY();
+        int diff_x = p2_x - p1_x , diff_y = new_y - p1_y;
+
+        ArrayList<Tile> tiles_between = new ArrayList<>();
+
+        if (diff_x == 0){
+            for (int i = 1; i <= abs(diff_y); i++){
+                tiles_between.add(this.getTileAt(p1_x, p1_y + i * Integer.signum(diff_y)));
+            }
+        } else if (diff_y == 0){
+            for (int i = 1; i <= abs(diff_x); i++){
+                tiles_between.add(this.getTileAt(p1_x + i * Integer.signum(diff_x), p1_y));
+            }
+        } else if (abs(diff_x) == abs(diff_y)){
+            for (int i = 1; i <= abs(diff_x); i++){
+                tiles_between.add(this.getTileAt(p1_x + i * Integer.signum(diff_x), p1_y + i * Integer.signum(diff_y)));
+            }
+        } else {
+            tiles_between.add(p2.getPosition()); // Knight's
+        }
+
+        return tiles_between;
+    }
+
+    public ArrayList<ArrayList<Tile>> getTilesBetweenKingCheckingPiece(Player player){
+        King king = getKing(player.getColor());
+        ArrayList<Piece> opposing_pieces = getOpposingPieces(king.getColor());
+        ArrayList<ArrayList<Tile>> tiles_to_block = new ArrayList<>();
+
+        for (Piece p : opposing_pieces){
+            if (isAttacking(p, king)){
+                tiles_to_block.add(getTilesBetween(king,p));
+            }
+        }
+
+        return tiles_to_block;
+    }
 
     // ----------- Setters -------------
 
@@ -327,6 +374,22 @@ public class Board {
         return !hasPieceBetweenTiles(piece1.getPosition(), piece2.getPosition()) && piece1.validAttack(piece2.getPosition());
     }
 
+    public boolean isAttacking(Piece piece, Tile tile){
+        return !hasPieceBetweenTiles(piece.getPosition(), tile) && piece.validAttack(tile);
+    }
+
+    public boolean isTileAttacked(Tile tile, Player player){
+        ArrayList<Piece> attacking_pieces = getOpposingPieces(player.getColor());
+
+        for (Piece p: attacking_pieces){
+            if (isAttacking(p, tile)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean isAttackedFrom(Piece piece, int x_pos, int y_pos){
         Tile tile = piece.getPosition();
 
@@ -343,12 +406,7 @@ public class Board {
 
     public boolean isChecked(Player player){
         King king = getKing(player.getColor());
-        ArrayList<Piece> attacking_pieces;
-
-        if (king.getColor() == Color.White)
-            attacking_pieces = blackPieces;
-        else
-            attacking_pieces = whitePieces;
+        ArrayList<Piece> attacking_pieces = getOpposingPieces(king.getColor());
 
         for (Piece p: attacking_pieces){
             if (isAttacking(p, king)){

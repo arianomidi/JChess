@@ -85,8 +85,13 @@ public class Game {
     // ----------- Checkers -------------
 
     public boolean isCheckmate() {
-        if (curPlayer.isKingChecked() && curPlayer.wasKingChecked()) {
+        if (whitePlayer.isKingChecked() && whitePlayer.wasKingChecked()) {
             gameOver = true;
+            System.out.println(boldAndUnderline("Checkmate: Black Wins\n") + "\033[0m");
+            return true;
+        } else if (blackPlayer.isKingChecked() && blackPlayer.wasKingChecked()) {
+            gameOver = true;
+            System.out.println(boldAndUnderline("Checkmate: White Wins\n") + "\033[0m");
             return true;
         } else
             return false;
@@ -162,7 +167,7 @@ public class Game {
                 throw new Exception("Exit Game");
             case "RESIGN":
                 gameOver = true;
-                throw new Exception(curPlayer.getColor() + " Resigns");
+                throw new Exception(bold(curPlayer.getColor() + " Resigns"));
             case "O-O":
                 if (curPlayer.getColor() == Util.Color.White)
                     move_tile = board.getTileAt(7, 1);
@@ -384,14 +389,13 @@ public class Game {
                 printChecks();
 
                 if (isCheckmate()) {
-                    System.out.println(getWinner());
                     return;
                 }
             }
             pieceMoved = playerTurn(curPlayer);
         }
 
-        System.out.println("\033[0;1m" + "Game Over: " + getWinner() + " Wins" + "\033[0;0m");
+        System.out.println(boldAndUnderline("Game Over:" + getWinner() + " Wins") + "\033[0;0m");
     }
 
     // ----------- Others -------------
@@ -399,12 +403,14 @@ public class Game {
     public void printChecks () {
         if (playerUnderCheck(whitePlayer)) {
             whitePlayer.setChecked(true);
-            System.out.println("\033[0mCheck: White");
-        }
+            System.out.println("\033[0;1mCheck: White\n");
+        } else
+            whitePlayer.setChecked(false);
         if (playerUnderCheck(blackPlayer)) {
             blackPlayer.setChecked(true);
-            System.out.println("\033[0mCheck: Black");
-        }
+            System.out.println("\033[0;1mCheck: Black\n");
+        } else
+            blackPlayer.setChecked(false);
     }
 
     private void printBoard() {

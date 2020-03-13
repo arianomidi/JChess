@@ -1,5 +1,6 @@
 package aomidi.chess.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,12 +37,45 @@ public class Move {
     // ----------- Checkers -------------
 
     public boolean validMove(Piece piece, Tile new_tile){
+        // Check if king is not moving into a attacked tile
+        if (piece instanceof King){
+            boolean move_into_check = false;
+            move_into_check = board.isTileAttacked(new_tile, game.getCurPlayer());
+
+            if (move_into_check)
+                if (new_tile.hasPiece())
+                    throw new IllegalArgumentException("Invalid Move: King can't capture a defended piece");
+                else
+                    throw new IllegalArgumentException("Invalid Move: King can't move into check");
+        }
+        // Check if king is checked and if move gets king out of check
+        else if (game.getCurPlayer().isKingChecked()) {
+            boolean move_gets_out_of_check = false;
+            // Piece has to block or take attacking piece
+            ArrayList<ArrayList<Tile>> blocking_tiles = board.getTilesBetweenKingCheckingPiece(game.getCurPlayer());
+            System.out.println(blocking_tiles);
+
+            if (blocking_tiles.size() == 1) {
+                // Loop through all tiles to see if selected tile is one of the blocking tiles
+                for (Tile t : blocking_tiles.get(0)) {
+                    if (t.equals(new_tile)){
+                        move_gets_out_of_check = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!move_gets_out_of_check)
+                throw new IllegalArgumentException("Invalid Move: King is Checked");
+        }
+
         // If there is no piece between cur_piece and new tile then it can be moved
         boolean isPieceBlocking = board.hasPieceBetweenTiles(piece.getPosition(), new_tile);
 
         if (isPieceBlocking)
             throw new IllegalArgumentException(piece.toSimpleString() + " is blocked from getting to " + new_tile);
 
+        // Dont return all values as if they were false then an exception would be thrown
         return !isPieceBlocking;
     }
 
