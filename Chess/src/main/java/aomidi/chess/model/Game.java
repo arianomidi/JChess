@@ -20,6 +20,7 @@ public class Game {
     private Player blackPlayer;
     private Player curPlayer;
     private boolean gameOver;
+    private boolean isDraw;
 
     // ----------- Constructors -------------
     public Game(Chess chess) {
@@ -184,6 +185,26 @@ public class Game {
             case "RESIGN":
                 gameOver = true;
                 throw new Exception(bold(curPlayer.getColor() + " Resigns"));
+            case "DRAW":
+                sleep(1000);
+                System.out.println("\n\n");
+                System.out.println(this.board.toSymbol(getOpposingPlayer().getColor()));
+                System.out.println("\033[0;1m" + getOpposingPlayer().getColor() + "Player's Turn" + "\033[0;0m");
+
+                if (input("\033[0;0m * " + curPlayer.getColor() + " Offers a Draw: Accept(Y/N) \033[0;0m").toUpperCase().compareTo("Y") == 0){
+                    gameOver = true;
+                    isDraw = true;
+                    throw new Exception(bold("Draw Accepted"));
+                } else {
+                    sleep(1000);
+                    System.out.println("\n\n");
+                    System.out.println(this.board.toSymbol(curPlayer.getColor()));
+                    System.out.println("\033[0;1m" + curPlayer.getColor() + "Player's Turn" + "\033[0;0m");
+                    System.out.println(" * Enter Move: Draw");
+                    throw new Exception(bold("Draw Offer Declined"));
+                }
+
+
             case "O-O":
                 if (curPlayer.getColor() == Util.Color.White)
                     move_tile = board.getTileAt(7, 1);
@@ -389,6 +410,15 @@ public class Game {
         return pieceMoved;
     }
 
+    public boolean takeBackMove (){
+        // Remove Last Move
+        Move lastMove = movesList.get(movesList.size() - 1);
+        movesList.remove(movesList.size() - 1);
+
+        System.out.println("Illegal Move: Move puts King in check\n");
+        return lastMove.moveBack();
+    }
+
     // ----------- Main Function -------------
 
     public void playGame () {
@@ -396,24 +426,32 @@ public class Game {
 
         while (!isGameOver()) {
             if (pieceMoved) {
-                this.numMoves += 1;
-                printBoard();
-                // Reset players moves
-                curPlayer.setFirstMove(true);
-                // Switch players
-                curPlayer = getOpposingPlayer();
-                // Print Checks
-                printChecks();
+                // If player moved is still in check take back move
+                if (playerUnderCheck(curPlayer)){
+                    takeBackMove();
+                } else {
+                    this.numMoves += 1;
+                    printBoard();
+                    // Reset players moves
+                    curPlayer.setFirstMove(true);
+                    // Switch players
+                    curPlayer = getOpposingPlayer();
+                    // Print Checks
+                    printChecks();
 
-                if (isCheckmate()) {
-                    printMoves();
-                    return;
+                    if (isCheckmate()) {
+                        printMoves();
+                        return;
+                    }
                 }
             }
             pieceMoved = playerTurn(curPlayer);
         }
 
-        System.out.println(boldAndUnderline("Game Over:" + getWinner() + " Wins\n") + "\033[0;0m");
+        if (isDraw)
+            System.out.println(boldAndUnderline("Game Over: Game Ends in Draw\n") + "\033[0;0m");
+        else
+            System.out.println(boldAndUnderline("Game Over:" + getWinner() + " Wins\n") + "\033[0;0m");
         printMoves();
     }
 

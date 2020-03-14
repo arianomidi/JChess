@@ -53,7 +53,6 @@ public class Move {
             boolean move_gets_out_of_check = false;
             // Piece has to block or take attacking piece
             ArrayList<ArrayList<Tile>> blocking_tiles = board.getTilesBetweenKingCheckingPiece(game.getCurPlayer());
-            System.out.println(blocking_tiles);
 
             if (blocking_tiles.size() == 1) {
                 // Loop through all tiles to see if selected tile is one of the blocking tiles
@@ -100,6 +99,7 @@ public class Move {
     public boolean move(){
         Piece piece = (Piece) move.get("piece");
         Tile new_tile = (Tile) move.get("tile");
+        move.put("old_tile", ((Piece) move.get("piece")).getPosition());
         boolean hasPieceOnTile = board.hasPieceAt(new_tile.getX(), new_tile.getY());
 
         // Test attack if there's a piece on the tile, else test moveTo
@@ -124,13 +124,11 @@ public class Move {
         }
     }
 
-    public boolean move(Piece piece, Tile tile){
-        Map<String, Object> new_move = new HashMap<>();
-        new_move.put("piece", piece);
-        new_move.put("tile", tile);
-        setMove(new_move);
+    public boolean moveBack(){
+        Piece piece = (Piece) move.get("piece");
+        Tile old_tile = (Tile) move.get("old_tile");
 
-        return move();
+        return piece.moveTo(old_tile, true);
     }
 
     // ----------- Other -------------

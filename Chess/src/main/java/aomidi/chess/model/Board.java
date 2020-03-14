@@ -81,16 +81,22 @@ public class Board {
     }
 
     public void addTestingPieces(){
-        // Bishop
-        new Bishop(getTileAt(5,2), Color.White, this);
-        new Bishop(getTileAt(5,7), Color.Black, this);
-        new Bishop(getTileAt(7,6), Color.Black, this);
-        // Queen
-        new Queen(getTileAt(3,5), Color.White, this);
-        new Queen(getTileAt(7,4), Color.Black, this);
-        // King
+
+        new Pawn(getTileAt(4,2), Color.White, this);
+        new Bishop(getTileAt(3,3), Color.Black, this);
+
+        //King
         new King(getTileAt(5,1), Color.White, this);
         new King(getTileAt(5,8), Color.Black, this);
+
+//        // Bishop
+//        new Bishop(getTileAt(5,2), Color.White, this);
+//        new Bishop(getTileAt(5,7), Color.Black, this);
+//        new Bishop(getTileAt(7,6), Color.Black, this);
+//        // Queen
+//        new Queen(getTileAt(3,5), Color.White, this);
+//        new Queen(getTileAt(7,4), Color.Black, this);
+//
 
     }
 
