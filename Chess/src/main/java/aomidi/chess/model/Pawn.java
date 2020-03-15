@@ -23,13 +23,6 @@ public class Pawn extends Piece {
 
     public boolean isFirstMove(){ return firstMove; }
 
-    // ----------- Setters -------------
-
-    public boolean setFirstMove(boolean b){
-        this.firstMove = b;
-        return true;
-    }
-
     // ----------- Checkers -------------
 
     public boolean validMove(Tile tile){

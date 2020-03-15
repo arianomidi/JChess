@@ -19,17 +19,6 @@ public class Util {
         King
     }
 
-    public enum FileLetter {
-        A,
-        B,
-        C,
-        D,
-        E,
-        F,
-        G,
-        H
-    }
-
     // ----------- Conversion Functions -------------
 
     public static String intToLetter(int file) {
@@ -145,7 +134,6 @@ public class Util {
         else
             return false;
     }
-
 
     // ---------- String Manipulation ------------
 

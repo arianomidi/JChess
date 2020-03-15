@@ -9,7 +9,6 @@ public abstract class Piece {
     private Tile tile;
     private Color color;
     private Board board;
-    private boolean inPlay;
 
     // ----------- Constructors -------------
 
@@ -17,7 +16,6 @@ public abstract class Piece {
         this.tile = tile;
         this.color = color;
         this.board = board;
-        this.inPlay = true;
 
         if (!this.board.addPieceAt(this, tile)) {
             throw new IllegalArgumentException("Already a Piece on tile " + tile);
@@ -31,8 +29,6 @@ public abstract class Piece {
     public Color getColor(){ return this.color; }
 
     public Board getBoard(){ return this.board; }
-
-    public boolean isInPlay() { return this.inPlay; }
 
     public abstract PieceType getPieceType();
 
@@ -53,18 +49,15 @@ public abstract class Piece {
         }
     }
 
-    // Overide moveTo for Pawn Attack and Castling
+    // Overide moveTo for Pawn Attack, Castling and Move Back
     public boolean moveTo(Tile tile, boolean overide){
-        if (overide){
-            this.tile.removePiece();
+        this.tile.removePiece();
 
-            // Set tile to new tile
-            this.tile = tile;
-            this.tile.setPiece(this);
+        // Set tile to new tile
+        this.tile = tile;
+        this.tile.setPiece(this);
 
-            return true;
-        }
-        return false;
+        return true;
     }
 
     // Attack only if its a valid attack
@@ -73,10 +66,8 @@ public abstract class Piece {
             tile.getPiece().delete();
             // Move piece to new tile
             return this.moveTo(tile, true);
-        } else {
-            //throw new IllegalArgumentException("Piece cant move to tile: " + tile);
+        } else
             return false;
-        }
     }
 
     // ----------- Checkers -------------
@@ -112,9 +103,7 @@ public abstract class Piece {
     public void delete(){
         // remove piece from tile and board
         this.board.removePieceAt(this.tile);
-        this.tile.removePiece();
 
-        this.inPlay = false;
         this.tile = null;
         this.color = null;
     }

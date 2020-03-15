@@ -15,15 +15,17 @@ public class Board {
     private ArrayList<Piece> allPieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Piece> whitePieces;
+    private King blackKing;
+    private King whiteKing;
 
     // ----------- Constructors -------------
 
     public Board(Game game){
         this.game = game;
-        this.allPieces = new ArrayList<Piece>();
-        this.blackPieces = new ArrayList<Piece>();
-        this.whitePieces = new ArrayList<Piece>();
-        this.tiles = new HashMap<String, ArrayList<Tile>>();
+        this.allPieces = new ArrayList<>();
+        this.blackPieces = new ArrayList<>();
+        this.whitePieces = new ArrayList<>();
+        this.tiles = new HashMap<>();
 
         // Init tiles
         for(int file = 1; file <= 8; file++){
@@ -76,28 +78,17 @@ public class Board {
         new Queen(getTileAt(4,1), Color.White, this);
         new Queen(getTileAt(4,8), Color.Black, this);
         // Kings
-        new King(getTileAt(5,1), Color.White, this);
-        new King(getTileAt(5,8), Color.Black, this);
+        whiteKing = new King(getTileAt(5,1), Color.White, this);
+        blackKing = new King(getTileAt(5,8), Color.Black, this);
     }
 
     public void addTestingPieces(){
-
         new Pawn(getTileAt(4,2), Color.White, this);
         new Bishop(getTileAt(3,3), Color.Black, this);
 
-        //King
-        new King(getTileAt(5,1), Color.White, this);
-        new King(getTileAt(5,8), Color.Black, this);
-
-//        // Bishop
-//        new Bishop(getTileAt(5,2), Color.White, this);
-//        new Bishop(getTileAt(5,7), Color.Black, this);
-//        new Bishop(getTileAt(7,6), Color.Black, this);
-//        // Queen
-//        new Queen(getTileAt(3,5), Color.White, this);
-//        new Queen(getTileAt(7,4), Color.Black, this);
-//
-
+        // Kings
+        whiteKing = new King(getTileAt(5,1), Color.White, this);
+        blackKing = new King(getTileAt(5,8), Color.Black, this);
     }
 
     // ----------- Getters -------------
@@ -106,21 +97,15 @@ public class Board {
 
     public King getKing(Color color){
         if (color == Color.White){
-            for (Piece p : this.whitePieces){
-                if (p instanceof King){
-                    return (King) p;
-                }
-            }
+            return whiteKing;
         } else if (color == Color.Black){
-            for (Piece p : this.blackPieces){
-                if (p instanceof King){
-                    return (King) p;
-                }
-            }
+            return blackKing;
         }
 
         throw new NullPointerException("No King found for " + color);
     }
+
+    // ----------- Getters -------------
 
     public Tile getTileAt(Integer file, Integer rank){
         return this.tiles.get(intToLetter(file)).get(rank - 1);
@@ -138,7 +123,7 @@ public class Board {
 
     }
 
-    public ArrayList<Piece> getPiecesOfType (PieceType type, Color color){
+    private ArrayList<Piece> getPiecesOfType (PieceType type, Color color){
         ArrayList<Piece> return_pieces = new ArrayList<>();
         ArrayList<Piece> pieces;
 
@@ -156,36 +141,13 @@ public class Board {
         return return_pieces;
     }
 
-    public ArrayList<Piece> getPiecesOfType (PieceType type, Character specified_char, Color color){
-        ArrayList<Piece> return_pieces = new ArrayList<>();
-        ArrayList<Piece> pieces = getPiecesOfType(type, color);
-
-        for (Piece p : pieces) {
-            if (p.getPieceType() == type){
-                if (isFile(specified_char) && p.getPosition().getX() == letterToInt(String.valueOf(specified_char))) {
-                    return_pieces.add(p);
-                } else if (isRank(specified_char) && p.getPosition().getY() == Integer.parseInt(String.valueOf(specified_char))) {
-                    return_pieces.add(p);
-                }
-            }
-        }
-        // If no Piece was found throw exception
-        if (return_pieces.size() == 0)
-            throw new IllegalArgumentException("Invalid Input");
-
-        return return_pieces;
-    }
-
     public ArrayList<Piece> getPiecesOfTypeCanMoveTo (PieceType type, Color color, Tile tile){
         ArrayList<Piece> return_pieces = new ArrayList<>();
         ArrayList<Piece> pieces = getPiecesOfType(type, color);
-        Class piece_class;
 
         // If no Piece was found throw exception
         if (pieces.size() == 0)
             throw new IllegalArgumentException("Invalid Input");
-        else
-            piece_class = pieces.get(0).getClass();
 
         for (Piece p : pieces){
             if (p.validMove(tile)){
@@ -220,43 +182,21 @@ public class Board {
         return return_pieces;
     }
 
-    public Piece getPieceBetweenTiles(Tile cur_tile, Tile new_tile){
-        int cur_x = cur_tile.getX(), cur_y = cur_tile.getY();
-        int new_x = new_tile.getX(), new_y = new_tile.getY();
-        int diff_x = new_x - cur_x , diff_y = new_y - cur_y;
+    public ArrayList<ArrayList<Tile>> getTilesBetweenKingCheckingPiece(Player player){
+        King king = getKing(player.getColor());
+        ArrayList<Piece> opposing_pieces = getOpposingPieces(king.getColor());
+        ArrayList<ArrayList<Tile>> tiles_to_block = new ArrayList<>();
 
-        boolean existsPiece = false;
-
-        if (diff_x == 0){
-            for (int i = 1; i < abs(diff_y); i++){
-                existsPiece = this.hasPieceAt(cur_x, cur_y + i * Integer.signum(diff_y));
-                if (existsPiece){
-                    return this.getPieceAt(cur_x, cur_y + i * Integer.signum(diff_y));
-                }
+        for (Piece p : opposing_pieces){
+            if (isAttacking(p, king)){
+                tiles_to_block.add(getTilesBetween(king,p));
             }
-        } else if (diff_y == 0){
-            for (int i = 1; i < abs(diff_x); i++){
-                existsPiece = this.hasPieceAt(cur_x + i * Integer.signum(diff_x), cur_y);
-                if (existsPiece){
-                    return this.getPieceAt(cur_x + i * Integer.signum(diff_x), cur_y);
-                }
-            }
-        } else if (abs(diff_x) == abs(diff_y)){
-            for (int i = 1; i < abs(diff_x); i++){
-                existsPiece = this.hasPieceAt(cur_x + i * Integer.signum(diff_x), cur_y + i * Integer.signum(diff_y));
-                if (existsPiece){
-                    return this.getPieceAt(cur_x + i * Integer.signum(diff_x), cur_y + i * Integer.signum(diff_y));
-                }
-            }
-        } else {
-            return null;     // Knight's
         }
 
-        return null;
+        return tiles_to_block;
     }
 
-    // P1 is king
-    public ArrayList<Tile> getTilesBetween(Piece p1, Piece p2){
+    private ArrayList<Tile> getTilesBetween(Piece p1, Piece p2){
         int p1_x = p1.getPosition().getX(), p1_y =  p1.getPosition().getY();
         int p2_x = p2.getPosition().getX(), new_y = p2.getPosition().getY();
         int diff_x = p2_x - p1_x , diff_y = new_y - p1_y;
@@ -280,20 +220,6 @@ public class Board {
         }
 
         return tiles_between;
-    }
-
-    public ArrayList<ArrayList<Tile>> getTilesBetweenKingCheckingPiece(Player player){
-        King king = getKing(player.getColor());
-        ArrayList<Piece> opposing_pieces = getOpposingPieces(king.getColor());
-        ArrayList<ArrayList<Tile>> tiles_to_block = new ArrayList<>();
-
-        for (Piece p : opposing_pieces){
-            if (isAttacking(p, king)){
-                tiles_to_block.add(getTilesBetween(king,p));
-            }
-        }
-
-        return tiles_to_block;
     }
 
     // ----------- Setters -------------
@@ -377,7 +303,7 @@ public class Board {
     }
 
     public boolean isAttacking(Piece piece1, Piece piece2){
-        return !hasPieceBetweenTiles(piece1.getPosition(), piece2.getPosition()) && piece1.validAttack(piece2.getPosition());
+        return isAttacking(piece1,piece2.getPosition());
     }
 
     public boolean isAttacking(Piece piece, Tile tile){
@@ -391,20 +317,6 @@ public class Board {
             if (isAttacking(p, tile)){
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    public boolean isAttackedFrom(Piece piece, int x_pos, int y_pos){
-        Tile tile = piece.getPosition();
-
-        Piece attacking_piece = getPieceBetweenTiles(tile, getTileAt(x_pos, y_pos));
-        if (attacking_piece == null)
-            attacking_piece = getPieceAt(x_pos, y_pos);
-
-        if (attacking_piece != null && attacking_piece.getColor() == getOpposingColor(piece.getColor())){
-            return attacking_piece.validAttack(tile);
         }
 
         return false;
@@ -424,34 +336,6 @@ public class Board {
     }
 
     // ----------- Others -------------
-
-    public String toString(){
-        String string = "";
-
-        for(int rank = 1; rank <= 9; rank++){
-
-            if (rank != 9) {
-                string += (9 - rank) + " ";
-            } else {
-                string += "  ";
-            }
-
-            for (int file = 1; file <= 8; file++){
-                if (rank == 9){
-                    string += "  " + intToLetter(file) + "  ";
-                } else {
-                    string += getTileAt(file, 9 - rank).toBoardTile();
-                }
-            }
-            if (rank != 8)
-                string += "\n";
-            if (rank != 9)
-                string = string.concat("\n");
-        }
-
-
-        return string;
-    }
 
     public String toSymbol(){
         String string = Chess.getBoardColor() + "  " + underline("                                                                                                \n");
