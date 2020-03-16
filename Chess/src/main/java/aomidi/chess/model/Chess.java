@@ -7,7 +7,7 @@ import static aomidi.chess.model.Util.letterToInt;
 
 public class Chess {
     private Game game;
-    private boolean test;
+    private boolean standardGame;
     private boolean flipBoard;
     private static String boardColor;
     private String error;
@@ -15,7 +15,7 @@ public class Chess {
     // ----------- Constructors -------------
 
     public Chess(){
-        this.test = true;
+        this.standardGame = false;
         this.flipBoard = true;
         // Grey:37 Green:32 Black:30
         this.boardColor = "32m";
@@ -28,8 +28,8 @@ public class Chess {
 
     public Game getGame() { return game; }
 
-    public boolean isTest() {
-        return test;
+    public boolean isStandardGame() {
+        return standardGame;
     }
 
     public boolean flipBoardSelected() {

@@ -3,6 +3,8 @@ package aomidi.chess.model;
 import java.util.Scanner;
 
 public class Util {
+    public static final String StandardStartingPosition = "R N B Q K B N R p p p p p p p p   #   #   #   # #   #   #   #     #   #   #   # #   #   #   #   p p p p p p p p R N B Q K B N R ";
+
     // ----------- Enumeration -------------
 
     public enum Color {
@@ -84,6 +86,26 @@ public class Util {
                 return "K";
             default:
                 throw new java.lang.IllegalArgumentException("Illegal PieceType: " + type);
+        }
+    }
+
+    public static PieceType getPieceType(String piece) {
+        piece = piece.toUpperCase();
+        switch (piece) {
+            case "P":
+                return PieceType.Pawn;
+            case "N":
+                return PieceType.Knight;
+            case "B":
+                return PieceType.Bishop;
+            case "R":
+                return PieceType.Rook;
+            case "Q":
+                return PieceType.Queen;
+            case "K":
+                return PieceType.King;
+            default:
+                throw new java.lang.IllegalArgumentException("Illegal Input: " + piece);
         }
     }
 

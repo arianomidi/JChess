@@ -45,51 +45,54 @@ public class Board {
             this.tiles.put(intToLetter(file), row);
         }
         // Add Pieces
-        if (!game.getChess().isTest())
-            this.addStartingPieces();
-        else
-            this.addTestingPieces();
+        this.addStartingPieces();
     }
 
     public void addStartingPieces(){
-        // Pawns
-        for(int file = 1; file <= 8; file++){
-            new Pawn(getTileAt(file,2), Color.White, this);
-            new Pawn(getTileAt(file,7), Color.Black, this);
+        String pieces = StandardStartingPosition;
+        if (!game.getChess().isStandardGame())
+            pieces = game.getCustomStartingPieces();
+
+        for (int rank = 8; rank >= 1; rank--){
+            for (int file = 1; file <= 8; file ++){
+                String str_type = pieces.substring((16 * (8 - rank)) + 2 * (file - 1), (16 * (8 - rank)) + 2 * file - 1);
+
+                if (str_type.compareTo("#") != 0 && str_type.compareTo(" ") != 0) {
+                    PieceType type = getPieceType(str_type);
+
+                    Color color;
+                    if (rank >= 5)
+                        color = Color.Black;
+                    else
+                        color = Color.White;
+
+                    this.addStartingPiece(type, file, rank, color);
+                }
+            }
         }
-        // Knights
-        for (int file = 2; file <= 7; file += 5){
-            new Knight(getTileAt(file,1), Color.White, this);
-            new Knight(getTileAt(file,8), Color.Black, this);
-        }
-        // Bishops
-        for (int file = 3; file <= 6; file += 3){
-            new Bishop(getTileAt(file,1), Color.White, this);
-            new Bishop(getTileAt(file,8), Color.Black, this);
-        }
-        // Rooks
-        for (int file = 1; file <= 8; file += 7){
-            new Rook(getTileAt(file,1), Color.White, this);
-            new Rook(getTileAt(file,8), Color.Black, this);
-        }
-        // Queens
-        new Queen(getTileAt(4,1), Color.White, this);
-        new Queen(getTileAt(4,8), Color.Black, this);
-        // Kings
-        new King(getTileAt(5,1), Color.White, this);
-        new King(getTileAt(5,8), Color.Black, this);
     }
 
-    public void addTestingPieces(){
-        new Pawn(getTileAt(4,2), Color.White, this);
-        new Bishop(getTileAt(3,3), Color.Black, this);
-
-        new Queen(getTileAt(4,5), Color.White, this);
-        new Queen(getTileAt(5, 4), Color.Black, this);
-
-        // Kings
-        new King(getTileAt(5,1), Color.White, this);
-        new King(getTileAt(5,8), Color.Black, this);
+    private void addStartingPiece(PieceType type, int file, int rank, Color color){
+        switch (type){
+            case Pawn:
+                new Pawn(getTileAt(file,rank), color, this);
+                break;
+            case Knight:
+                new Knight(getTileAt(file,rank), color, this);
+                break;
+            case Bishop:
+                new Bishop(getTileAt(file,rank), color, this);
+                break;
+            case Rook:
+                new Rook(getTileAt(file,rank), color, this);
+                break;
+            case Queen:
+                new Queen(getTileAt(file,rank), color, this);
+                break;
+            case King:
+                new King(getTileAt(file,rank), color, this);
+                break;
+        }
     }
 
     // ----------- Getters -------------

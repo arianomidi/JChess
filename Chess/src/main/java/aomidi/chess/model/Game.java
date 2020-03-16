@@ -36,6 +36,21 @@ public class Game {
         printBoard();
     }
 
+    // Black Piece Top Half, White Bottom Half
+    public String getCustomStartingPieces(){
+        String s = "";
+        s += "R N B Q K B N R ";
+        s += "p p p p p p p p ";
+        s += "  #   #   #   # ";
+        s += "#   #   #   #   ";
+        s += "  #   #   #   # ";
+        s += "#   #   #   #   ";
+        s += "p p p p p p p p ";
+        s += "R N B Q K B N R ";
+        return s;
+    }
+
+
     // ----------- Getters -------------
 
     public Chess getChess() {

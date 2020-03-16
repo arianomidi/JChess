@@ -27,8 +27,6 @@ public class Player {
 
     public Color getColor() { return color; }
 
-    public Game getGame() { return game; }
-
     public boolean isFirstMove() { return firstMove; }
 
     public King getKing(){ return king; }
