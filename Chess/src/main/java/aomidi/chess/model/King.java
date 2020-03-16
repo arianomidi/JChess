@@ -26,8 +26,17 @@ public class King extends Piece {
         int diff_in_y = new_y - cur_y;
         int diff_in_x = new_x - cur_x;
 
+        // Check if distance of new tile to cur tile is within 1 tile
         if ( abs(diff_in_x) <= 1 && abs(diff_in_y) <= 1 ){
             if (diff_in_y != 0 || diff_in_x != 0){
+                // Check if king is not moving into a attacked tile
+                if (this.getBoard().isTileAttacked(tile, this.getColor())) {
+                    if (tile.hasPiece())
+                        throw new IllegalArgumentException("Invalid Move: King can't capture a defended piece");
+                    else
+                        throw new IllegalArgumentException("Invalid Move: King can't move into check");
+                }
+
                 return true;
             }
         }

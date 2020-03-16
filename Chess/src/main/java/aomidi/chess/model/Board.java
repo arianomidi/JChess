@@ -15,8 +15,6 @@ public class Board {
     private ArrayList<Piece> allPieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Piece> whitePieces;
-    private King blackKing;
-    private King whiteKing;
 
     // ----------- Constructors -------------
 
@@ -78,31 +76,20 @@ public class Board {
         new Queen(getTileAt(4,1), Color.White, this);
         new Queen(getTileAt(4,8), Color.Black, this);
         // Kings
-        whiteKing = new King(getTileAt(5,1), Color.White, this);
-        blackKing = new King(getTileAt(5,8), Color.Black, this);
+        new King(getTileAt(5,1), Color.White, this);
+        new King(getTileAt(5,8), Color.Black, this);
     }
 
     public void addTestingPieces(){
         new Pawn(getTileAt(4,2), Color.White, this);
         new Bishop(getTileAt(3,3), Color.Black, this);
 
+        new Queen(getTileAt(4,5), Color.White, this);
+        new Queen(getTileAt(5, 4), Color.Black, this);
+
         // Kings
-        whiteKing = new King(getTileAt(5,1), Color.White, this);
-        blackKing = new King(getTileAt(5,8), Color.Black, this);
-    }
-
-    // ----------- Getters -------------
-
-    public Game getGame() { return game; }
-
-    public King getKing(Color color){
-        if (color == Color.White){
-            return whiteKing;
-        } else if (color == Color.Black){
-            return blackKing;
-        }
-
-        throw new NullPointerException("No King found for " + color);
+        new King(getTileAt(5,1), Color.White, this);
+        new King(getTileAt(5,8), Color.Black, this);
     }
 
     // ----------- Getters -------------
@@ -123,7 +110,7 @@ public class Board {
 
     }
 
-    private ArrayList<Piece> getPiecesOfType (PieceType type, Color color){
+    public ArrayList<Piece> getPiecesOfType (PieceType type, Color color){
         ArrayList<Piece> return_pieces = new ArrayList<>();
         ArrayList<Piece> pieces;
 
@@ -183,8 +170,8 @@ public class Board {
     }
 
     public ArrayList<ArrayList<Tile>> getTilesBetweenKingCheckingPiece(Player player){
-        King king = getKing(player.getColor());
-        ArrayList<Piece> opposing_pieces = getOpposingPieces(king.getColor());
+        King king = player.getKing();
+        ArrayList<Piece> opposing_pieces = getOpposingPieces(player.getColor());
         ArrayList<ArrayList<Tile>> tiles_to_block = new ArrayList<>();
 
         for (Piece p : opposing_pieces){
@@ -310,24 +297,11 @@ public class Board {
         return !hasPieceBetweenTiles(piece.getPosition(), tile) && piece.validAttack(tile);
     }
 
-    public boolean isTileAttacked(Tile tile, Player player){
-        ArrayList<Piece> attacking_pieces = getOpposingPieces(player.getColor());
+    public boolean isTileAttacked(Tile tile, Color color){
+        ArrayList<Piece> attacking_pieces = getOpposingPieces(color);
 
         for (Piece p: attacking_pieces){
             if (isAttacking(p, tile)){
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isChecked(Player player){
-        King king = getKing(player.getColor());
-        ArrayList<Piece> attacking_pieces = getOpposingPieces(king.getColor());
-
-        for (Piece p: attacking_pieces){
-            if (isAttacking(p, king)){
                 return true;
             }
         }

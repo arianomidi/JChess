@@ -36,14 +36,14 @@ public class Move {
                     move_tile = board.getTileAt(7, 1);
                 else
                     move_tile = board.getTileAt(7, 8);
-                piece = board.getKing(player.getColor());
+                piece = player.getKing();
                 break;
             case "O-O-O":
                 if (player.getColor() == Util.Color.White)
                     move_tile = board.getTileAt(3, 1);
                 else
                     move_tile = board.getTileAt(3, 8);
-                piece = board.getKing(player.getColor());
+                piece = player.getKing();
                 break;
             default:
                 // Get Move to Tile and Piece
@@ -271,16 +271,8 @@ public class Move {
     // ----------- Checkers -------------
 
     public boolean validMove(Piece piece, Tile new_tile){
-        // Check if king is not moving into a attacked tile
-        if (piece instanceof King){
-            if (board.isTileAttacked(new_tile, player))
-                if (new_tile.hasPiece())
-                    throw new IllegalArgumentException("Invalid Move: King can't capture a defended piece");
-                else
-                    throw new IllegalArgumentException("Invalid Move: King can't move into check");
-        }
-        // Check if king is checked and if move gets king out of check
-        else if (player.isKingChecked()) {
+        // Check if king is checked and if move blocks check (piece != king)
+        if (player.isUnderCheck() && !(piece instanceof King)) {
             boolean move_gets_out_of_check = false;
             // Piece has to block or take attacking piece
             ArrayList<ArrayList<Tile>> blocking_tiles = board.getTilesBetweenKingCheckingPiece(player);
@@ -335,7 +327,6 @@ public class Move {
         // Test attack if there's a piece on the tile, else test moveTo
         if (hasPieceOnTile){
             if (validAttack(piece, new_tile)){
-                addToMoveList();
                 return true;
             } else {
                 return false;
@@ -343,10 +334,6 @@ public class Move {
         } else {
             if (validMove(piece, new_tile)) {
                 boolean moved = piece.moveTo(new_tile);
-
-                if (moved)
-                    addToMoveList();
-
                 return moved;
             } else {
                 return false;
@@ -362,10 +349,6 @@ public class Move {
     }
 
     // ----------- Other -------------
-
-    public void addToMoveList(){
-        game.addMove(this);
-    }
 
     public String toString(){
         return (String) move.get("string");

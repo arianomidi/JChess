@@ -1,12 +1,18 @@
 package aomidi.chess.model;
 import aomidi.chess.model.Util.Color;
 
+import java.util.ArrayList;
+
+import static aomidi.chess.model.Util.boldAndUnderline;
+import static aomidi.chess.model.Util.replaceString;
+
 public class Player {
     private Color color;
     private Game game;
     private boolean firstMove;
-    private boolean wasChecked;
+    private King king;
     private boolean isChecked;
+
 
     // ----------- Constructors -------------
     public Player(Color color, Game game){
@@ -14,7 +20,7 @@ public class Player {
         this.game = game;
         this.firstMove = true;
         this.isChecked = false;
-        this.wasChecked = false;
+        this.king = (King) game.getBoard().getPiecesOfType(Util.PieceType.King, color).get(0);
     }
 
     // ----------- Getters -------------
@@ -25,13 +31,7 @@ public class Player {
 
     public boolean isFirstMove() { return firstMove; }
 
-    public boolean wasKingChecked() {
-        return wasChecked;
-    }
-
-    public boolean isKingChecked() {
-        return isChecked;
-    }
+    public King getKing(){ return king; }
 
     // ----------- Setters -------------
 
@@ -39,9 +39,44 @@ public class Player {
         this.firstMove = isFirstMove;
     }
 
-    public void setChecked(boolean checked) {
-        this.wasChecked = this.isChecked;
-        this.isChecked = checked;
+    public void setChecked(boolean checked) { this.isChecked = checked; }
+
+    // ----------- Checkers -------------
+
+    public boolean isUnderCheck() {
+        ArrayList<Piece> attacking_pieces = game.getBoard().getOpposingPieces(king.getColor());
+
+        for (Piece p: attacking_pieces){
+            if (game.getBoard().isAttacking(p, king)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isCheckmated() {
+        return false;
+//        if (whitePlayer.isKingChecked() && whitePlayer.wasKingChecked()) {
+//            // Change last move notation to checkmate
+//            Move last_move = movesList.get(movesList.size() - 1);
+//            String new_move_str = (String) last_move.getMove().get("string");
+//            last_move.getMove().replace("string", replaceString(new_move_str, "#", new_move_str.length() - 1));
+//
+//            gameOver = true;
+//            System.out.println(boldAndUnderline("Checkmate: Black Wins\n") + "\033[0m");
+//            return true;
+//        } else if (blackPlayer.isKingChecked() && blackPlayer.wasKingChecked()) {
+//            // Change last move notation to checkmate
+//            Move last_move = movesList.get(movesList.size() - 1);
+//            String new_move_str = (String) last_move.getMove().get("string");
+//            last_move.getMove().replace("string", replaceString(new_move_str, "#", new_move_str.length() - 1));
+//
+//            gameOver = true;
+//            System.out.println(boldAndUnderline("Checkmate: White Wins\n") + "\033[0m");
+//            return true;
+//        } else
+//            return false;
     }
 
 }
