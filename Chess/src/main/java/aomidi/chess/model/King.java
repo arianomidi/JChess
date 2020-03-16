@@ -14,21 +14,25 @@ public class King extends Piece {
 
     // ----------- Getters -------------
     @Override
-    public PieceType getPieceType() { return PieceType.King; }
+    public PieceType getPieceType() {
+        return PieceType.King;
+    }
 
-    public boolean isFirstMove(){ return this.firstMove; }
+    public boolean isFirstMove() {
+        return this.firstMove;
+    }
 
     // ----------- Checkers -------------
     @Override
-    public boolean validMove(Tile tile){
+    public boolean validMove(Tile tile) {
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
         int new_x = tile.getX(), new_y = tile.getY();
         int diff_in_y = new_y - cur_y;
         int diff_in_x = new_x - cur_x;
 
         // Check if distance of new tile to cur tile is within 1 tile
-        if ( abs(diff_in_x) <= 1 && abs(diff_in_y) <= 1 ){
-            if (diff_in_y != 0 || diff_in_x != 0){
+        if (abs(diff_in_x) <= 1 && abs(diff_in_y) <= 1) {
+            if (diff_in_y != 0 || diff_in_x != 0) {
                 // Check if king is not moving into a attacked tile
                 if (this.getBoard().isTileAttacked(tile, this.getColor())) {
                     if (tile.hasPiece())
@@ -51,7 +55,7 @@ public class King extends Piece {
         return false;
     }
 
-    public boolean canCastle(Tile tile, String type){
+    public boolean canCastle(Tile tile, String type) {
         String error = "";
 
         if (!this.firstMove)
@@ -104,7 +108,7 @@ public class King extends Piece {
 
     @Override
     public boolean equals(Object obj) {
-        if ( obj instanceof King && ((King) obj).isFirstMove() == this.firstMove) {
+        if (obj instanceof King && ((King) obj).isFirstMove() == this.firstMove) {
             return super.equals(obj);
         } else {
             return false;
@@ -114,7 +118,7 @@ public class King extends Piece {
     // ----------- Actions -------------
     @Override
     public boolean moveTo(Tile tile) {
-        if (super.moveTo(tile)){
+        if (super.moveTo(tile)) {
             this.firstMove = false;
             return true;
         } else {
@@ -126,7 +130,7 @@ public class King extends Piece {
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);
-        switch (column){
+        switch (column) {
             case 1:
                 return replaceString(string, bold("+"), 6, 6);
             case 2:
@@ -157,7 +161,7 @@ public class King extends Piece {
                 if (this.getColor() == Util.Color.White) {
                     return replaceString(string, bold("{___}") + "\033[4m", 8, 12);
                 } else {
-                    return replaceString(string, bold("{") + boldAndUnderline("/X\\")+ bold("}") + "\033[4m", 8, 12);
+                    return replaceString(string, bold("{") + boldAndUnderline("/X\\") + bold("}") + "\033[4m", 8, 12);
                 }
             default:
                 throw new IllegalArgumentException("Column out of range: " + column);

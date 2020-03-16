@@ -2,7 +2,8 @@ package aomidi.chess.model;
 
 import aomidi.chess.model.Util.Color;
 
-import static aomidi.chess.model.Util.*;
+import static aomidi.chess.model.Util.intToLetter;
+import static aomidi.chess.model.Util.underline;
 
 public class Tile {
     private int x, y;
@@ -11,7 +12,7 @@ public class Tile {
 
     // ----------- Constructor -------------
 
-    public Tile(int x_coordinate, int y_coordinate, Color color){
+    public Tile(int x_coordinate, int y_coordinate, Color color) {
         this.x = x_coordinate;
         this.y = y_coordinate;
         this.color = color;
@@ -28,14 +29,18 @@ public class Tile {
         return this.y;
     }
 
-    public Color getColor() { return this.color; }
+    public Color getColor() {
+        return this.color;
+    }
 
-    public Piece getPiece() { return this.piece; }
+    public Piece getPiece() {
+        return this.piece;
+    }
 
     // ----------- Setters -------------
 
     public boolean setPiece(Piece piece) {
-        if (this.piece == null){
+        if (this.piece == null) {
             this.piece = piece;
             return true;
         } else {
@@ -43,32 +48,34 @@ public class Tile {
         }
     }
 
-    public boolean removePiece(){
+    public boolean removePiece() {
         this.piece = null;
         return true;
     }
 
     // ----------- Checkers -------------
 
-    public boolean hasPiece() { return (this.piece != null); }
+    public boolean hasPiece() {
+        return (this.piece != null);
+    }
 
     // ----------- Others -------------
 
-    public String toString(){
+    public String toString() {
         return intToLetter(this.getX()).toLowerCase() + this.getY();
     }
 
-    public String toSymbol(int column){
+    public String toSymbol(int column) {
         // If there's a piece use piece symbol else use empty tile symbol
-        if (this.hasPiece()){
+        if (this.hasPiece()) {
             return this.getPiece().toSymbol(column);
         } else {
             return getSymbol(column);
         }
     }
 
-    public String getSymbol(int column){
-        switch (column){
+    public String getSymbol(int column) {
+        switch (column) {
             case 1:
             case 2:
             case 3:

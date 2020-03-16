@@ -120,7 +120,7 @@ public class Util {
         }
     }
 
-    public static Color getOpposingColor(Color color){
+    public static Color getOpposingColor(Color color) {
         switch (color) {
             case Black:
                 return Color.White;
@@ -133,9 +133,9 @@ public class Util {
 
     // ----------- Checkers -------------
 
-    public static boolean isFile(Character s){
+    public static boolean isFile(Character s) {
         s = Character.toUpperCase(s);
-        switch (s){
+        switch (s) {
             case 'A':
             case 'B':
             case 'C':
@@ -150,35 +150,31 @@ public class Util {
         }
     }
 
-    public static boolean isRank(Character c){
-        if ('0' < c && c <= '8')
-            return true;
-        else
-            return false;
+    public static boolean isRank(Character c) {
+        return '0' < c && c <= '8';
     }
 
     // ---------- String Manipulation ------------
 
-    public static String input(String msg){
+    public static String input(String msg) {
         System.out.println(msg);
         Scanner scan = new Scanner(System.in);
-        String input = scan.nextLine();
-        return input;
+        return scan.nextLine();
     }
 
-    public static String bold(String string){
+    public static String bold(String string) {
         return "\033[0;1m" + string + Chess.getBoardColor();
     }
 
-    public static String underline(String string){
+    public static String underline(String string) {
         return "\033[4m" + string + Chess.getBoardColor();
     }
 
-    public static String boldAndUnderline(String string){
+    public static String boldAndUnderline(String string) {
         return "\033[0m\033[1;4m" + string + Chess.getBoardColor();
     }
 
-    public static String replaceString(String string, String substring, int from, int to){
+    public static String replaceString(String string, String substring, int from, int to) {
         int strlen = string.length();
         String s1 = string.substring(0, from - 1 + Chess.getLen());
         String s2 = string.substring(to + Chess.getLen(), strlen);
@@ -186,21 +182,17 @@ public class Util {
         return s + Chess.getBoardColor();
     }
 
-    public static String replaceString(String string, String substring, int from){
+    public static String replaceString(String string, String substring, int from) {
         int strlen = string.length();
         String s1 = string.substring(0, from);
         String s2 = string.substring(from + substring.length(), strlen);
-        String s = s1 + substring + s2;
-        return s;
+        return s1 + substring + s2;
     }
 
-    public static void sleep(int time){
-        try
-        {
+    public static void sleep(int time) {
+        try {
             Thread.sleep(time);
-        }
-        catch(InterruptedException ex)
-        {
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
     }

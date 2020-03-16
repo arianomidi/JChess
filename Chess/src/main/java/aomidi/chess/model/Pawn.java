@@ -1,11 +1,8 @@
 package aomidi.chess.model;
 
-import aomidi.chess.model.Util.PieceType;
-import aomidi.chess.model.Util.Color;
+import aomidi.chess.model.Util.*;
 
-import static aomidi.chess.model.Util.replaceString;
-import static aomidi.chess.model.Util.bold;
-import static aomidi.chess.model.Util.boldAndUnderline;
+import static aomidi.chess.model.Util.*;
 import static java.lang.Math.abs;
 
 public class Pawn extends Piece {
@@ -19,13 +16,17 @@ public class Pawn extends Piece {
 
     // ----------- Getters -------------
 
-    public PieceType getPieceType(){ return PieceType.Pawn; }
+    public PieceType getPieceType() {
+        return PieceType.Pawn;
+    }
 
-    public boolean isFirstMove(){ return firstMove; }
+    public boolean isFirstMove() {
+        return firstMove;
+    }
 
     // ----------- Checkers -------------
 
-    public boolean validMove(Tile tile){
+    public boolean validMove(Tile tile) {
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
         int new_x = tile.getX(), new_y = tile.getY();
         int diff_in_y = new_y - cur_y;
@@ -35,42 +36,33 @@ public class Pawn extends Piece {
             diff_in_y = -diff_in_y;
 
         // If its the first move then pawn is allowed to move 2 squares else move only 1 square
-        if (this.isFirstMove()){
-            if (cur_x == new_x && 0 < diff_in_y && diff_in_y <= 2 ){
-                return true;
-            }
+        if (this.isFirstMove()) {
+            return cur_x == new_x && 0 < diff_in_y && diff_in_y <= 2;
         } else {
-            if (cur_x == new_x && 0 < diff_in_y && diff_in_y <= 1){
-                return true;
-            }
+            return cur_x == new_x && diff_in_y == 1;
         }
 
-        return false;
     }
 
     // Pawn attack is different to move
     @Override
-    public boolean validAttack(Tile tile){
+    public boolean validAttack(Tile tile) {
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
         int new_x = tile.getX(), new_y = tile.getY();
         int diff_in_y = new_y - cur_y, diff_in_x = cur_x - new_x;
 
         // Difference in y for Black is negative as pieces attack downwards
-        if (this.getColor() == Color.Black){
+        if (this.getColor() == Color.Black) {
             diff_in_y = -diff_in_y;
         }
 
         // If attack is diagonal 1 square ahead return true
-        if (abs(diff_in_x) == 1 && diff_in_y == 1){
-            return true;
-        } else {
-            return false;
-        }
+        return abs(diff_in_x) == 1 && diff_in_y == 1;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if ( obj instanceof Pawn && ((Pawn) obj).isFirstMove() == this.firstMove) {
+        if (obj instanceof Pawn && ((Pawn) obj).isFirstMove() == this.firstMove) {
             return super.equals(obj);
         } else {
             return false;
@@ -80,11 +72,11 @@ public class Pawn extends Piece {
     // ----------- Action -------------
     @Override
     public boolean moveTo(Tile tile) {
-        if (super.moveTo(tile)){
+        if (super.moveTo(tile)) {
             this.firstMove = false;
 
             // Upgrading Pawns
-            if (tile.getY() == 8 || tile.getY() == 1){
+            if (tile.getY() == 8 || tile.getY() == 1) {
                 Color color = this.getColor();
                 this.delete();
 
@@ -98,10 +90,10 @@ public class Pawn extends Piece {
 
     // ----------- Others -------------
     @Override
-    public String toSymbol(int column){
+    public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);
 
-        switch (column){
+        switch (column) {
             case 1:
             case 2:
                 return string;
@@ -113,7 +105,7 @@ public class Pawn extends Piece {
                 if (this.getColor() == Color.White) {
                     return replaceString(string, bold("{__}"), 5, 8);
                 } else {
-                    return replaceString(string, bold("{") + boldAndUnderline("XX")+ bold("}"), 5, 8);
+                    return replaceString(string, bold("{") + boldAndUnderline("XX") + bold("}"), 5, 8);
                 }
             case 6:
                 return string;

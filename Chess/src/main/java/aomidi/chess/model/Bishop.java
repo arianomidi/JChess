@@ -1,8 +1,9 @@
 package aomidi.chess.model;
 
+import aomidi.chess.model.Util.*;
+
 import static aomidi.chess.model.Util.*;
 import static java.lang.Math.abs;
-import aomidi.chess.model.Util.PieceType;
 
 public class Bishop extends Piece {
 
@@ -13,7 +14,9 @@ public class Bishop extends Piece {
 
     // ----------- Getters -------------
 
-    public PieceType getPieceType() { return Util.PieceType.Bishop; }
+    public PieceType getPieceType() {
+        return Util.PieceType.Bishop;
+    }
 
     // ----------- Checkers -------------
     @Override
@@ -23,16 +26,12 @@ public class Bishop extends Piece {
         int diff_in_y = new_y - cur_y;
         int diff_in_x = new_x - cur_x;
 
-        if (abs(diff_in_x) == abs(diff_in_y) && diff_in_x != 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return abs(diff_in_x) == abs(diff_in_y) && diff_in_x != 0;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if ( obj instanceof Bishop) {
+        if (obj instanceof Bishop) {
             return super.equals(obj);
         } else {
             return false;
@@ -43,7 +42,7 @@ public class Bishop extends Piece {
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);
-        switch (column){
+        switch (column) {
             case 1:
                 return replaceString(string, bold(","), 6, 6);
             case 2:
@@ -64,7 +63,7 @@ public class Bishop extends Piece {
                 if (this.getColor() == Util.Color.White) {
                     return replaceString(string, bold("{___}"), 4, 8);
                 } else {
-                    return replaceString(string, bold("{") + boldAndUnderline("/X\\")+ bold("}"), 4, 8);
+                    return replaceString(string, bold("{") + boldAndUnderline("/X\\") + bold("}"), 4, 8);
                 }
             case 6:
                 return string;

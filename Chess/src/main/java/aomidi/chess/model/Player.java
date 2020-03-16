@@ -1,10 +1,8 @@
 package aomidi.chess.model;
+
 import aomidi.chess.model.Util.Color;
 
 import java.util.ArrayList;
-
-import static aomidi.chess.model.Util.boldAndUnderline;
-import static aomidi.chess.model.Util.replaceString;
 
 public class Player {
     private Color color;
@@ -15,7 +13,7 @@ public class Player {
 
 
     // ----------- Constructors -------------
-    public Player(Color color, Game game){
+    public Player(Color color, Game game) {
         this.color = color;
         this.game = game;
         this.firstMove = true;
@@ -25,11 +23,17 @@ public class Player {
 
     // ----------- Getters -------------
 
-    public Color getColor() { return color; }
+    public Color getColor() {
+        return color;
+    }
 
-    public boolean isFirstMove() { return firstMove; }
+    public boolean isFirstMove() {
+        return firstMove;
+    }
 
-    public King getKing(){ return king; }
+    public King getKing() {
+        return king;
+    }
 
     // ----------- Setters -------------
 
@@ -37,15 +41,17 @@ public class Player {
         this.firstMove = isFirstMove;
     }
 
-    public void setChecked(boolean checked) { this.isChecked = checked; }
+    public void setChecked(boolean checked) {
+        this.isChecked = checked;
+    }
 
     // ----------- Checkers -------------
 
     public boolean isUnderCheck() {
         ArrayList<Piece> attacking_pieces = game.getBoard().getOpposingPieces(king.getColor());
 
-        for (Piece p: attacking_pieces){
-            if (game.getBoard().isAttacking(p, king)){
+        for (Piece p : attacking_pieces) {
+            if (game.getBoard().isAttacking(p, king)) {
                 return true;
             }
         }

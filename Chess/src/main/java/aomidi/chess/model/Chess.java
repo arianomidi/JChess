@@ -1,10 +1,5 @@
 package aomidi.chess.model;
 
-import java.util.Scanner;
-
-import static aomidi.chess.model.Util.input;
-import static aomidi.chess.model.Util.letterToInt;
-
 public class Chess {
     private Game game;
     private boolean standardGame;
@@ -14,11 +9,11 @@ public class Chess {
 
     // ----------- Constructors -------------
 
-    public Chess(){
+    public Chess() {
         this.standardGame = false;
         this.flipBoard = true;
         // Grey:37 Green:32 Black:30
-        this.boardColor = "32m";
+        boardColor = "32m";
 
         this.game = new Game(this);
         this.error = "";
@@ -26,7 +21,9 @@ public class Chess {
 
     // ----------- Getters -------------
 
-    public Game getGame() { return game; }
+    public Game getGame() {
+        return game;
+    }
 
     public boolean isStandardGame() {
         return standardGame;
@@ -36,13 +33,17 @@ public class Chess {
         return flipBoard;
     }
 
-    public static String getBoardColor() { return "\033[0;" + boardColor; }
+    public static String getBoardColor() {
+        return "\033[0;" + boardColor;
+    }
 
-    public static int getLen() { return getBoardColor().length(); }
+    public static int getLen() {
+        return getBoardColor().length();
+    }
 
     // ----------- Main -------------
 
-    public void startGame(){
+    public void startGame() {
         this.game.playGame();
     }
 

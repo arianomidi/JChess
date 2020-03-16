@@ -1,11 +1,11 @@
 package aomidi.chess.model;
 
-import static aomidi.chess.model.Util.*;
-import static aomidi.chess.model.Util.bold;
-import static java.lang.Math.abs;
-import aomidi.chess.model.Util.PieceType;
+import aomidi.chess.model.Util.*;
 
-public class Queen extends Piece{
+import static aomidi.chess.model.Util.*;
+import static java.lang.Math.abs;
+
+public class Queen extends Piece {
 
     // ----------- Constructor -------------
     public Queen(Tile tile, Util.Color color, Board board) {
@@ -14,35 +14,29 @@ public class Queen extends Piece{
 
     // ----------- Getters -------------
 
-    public PieceType getPieceType() { return Util.PieceType.Queen; }
+    public PieceType getPieceType() {
+        return Util.PieceType.Queen;
+    }
 
     // ----------- Checkers -------------
     @Override
-    public boolean validMove(Tile tile){
+    public boolean validMove(Tile tile) {
         int cur_x = this.getPosition().getX(), cur_y = this.getPosition().getY();
         int new_x = tile.getX(), new_y = tile.getY();
         int diff_in_y = new_y - cur_y;
         int diff_in_x = new_x - cur_x;
 
-        if (diff_in_x == 0){
-            if (diff_in_y != 0){
-                return true;
-            }
-        } else if (diff_in_y == 0){
-            if (diff_in_x != 0){
-                return true;
-            }
-        } else if (abs(diff_in_x) == abs(diff_in_y) && diff_in_x != 0) {
+        if (diff_in_x == 0) {
+            return diff_in_y != 0;
+        } else if (diff_in_y == 0) {
             return true;
-        }
-
-        return false;
+        } else return abs(diff_in_x) == abs(diff_in_y);
 
     }
 
     @Override
     public boolean equals(Object obj) {
-        if ( obj instanceof Queen) {
+        if (obj instanceof Queen) {
             return super.equals(obj);
         } else {
             return false;
@@ -53,7 +47,7 @@ public class Queen extends Piece{
     @Override
     public String toSymbol(int column) {
         String string = this.getPosition().getSymbol(column);
-        switch (column){
+        switch (column) {
             case 1:
                 return replaceString(string, bold("*"), 6, 6);
             case 2:
@@ -84,7 +78,7 @@ public class Queen extends Piece{
                 if (this.getColor() == Util.Color.White) {
                     return replaceString(string, bold("{___}") + "\033[4m", 8, 12);
                 } else {
-                    return replaceString(string, bold("{") + boldAndUnderline("/X\\")+ bold("}") + "\033[4m", 8, 12);
+                    return replaceString(string, bold("{") + boldAndUnderline("/X\\") + bold("}") + "\033[4m", 8, 12);
                 }
             default:
                 throw new IllegalArgumentException("Column out of range: " + column);

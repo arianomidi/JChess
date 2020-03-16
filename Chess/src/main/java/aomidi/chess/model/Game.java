@@ -1,15 +1,11 @@
 package aomidi.chess.model;
 
-import aomidi.chess.model.Util.Color;
+import aomidi.chess.model.Util.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static aomidi.chess.model.Util.*;
-import static aomidi.chess.model.Util.input;
-import static aomidi.chess.model.Util.isFile;
 
 public class Game {
     private Chess chess;
@@ -37,7 +33,7 @@ public class Game {
     }
 
     // Black Piece Top Half, White Bottom Half
-    public String getCustomStartingPieces(){
+    public String getCustomStartingPieces() {
         String s = "";
         s += "R N B Q K B N R ";
         s += "p p p p p p p p ";
@@ -71,7 +67,7 @@ public class Game {
 
     // ----------- Actions -------------
 
-    public boolean playerTurn (Player curPlayer){
+    public boolean playerTurn(Player curPlayer) {
         boolean pieceMoved = false;
 
         try {
@@ -110,7 +106,7 @@ public class Game {
         return pieceMoved;
     }
 
-    public boolean takeBackMove (){
+    public boolean takeBackMove() {
         // Remove Last Move
         Move lastMove = movesList.get(movesList.size() - 1);
         movesList.remove(movesList.size() - 1);
@@ -121,13 +117,13 @@ public class Game {
 
     // ----------- Main Function -------------
 
-    public void playGame () {
+    public void playGame() {
         boolean pieceMoved = playerTurn(curPlayer);
 
         while (!isGameOver) {
             if (pieceMoved) {
                 // If player moved is still in check take back move
-                if (curPlayer.isUnderCheck()){
+                if (curPlayer.isUnderCheck()) {
                     takeBackMove();
                 } else {
                     printBoard();
@@ -148,20 +144,20 @@ public class Game {
 
     // ----------- Game Functions -------------
 
-    public String GameStatus(){
+    public String GameStatus() {
         curPlayer.setChecked(true);
         Move last_move = movesList.get(movesList.size() - 1);
 
         if (curPlayer.isCheckmated()) {
             // Change last move notation to checkmate
-            last_move.getMove().replace("string", ((String) last_move.getMove().get("string")) + "#");
+            last_move.getMove().replace("string", last_move.getMove().get("string") + "#");
             System.out.println("\033[0;1mCheckmate\n");
 
             isGameOver = true;
             return "Checkmate";
         } else if (curPlayer.isUnderCheck()) {
             // Change last move notation to check
-            last_move.getMove().replace("string", ((String) last_move.getMove().get("string")) + "+");
+            last_move.getMove().replace("string", last_move.getMove().get("string") + "+");
             System.out.println("\033[0;1mCheck\n");
 
             return "Check";
@@ -190,7 +186,7 @@ public class Game {
         }
     }
 
-    public void GameOver(){
+    public void GameOver() {
         if (isDraw)
             System.out.println(boldAndUnderline("Game Over: Game Drawn\n") + "\033[0;0m");
         else
@@ -209,16 +205,14 @@ public class Game {
                 System.out.print("\n\n\n");
                 System.out.println(this.board.toSymbol(getOpposingPlayer().getColor()));
             }
-        }
-        else
+        } else
             System.out.println(this.board.toSymbol());
     }
 
     private void printMoves() {
-        for (int i = 0; i < movesList.size(); i++){
+        for (int i = 0; i < movesList.size(); i++) {
             if (i % 2 == 0) {
-                Integer move_num = (i / 2) + 1;
-                System.out.print(bold(move_num.toString() + ". ") + "\033[0;0m");
+                System.out.print(bold(((i / 2) + 1) + ". ") + "\033[0;0m");
             }
             System.out.print(movesList.get(i) + " ");
         }
