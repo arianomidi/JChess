@@ -22,6 +22,17 @@ public class Move {
         this.move = getMoveInput(input);
     }
 
+    public Move(Piece piece, Tile tile, Player player, Game game) {
+        this.game = game;
+        this.board = game.getBoard();
+        this.player = player;
+
+        this.move = new HashMap<>();
+        move.put("piece", piece);
+        move.put("tile", tile);
+        this.move.put("string", getTypeLetter(piece.getPieceType()) + tile);
+    }
+
     // ----------- Inputs -------------
 
     public Map<String, Object> getMoveInput(String input) {
@@ -231,6 +242,14 @@ public class Move {
                 } else if (pieces.get(i).getPosition().getY() == pieces.get(i - 1).getPosition().getY()) {
                     error += getTypeLetter(pieces.get(i).getPieceType()) + intToLetter(pieces.get(i).getPosition().getX()).toLowerCase() + tile + " or ";
                     error += getTypeLetter(pieces.get(i).getPieceType()) + intToLetter(pieces.get(i - 1).getPosition().getX()).toLowerCase() + tile;
+                } else if (pieces.get(0) instanceof Queen){
+                    if (pieces.get(i).getPosition().getX() == pieces.get(i - 1).getPosition().getX()) {
+                        error += getTypeLetter(pieces.get(i).getPieceType()) + pieces.get(i).getPosition().getY() + tile + " or ";
+                        error += getTypeLetter(pieces.get(i).getPieceType()) + pieces.get(i - 1).getPosition().getY() + tile;
+                    } else {
+                        error += "Q" + intToLetter(pieces.get(i).getPosition().getX()).toLowerCase() + tile + " or ";
+                        error += "Q" + intToLetter(pieces.get(i - 1).getPosition().getX()).toLowerCase() + tile;
+                    }
                 }
             }
         }
@@ -308,7 +327,7 @@ public class Move {
             if (pieceOnTile.getColor() == piece.getColor())
                 throw new IllegalArgumentException("There is already a " + piece.getColor() + " piece on " + new_tile);
             else
-                return piece.attack(new_tile);
+                return true;
         } else {
             return false;
         }
@@ -316,7 +335,7 @@ public class Move {
 
     // ----------- Action -------------
 
-    public boolean move() {
+    public boolean move() throws CloneNotSupportedException {
         Piece piece = (Piece) move.get("piece");
         Tile new_tile = (Tile) move.get("tile");
         move.put("old_tile", ((Piece) move.get("piece")).getPosition());
@@ -324,21 +343,32 @@ public class Move {
 
         // Test attack if there's a piece on the tile, else test moveTo
         if (hasPieceOnTile) {
-            return validAttack(piece, new_tile);
-        } else {
-            if (validMove(piece, new_tile)) {
-                return piece.moveTo(new_tile);
+            if (validAttack(piece, new_tile)) {
+                move.put("attacked_piece", new_tile.getPiece());
+                return piece.attack(new_tile);
             } else {
                 return false;
             }
+        } else {
+            if (validMove(piece, new_tile))
+                return piece.moveTo(new_tile);
+            else
+                return false;
         }
     }
 
-    public boolean moveBack() {
+    public void moveBack() {
         Piece piece = (Piece) move.get("piece");
         Tile old_tile = (Tile) move.get("old_tile");
 
-        return piece.moveTo(old_tile, true);
+        piece.moveTo(old_tile, true);
+
+        if (move.containsKey("attacked_piece")) {
+            Tile attacked_tile = (Tile) move.get("tile");
+            Piece attacked_piece = (Piece) move.get("attacked_piece");
+
+            board.addPieceAt(attacked_piece, attacked_tile);
+        }
     }
 
     // ----------- Other -------------

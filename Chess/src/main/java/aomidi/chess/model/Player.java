@@ -9,15 +9,12 @@ public class Player {
     private Game game;
     private boolean firstMove;
     private King king;
-    private boolean isChecked;
-
 
     // ----------- Constructors -------------
     public Player(Color color, Game game) {
         this.color = color;
         this.game = game;
         this.firstMove = true;
-        this.isChecked = false;
         this.king = (King) game.getBoard().getPiecesOfType(Util.PieceType.King, color).get(0);
     }
 
@@ -41,10 +38,6 @@ public class Player {
         this.firstMove = isFirstMove;
     }
 
-    public void setChecked(boolean checked) {
-        this.isChecked = checked;
-    }
-
     // ----------- Checkers -------------
 
     public boolean isUnderCheck() {
@@ -60,27 +53,70 @@ public class Player {
     }
 
     public boolean isCheckmated() {
-        return false;
-//        if (whitePlayer.isKingChecked() && whitePlayer.wasKingChecked()) {
-//            // Change last move notation to checkmate
-//            Move last_move = movesList.get(movesList.size() - 1);
-//            String new_move_str = (String) last_move.getMove().get("string");
-//            last_move.getMove().replace("string", replaceString(new_move_str, "#", new_move_str.length() - 1));
-//
-//            gameOver = true;
-//            System.out.println(boldAndUnderline("Checkmate: Black Wins\n") + "\033[0m");
-//            return true;
-//        } else if (blackPlayer.isKingChecked() && blackPlayer.wasKingChecked()) {
-//            // Change last move notation to checkmate
-//            Move last_move = movesList.get(movesList.size() - 1);
-//            String new_move_str = (String) last_move.getMove().get("string");
-//            last_move.getMove().replace("string", replaceString(new_move_str, "#", new_move_str.length() - 1));
-//
-//            gameOver = true;
-//            System.out.println(boldAndUnderline("Checkmate: White Wins\n") + "\033[0m");
-//            return true;
-//        } else
-//            return false;
+        boolean checkmate = true;
+        // If its a singular check, test if there is a piece that can block
+        ArrayList<ArrayList<Tile>> blocking_tiles = game.getBoard().getTilesBetweenKingCheckingPiece(this);
+
+        if (blocking_tiles.size() == 1)
+            for (Tile tile : blocking_tiles.get(0)){
+                ArrayList<Piece> defending_pieces = game.getBoard().getPieces(king.getColor());
+
+                for (Piece piece : defending_pieces) {
+                    if (!(piece instanceof King)) {
+                        try {
+                            // Test if Move is Valid
+                            Move move = new Move(piece, tile, this, game);
+
+                            if (tile.hasPiece())
+                                move.validAttack(piece, tile);
+                            else
+                                move.validMove(piece, tile);
+
+                            // If piece can move to a blocking tile then its not a checkmate
+                            if (piece.validMove(tile)) {
+
+                                System.out.println(move);
+                                checkmate = false;
+                            }
+
+                        } catch (Exception e) {
+//                            System.out.println(e.getMessage() + "\n");
+                        }
+                    }
+                }
+            }
+
+        if (!checkmate)
+            return false;
+
+        // Check if King has a legal move
+        for (int x_diff = -1; x_diff <= 1; x_diff++){
+            int file = king.getPosition().getX() + x_diff;
+
+            // Skip if file is out of bounds
+            if (file == 0 || file == 9)
+                continue;
+            for (int y_diff = -1; y_diff <= 1; y_diff++){
+                int rank = king.getPosition().getY() + y_diff;
+
+                // Skip if file is out of bounds or if tile is king
+                if (rank == 0 || rank == 9)
+                    continue;
+                else if (x_diff == 0 && y_diff == 0)
+                    continue;
+
+                Tile test_tile = game.getBoard().getTileAt(file, rank);
+
+                try {
+                    if (!test_tile.hasPiece() && king.validMove(test_tile))
+                        return false;
+                } catch (Exception e){
+
+                }
+            }
+        }
+
+        return true;
     }
 
 }

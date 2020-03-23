@@ -104,12 +104,16 @@ public class Board {
         return getTileAt(x, y).getPiece();
     }
 
-    public ArrayList<Piece> getOpposingPieces(Color color) {
-        if (getOpposingColor(color) == Color.White)
+    public  ArrayList<Piece> getPieces(Color color) {
+        if (color == Color.White)
             return whitePieces;
         else
             return blackPieces;
 
+    }
+
+    public ArrayList<Piece> getOpposingPieces(Color color) {
+        return getPieces(getOpposingColor(color));
     }
 
     public ArrayList<Piece> getPiecesOfType(PieceType type, Color color) {

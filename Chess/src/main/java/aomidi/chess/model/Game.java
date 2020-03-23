@@ -35,14 +35,14 @@ public class Game {
     // Black Piece Top Half, White Bottom Half
     public String getCustomStartingPieces() {
         String s = "";
-        s += "R N B Q K B N R ";
-        s += "p p p p p p p p ";
+        s += "    B     K     ";
+        s += "      p   Q   p ";
         s += "  #   #   #   # ";
         s += "#   #   #   #   ";
-        s += "  #   #   #   # ";
-        s += "#   #   #   #   ";
-        s += "p p p p p p p p ";
-        s += "R N B Q K B N R ";
+        s += "    B # Q #   # ";
+        s += "#   #   # Q #   ";
+        s += "p p p     p p p ";
+        s += "R N     K   N R ";
         return s;
     }
 
@@ -106,13 +106,13 @@ public class Game {
         return pieceMoved;
     }
 
-    public boolean takeBackMove() {
+    public void takeBackMove() {
         // Remove Last Move
         Move lastMove = movesList.get(movesList.size() - 1);
         movesList.remove(movesList.size() - 1);
 
         System.out.println("Illegal Move: Move puts King in check\n");
-        return lastMove.moveBack();
+        lastMove.moveBack();
     }
 
     // ----------- Main Function -------------
@@ -145,26 +145,94 @@ public class Game {
     // ----------- Game Functions -------------
 
     public String GameStatus() {
-        curPlayer.setChecked(true);
         Move last_move = movesList.get(movesList.size() - 1);
 
-        if (curPlayer.isCheckmated()) {
-            // Change last move notation to checkmate
-            last_move.getMove().replace("string", last_move.getMove().get("string") + "#");
-            System.out.println("\033[0;1mCheckmate\n");
+        if (curPlayer.isUnderCheck()) {
+            if (isCheckmate()) {
+                // Change last move notation to checkmate
+                last_move.getMove().replace("string", last_move.getMove().get("string") + "#");
+                System.out.println("\033[0;1mCheckmate\n");
 
-            isGameOver = true;
-            return "Checkmate";
-        } else if (curPlayer.isUnderCheck()) {
-            // Change last move notation to check
-            last_move.getMove().replace("string", last_move.getMove().get("string") + "+");
-            System.out.println("\033[0;1mCheck\n");
+                isGameOver = true;
+                return "Checkmate";
+            } else {
+                // Change last move notation to check
+                last_move.getMove().replace("string", last_move.getMove().get("string") + "+");
+                System.out.println("\033[0;1mCheck\n");
 
-            return "Check";
+                return "Check";
+            }
         }
 
         return "";
     }
+
+    private boolean isCheckmate(){
+        boolean checkmate = true;
+        // If its a singular check, test if there is a piece that can block
+        ArrayList<ArrayList<Tile>> blocking_tiles = board.getTilesBetweenKingCheckingPiece(curPlayer);
+
+        if (blocking_tiles.size() == 1)
+            for (Tile tile : blocking_tiles.get(0)){
+                ArrayList<Piece> defending_pieces = board.getPieces(curPlayer.getColor());
+
+                for (Piece piece : defending_pieces) {
+                    if (!(piece instanceof King)) {
+                        try {
+                            // Test if Move is Valid
+                            Move move = new Move(piece, tile, curPlayer, this);
+
+                            // If piece can move to a blocking tile then its not a checkmate
+                            if (move.move()) {
+                                if (!curPlayer.isUnderCheck()){
+                                    System.out.println(move);
+                                    checkmate = false;
+                                }
+                                move.moveBack();
+                            }
+
+                        } catch (Exception e) {
+//                            System.out.println(e.getMessage() + "\n");
+                        }
+                    }
+                }
+            }
+
+        if (!checkmate)
+            return false;
+
+
+        // Check if King has a legal move
+        King king = curPlayer.getKing();
+        for (int x_diff = -1; x_diff <= 1; x_diff++){
+            int file = king.getPosition().getX() + x_diff;
+
+            // Skip if file is out of bounds
+            if (file == 0 || file == 9)
+                continue;
+            for (int y_diff = -1; y_diff <= 1; y_diff++){
+                int rank = king.getPosition().getY() + y_diff;
+
+                // Skip if file is out of bounds or if tile is king
+                if (rank == 0 || rank == 9)
+                    continue;
+                else if (x_diff == 0 && y_diff == 0)
+                    continue;
+
+                Tile test_tile = board.getTileAt(file, rank);
+
+                try {
+                    if (!test_tile.hasPiece() && king.validMove(test_tile))
+                        return false;
+                } catch (Exception e){
+
+                }
+            }
+        }
+
+        return true;
+    }
+
 
     public void DrawOffer() throws Exception {
         sleep(1000);

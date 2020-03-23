@@ -6,7 +6,7 @@ import aomidi.chess.model.Util.PieceType;
 import static aomidi.chess.model.Util.getColorLetter;
 import static aomidi.chess.model.Util.getTypeLetter;
 
-public abstract class Piece {
+public abstract class Piece implements Cloneable{
     private Tile tile;
     private Color color;
     private Board board;
@@ -70,7 +70,7 @@ public abstract class Piece {
     // Attack only if its a valid attack
     public boolean attack(Tile tile) {
         if (validAttack(tile)) {
-            tile.getPiece().delete();
+            this.board.removePieceAt(tile);
             // Move piece to new tile
             return this.moveTo(tile, true);
         } else
@@ -105,10 +105,8 @@ public abstract class Piece {
 
     public void delete() {
         // remove piece from tile and board
-        this.board.removePieceAt(this.tile);
 
-        this.tile = null;
-        this.color = null;
     }
+
 
 }
