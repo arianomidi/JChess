@@ -10,6 +10,8 @@ public class ChessApplication {
 
         chess.startGame();
 
+
+
     }
 
 }

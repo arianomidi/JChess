@@ -35,14 +35,14 @@ public class Game {
     // Black Piece Top Half, White Bottom Half
     public String getCustomStartingPieces() {
         String s = "";
-        s += "    B     K     ";
-        s += "      p   Q   p ";
-        s += "  #   #   #   # ";
-        s += "#   #   #   #   ";
-        s += "    B # Q #   # ";
-        s += "#   #   # Q #   ";
-        s += "p p p     p p p ";
-        s += "R N     K   N R ";
+        s += "   . b .   k   . ";
+        s += " .   . p . q . p ";
+        s += "   .   .   .   . ";
+        s += " .   .   .   .   ";
+        s += "   . B . q .   . ";
+        s += " .   .   . Q .   ";
+        s += " P P P .   P P P ";
+        s += " R N .   K   N R ";
         return s;
     }
 
@@ -78,7 +78,6 @@ public class Game {
                 System.out.println("\033[0;1m" + "Move Again:" + "\033[0;0m");
             }
 
-            generateMoves();
             // Get player input
             String input = input(" * Enter Move: ");
             switch (input.toUpperCase()) {
@@ -265,33 +264,33 @@ public class Game {
 
     // ----------- Extra -------------
 
-    private ArrayList<Move> generateMoves(){
-        ArrayList<Move> legalMoves = new ArrayList<>();
-        ArrayList<Piece> pieces = board.getPieces(curPlayer.getColor());
-
-        for (int file = 1; file <= 8; file++){
-            for (int rank = 1; rank <= 8; rank++){
-                Tile tile = getBoard().getTileAt(file, rank);
-
-                for (Piece piece : pieces) {
-                    try {
-
-                        Move move = new Move(piece, tile, curPlayer, this);
-                        if (move.validAttack(piece, tile) || move.validMove(piece, tile)) {
-                            legalMoves.add(move);
-                        }
-
-                    } catch (Exception e) {
-                        //System.out.println(e.getMessage());
-
-                    }
-                }
-            }
-        }
-        System.out.println(legalMoves);
-
-        return legalMoves;
-    }
+//    private ArrayList<Move> generateMoves(){
+//        ArrayList<Move> legalMoves = new ArrayList<>();
+//        ArrayList<Piece> pieces = board.getPieces(curPlayer.getColor());
+//
+//        for (int file = 1; file <= 8; file++){
+//            for (int rank = 1; rank <= 8; rank++){
+//                Tile tile = getBoard().getTileAt(file, rank);
+//
+//                for (Piece piece : pieces) {
+//                    try {
+//
+//                        Move move = new Move(piece, tile, curPlayer, this);
+//                        if (move.validAttack(piece, tile) || move.validMove(piece, tile)) {
+//                            legalMoves.add(move);
+//                        }
+//
+//                    } catch (Exception e) {
+//                        //System.out.println(e.getMessage());
+//
+//                    }
+//                }
+//            }
+//        }
+//        System.out.println(legalMoves);
+//
+//        return legalMoves;
+//    }
 
 
     // ----------- Prints -------------

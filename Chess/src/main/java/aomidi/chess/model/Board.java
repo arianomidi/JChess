@@ -54,16 +54,16 @@ public class Board {
 
         for (int rank = 8; rank >= 1; rank--) {
             for (int file = 1; file <= 8; file++) {
-                String str_type = pieces.substring((16 * (8 - rank)) + 2 * (file - 1), (16 * (8 - rank)) + 2 * file - 1);
+                String str = pieces.substring((17 * (8 - rank)) + 2 * (file - 1) + 1, (17 * (8 - rank)) + 2 * file );
 
-                if (str_type.compareTo("#") != 0 && str_type.compareTo(" ") != 0) {
-                    PieceType type = getPieceType(str_type);
-
+                if (str.compareTo(".") != 0 && str.compareTo(" ") != 0) {
+                    PieceType type = getPieceType(str);
                     Color color;
-                    if (rank >= 5)
-                        color = Color.Black;
+
+                    if (Character.isUpperCase(str.charAt(0)))
+                        color = Util.Color.White;
                     else
-                        color = Color.White;
+                        color = Util.Color.Black;
 
                     this.addStartingPiece(type, file, rank, color);
                 }
