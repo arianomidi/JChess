@@ -1,6 +1,6 @@
-package aomidi.chess.model;
+package aomidi.chess.ai.model;
 
-import aomidi.chess.model.Util.Color;
+import aomidi.chess.ai.model.Util.Color;
 
 import static aomidi.chess.model.Util.intToLetter;
 import static aomidi.chess.model.Util.underline;

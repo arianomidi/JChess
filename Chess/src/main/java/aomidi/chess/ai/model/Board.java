@@ -1,19 +1,20 @@
-package aomidi.chess.model;
-
-import aomidi.chess.model.Util.*;
+package aomidi.chess.ai.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static aomidi.chess.model.Util.*;
+import static aomidi.chess.ai.model.Util.*;
 import static java.lang.Math.abs;
 
-public class Board {
+public class Board implements Cloneable{
     private Game game;
     private HashMap<String, ArrayList<Tile>> tiles;
+    private ArrayList<Tile> allTiles;
     private ArrayList<Piece> allPieces;
     private ArrayList<Piece> blackPieces;
     private ArrayList<Piece> whitePieces;
+    private King whiteKing;
+    private King blackKing;
 
     // ----------- Constructors -------------
 
@@ -23,6 +24,7 @@ public class Board {
         this.blackPieces = new ArrayList<>();
         this.whitePieces = new ArrayList<>();
         this.tiles = new HashMap<>();
+        this.allTiles = new ArrayList<>();
 
         // Init tiles
         for (int file = 1; file <= 8; file++) {
@@ -39,6 +41,8 @@ public class Board {
 
                 // Add tile to rank
                 row.add(rank - 1, tile);
+                // Add tile to all tiles
+                this.allTiles.add(tile);
             }
             // Add file to specific letter
             this.tiles.put(intToLetter(file), row);
@@ -54,16 +58,16 @@ public class Board {
 
         for (int rank = 8; rank >= 1; rank--) {
             for (int file = 1; file <= 8; file++) {
-                String str_type = pieces.substring((16 * (8 - rank)) + 2 * (file - 1), (16 * (8 - rank)) + 2 * file - 1);
+                String str = pieces.substring((17 * (8 - rank)) + 2 * (file - 1) + 1, (17 * (8 - rank)) + 2 * file );
 
-                if (str_type.compareTo("#") != 0 && str_type.compareTo(" ") != 0) {
-                    PieceType type = getPieceType(str_type);
-
+                if (str.compareTo(".") != 0 && str.compareTo(" ") != 0) {
+                    PieceType type = getPieceType(str);
                     Color color;
-                    if (rank >= 5)
-                        color = Color.Black;
-                    else
+
+                    if (Character.isUpperCase(str.charAt(0)))
                         color = Color.White;
+                    else
+                        color = Color.Black;
 
                     this.addStartingPiece(type, file, rank, color);
                 }
@@ -72,29 +76,72 @@ public class Board {
     }
 
     private void addStartingPiece(PieceType type, int file, int rank, Color color) {
+        Piece addedPiece;
         switch (type) {
             case Pawn:
-                new Pawn(getTileAt(file, rank), color, this);
+                addedPiece = new Pawn(getTileAt(file, rank), color);
                 break;
             case Knight:
-                new Knight(getTileAt(file, rank), color, this);
+                addedPiece = new Knight(getTileAt(file, rank), color);
                 break;
             case Bishop:
-                new Bishop(getTileAt(file, rank), color, this);
+                addedPiece = new Bishop(getTileAt(file, rank), color);
                 break;
             case Rook:
-                new Rook(getTileAt(file, rank), color, this);
+                addedPiece = new Rook(getTileAt(file, rank), color);
                 break;
             case Queen:
-                new Queen(getTileAt(file, rank), color, this);
+                addedPiece = new Queen(getTileAt(file, rank), color);
                 break;
             case King:
-                new King(getTileAt(file, rank), color, this);
+                addedPiece = new King(getTileAt(file, rank), color);
                 break;
+            default:
+                throw new IllegalArgumentException("Invalid Piece");
+        }
+
+        addPieceAt(addedPiece,file,rank);
+
+        if (addedPiece.getPieceType() == PieceType.King){
+            if (addedPiece.getColor() == Color.White)
+                whiteKing = (King) addedPiece;
+            else
+                blackKing = (King) addedPiece;
         }
     }
 
     // ----------- Getters -------------
+
+    public String getFEN(){
+        String FEN = "";
+
+        for (int rank = 8; rank >= 1; rank--){
+            int space = 0;
+            for (int file = 1; file <= 8; file++){
+                Tile tile = getTileAt(file, rank);
+
+                if (tile.hasPiece()){
+                    Piece piece = tile.getPiece();
+
+                    if (space != 0) {
+                        FEN += space;
+                        space = 0;
+                    }
+
+                    FEN += getTypeLetter(piece.getPieceType(), piece.getColor());
+                } else
+                    space++;
+
+            }
+
+            if (space != 0)
+                FEN += space;
+
+            FEN += "/";
+        }
+
+        return FEN;
+    }
 
     public Tile getTileAt(Integer file, Integer rank) {
         return this.tiles.get(intToLetter(file)).get(rank - 1);
@@ -102,6 +149,13 @@ public class Board {
 
     public Piece getPieceAt(Integer x, Integer y) {
         return getTileAt(x, y).getPiece();
+    }
+
+    public King getKing(Color color){
+        if (color == Color.White)
+            return whiteKing;
+        else
+            return blackKing;
     }
 
     public  ArrayList<Piece> getPieces(Color color) {
@@ -176,7 +230,7 @@ public class Board {
     }
 
     public ArrayList<ArrayList<Tile>> getTilesBetweenKingCheckingPiece(Player player) {
-        King king = player.getKing();
+        King king = getKing(player.getColor());
         ArrayList<Piece> opposing_pieces = getOpposingPieces(player.getColor());
         ArrayList<ArrayList<Tile>> tiles_to_block = new ArrayList<>();
 
@@ -314,6 +368,26 @@ public class Board {
 
         return false;
     }
+
+    // ----------- Actions -------------
+
+    public boolean movePieceTo(Piece piece, Tile tile){
+        if (!tile.hasPiece()){
+            piece.setTile(tile);
+            return true;
+        } else
+            return false;
+    }
+
+    public boolean attackPieceAt(Piece piece, Tile tile){
+        if (tile.hasPiece() && tile.getPiece().getColor() != piece.getColor() && piece.validAttack(tile)){
+            removePieceAt(tile);
+            movePieceTo(piece, tile);
+            return true;
+        } else
+            return false;
+    }
+
 
     // ----------- Others -------------
 

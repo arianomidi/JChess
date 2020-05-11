@@ -78,6 +78,7 @@ public class Game {
                 System.out.println("\033[0;1m" + "Move Again:" + "\033[0;0m");
             }
 
+            generateMoves();
             // Get player input
             String input = input(" * Enter Move: ");
             switch (input.toUpperCase()) {
@@ -262,6 +263,37 @@ public class Game {
         printMoves();
     }
 
+    // ----------- Extra -------------
+
+    private ArrayList<Move> generateMoves(){
+        ArrayList<Move> legalMoves = new ArrayList<>();
+        ArrayList<Piece> pieces = board.getPieces(curPlayer.getColor());
+
+        for (int file = 1; file <= 8; file++){
+            for (int rank = 1; rank <= 8; rank++){
+                Tile tile = getBoard().getTileAt(file, rank);
+
+                for (Piece piece : pieces) {
+                    try {
+
+                        Move move = new Move(piece, tile, curPlayer, this);
+                        if (move.validAttack(piece, tile) || move.validMove(piece, tile)) {
+                            legalMoves.add(move);
+                        }
+
+                    } catch (Exception e) {
+                        //System.out.println(e.getMessage());
+
+                    }
+                }
+            }
+        }
+        System.out.println(legalMoves);
+
+        return legalMoves;
+    }
+
+
     // ----------- Prints -------------
 
     private void printBoard() {
@@ -273,7 +305,9 @@ public class Game {
                 System.out.print("\n\n\n");
                 System.out.println(this.board.toSymbol(getOpposingPlayer().getColor()));
             }
-        } else
+        } else if (chess.simpleSelected())
+            System.out.println(this.board.toSimpleSymbol());
+        else
             System.out.println(this.board.toSymbol());
     }
 

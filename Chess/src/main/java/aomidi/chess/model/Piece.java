@@ -103,6 +103,13 @@ public abstract class Piece implements Cloneable{
 
     public abstract String toSymbol(int column);
 
+    public String toSimpleSymbol() {
+        if (color == Color.Black)
+            return getTypeLetter(this.getPieceType()).toLowerCase();
+        else
+            return "\033[0;37m" + getTypeLetter(this.getPieceType()) + "\033[0m";
+    }
+
     public void delete() {
         // remove piece from tile and board
 

@@ -1,4 +1,4 @@
-package aomidi.chess.model;
+package aomidi.chess.ai.model;
 
 public class Chess {
     private Game game;
@@ -11,7 +11,7 @@ public class Chess {
     // ----------- Constructors -------------
 
     public Chess() {
-        this.standardGame = true;
+        this.standardGame = false;
         this.simple = true;
         this.flipBoard = true;
         // Grey:37 Green:32 Black:30
@@ -37,7 +37,7 @@ public class Chess {
     }
 
     public boolean simpleSelected() {
-        return standardGame;
+        return simple;
     }
 
     public boolean flipBoardSelected() {
