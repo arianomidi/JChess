@@ -896,23 +896,44 @@ public class Board implements Cloneable, BoardEvent {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
+        sb.append("\n");
+        sb.append("    A  B  C  D  E  F  G  H    \n");
+        sb.append("  +------------------------+  \n");
+
         for (int i = 7; i >= 0; i--) {
             Rank r = Rank.values()[i];
-            for (int n = 0; n <= 7; n++) {
+            for (int n = -1; n <= 8; n++) {
+                if (n == -1) {
+                    sb.append((i + 1) + " |");
+                    continue;
+                }else if (n == 8){
+                    sb.append("| " + (i + 1));
+                    continue;
+                }
+
                 File f = File.values()[n];
                 if (!File.NONE.equals(f) && !Rank.NONE.equals(r)) {
                     Square sq = Square.encode(r, f);
                     Piece piece = getPiece(sq);
                     if (Piece.NONE.equals(piece)) {
-                        sb.append(" ");
+                        if (sq.isLightSquare())
+                            sb.append("   ");
+                        else
+                            sb.append(" . ");
+                    } else if (piece.getPieceSide() == Side.WHITE){
+                        sb.append(" \033[1;37m" + Constants.getPieceNotation(piece) + "\033[0m ");
                     } else {
-                        sb.append(Constants.getPieceNotation(piece));
+                        sb.append(" \033[1m" + Constants.getPieceNotation(piece) + "\033[0m ");
                     }
                 }
             }
             sb.append("\n");
         }
-        sb.append("Side: " + getSideToMove());
+
+        sb.append("  +------------------------+  \n");
+        sb.append("    A  B  C  D  E  F  G  H    \n");
+
+        //sb.append("Side: " + getSideToMove());
 
         return sb.toString();
     }

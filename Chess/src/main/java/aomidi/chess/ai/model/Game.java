@@ -1,11 +1,18 @@
 package aomidi.chess.ai.model;
 
-import static aomidi.chess.ai.model.Util.*;
 import aomidi.chess.ai.model.Util.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static aomidi.chess.ai.model.Util.*;
+
+import com.github.bhlangonijr.chesslib.*;
+import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.bhlangonijr.chesslib.move.MoveGenerator;
+import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
+import com.github.bhlangonijr.chesslib.move.MoveList;
+import org.graalvm.compiler.lir.LIRInstruction;
 
 public class Game {
     private Chess chess;
@@ -18,34 +25,25 @@ public class Game {
     private boolean isDraw;
 
     // ----------- Constructors -------------
-    public Game(Chess chess) {
+    public Game(Chess chess) throws MoveGeneratorException {
         this.chess = chess;
-        this.board = new Board(this);
-        this.movesList = new ArrayList<>();
+        this.board = new Board();
 
-        this.whitePlayer = new Player(Color.White, this);
-        this.blackPlayer = new Player(Color.Black, this);
+        board.loadFromFen("r1b1k2r/pp1n1p1p/2p1pqpn/3pN3/4P1Q1/3K4/PBPP1PPP/R4BNR w kq - 0 1");
+
+        this.whitePlayer = new User(Side.WHITE, this);
+        this.blackPlayer = new AI(Side.BLACK, this);
         this.curPlayer = this.whitePlayer;
 
         this.isGameOver = false;
 
-        printBoard();
-    }
+        //print the chessboard in a human-readable form
+        System.out.println(board.toString());
 
-    // Black Piece Top Half, White Bottom Half
-    public String getCustomStartingPieces() {
-        String s = "";
-        s += "   . b .   k   . ";
-        s += " .   . p . q . p ";
-        s += "   .   .   .   . ";
-        s += " .   .   .   .   ";
-        s += "   . B . Q .   . ";
-        s += " .   .   . Q .   ";
-        s += " P P P .   P P P ";
-        s += " R N .   K   N R ";
-        return s;
+        MoveList moves = MoveGenerator.generateLegalMoves(board);
+        System.out.println("Eval: " + Util.evaluateBoard(board) + "\n");
+        printLegalMovesEvals(board);
     }
-
 
     // ----------- Getters -------------
 
@@ -58,7 +56,7 @@ public class Game {
     }
 
     public Player getOpposingPlayer() {
-        if (curPlayer.getColor() == Color.White) {
+        if (curPlayer.getSide() == Side.WHITE) {
             return blackPlayer;
         } else {
             return whitePlayer;
@@ -67,10 +65,42 @@ public class Game {
 
     // ----------- Actions -------------
 
-//    public boolean playerTurn(Player curPlayer) {
-//        boolean pieceMoved = false;
-//
-//        try {
+    public boolean playerTurn(Player curPlayer) {
+        boolean pieceMoved = false;
+
+        try {
+            if (curPlayer instanceof User){
+                if (curPlayer.isFirstMove()) {
+                System.out.println("\033[0;1m" + curPlayer.getSide() + "Player's Turn" + "\033[0;0m");
+                curPlayer.setFirstMove(false);
+                } else
+                    System.out.println("\033[0;1m" + "Move Again:" + "\033[0;0m");
+
+                // Get player input
+                String input = input(" * Enter Move: ");
+                switch (input.toUpperCase()) {
+                    case "CLOSE":
+                    case "EXIT":
+                        isGameOver = true;
+                        throw new Exception("Exit Game");
+                    case "RESIGN":
+                        isGameOver = true;
+                        throw new Exception(bold(curPlayer.getSide() + " Resigns"));
+                    case "DRAW":
+                        //DrawOffer();
+                        break;
+                    default:
+                        // Try to move to piece
+                        pieceMoved = curPlayer.movePiece(input);
+
+//                        if (pieceMoved)
+//                            movesList.add(move);
+                }
+            } else {
+                pieceMoved = ((AI) curPlayer).movePiece();
+            }
+
+
 //            if (curPlayer.isFirstMove()) {
 //                System.out.println("\033[0;1m" + curPlayer.getColor() + "Player's Turn" + "\033[0;0m");
 //                curPlayer.setFirstMove(false);
@@ -78,7 +108,6 @@ public class Game {
 //                System.out.println("\033[0;1m" + "Move Again:" + "\033[0;0m");
 //            }
 //
-//            generateMoves();
 //            // Get player input
 //            String input = input(" * Enter Move: ");
 //            switch (input.toUpperCase()) {
@@ -88,9 +117,10 @@ public class Game {
 //                    throw new Exception("Exit Game");
 //                case "RESIGN":
 //                    isGameOver = true;
-//                    throw new Exception(bold(curPlayer.getColor() + " Resigns"));
+//                    throw new Exception(bold(curPlayer.getSide() + " Resigns"));
 //                case "DRAW":
-//                    DrawOffer();
+//                    //DrawOffer();
+//                    break;
 //                default:
 //                    // Try to move to piece
 //                    Move move = new Move(input, curPlayer, this);
@@ -99,48 +129,43 @@ public class Game {
 //                    if (pieceMoved)
 //                        movesList.add(move);
 //            }
-//
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage() + "\n");
-//        }
-//
-//        return pieceMoved;
-//    }
 
-//    public void takeBackMove() {
-//        // Remove Last Move
-//        Move lastMove = movesList.get(movesList.size() - 1);
-//        movesList.remove(movesList.size() - 1);
-//
-//        System.out.println("Illegal Move: Move puts King in check\n");
-//        lastMove.moveBack();
-//    }
+        } catch (Exception e) {
+            System.out.println(e.getMessage() + "\n");
+        }
 
-    // ----------- Main Function -------------
-
-    public void playGame() {
-//        boolean pieceMoved = playerTurn(curPlayer);
+        return pieceMoved;
+    }
 //
-//        while (!isGameOver) {
-//            if (pieceMoved) {
-//                // If player moved is still in check take back move
-//                if (curPlayer.isUnderCheck()) {
-//                    takeBackMove();
-//                } else {
-//                    printBoard();
-//                    // Reset players moves
-//                    curPlayer.setFirstMove(true);
-//                    // Switch players
-//                    curPlayer = getOpposingPlayer();
-//                    // Get Checks and Checkmates
-//                    if (GameStatus().compareTo("Checkmate") == 0)
-//                        break;
+//    // ----------- Main Function -------------
+//
+    public void playGame() throws MoveGeneratorException {
+        boolean pieceMoved = playerTurn(curPlayer);
+
+        while (!isGameOver) {
+            if (pieceMoved) {
+//                if (curPlayer instanceof User) {
+                    System.out.println(board);
+                    System.out.println("Eval: " + Util.evaluateBoard(board) + "\n");
+                    printLegalMovesEvals(board);
+                    // Reset players moves
+                    curPlayer.setFirstMove(true);
 //                }
-//            }
-//            pieceMoved = playerTurn(curPlayer);
-//        }
-//
-//        GameOver();
+                // Switch players
+                curPlayer = getOpposingPlayer();
+                // Get Checks and Checkmates
+                if (board.isMated()) {
+                    System.out.println("Checkmate");
+                    break;
+                } else if (board.isDraw()){
+                    isDraw = true;
+                    break;
+                }
+            }
+            pieceMoved = playerTurn(curPlayer);
+        }
+
+        GameOver();
     }
 
     // ----------- Game Functions -------------
@@ -167,7 +192,7 @@ public class Game {
 //
 //        return "";
 //    }
-//
+
 //    private boolean isCheckmate(){
 //        boolean checkmate = true;
 //        // If its a singular check, test if there is a piece that can block
@@ -233,8 +258,8 @@ public class Game {
 //
 //        return true;
 //    }
-//
-//
+
+
 //    public void DrawOffer() throws Exception {
 //        sleep(1000);
 //        System.out.println("\n\n");
@@ -255,16 +280,17 @@ public class Game {
 //        }
 //    }
 //
-//    public void GameOver() {
-//        if (isDraw)
-//            System.out.println(boldAndUnderline("Game Over: Game Drawn\n") + "\033[0;0m");
-//        else
-//            System.out.println(boldAndUnderline("Game Over: " + getOpposingPlayer().getColor() + " Wins\n") + "\033[0;0m");
-//        printMoves();
-//    }
-//
-//    // ----------- Extra -------------
-//
+    public void GameOver() {
+        if (isDraw)
+            System.out.println(boldAndUnderline("Game Over: Game Drawn\n") + "\033[0;0m");
+        else
+            System.out.println(boldAndUnderline("Game Over: " + getOpposingPlayer().getSide() + " Wins\n") + "\033[0;0m");
+
+
+    }
+
+    // ----------- Extra -------------
+
 //    private ArrayList<Move> generateMoves(){
 //        ArrayList<Move> legalMoves = new ArrayList<>();
 //        ArrayList<Piece> pieces = board.getPieces(curPlayer.getColor());
@@ -296,22 +322,20 @@ public class Game {
 
     // ----------- Prints -------------
 
-    private void printBoard() {
-        if (this.chess.flipBoardSelected()) {
-            System.out.println(this.board.toSymbol(curPlayer.getColor()));
-            if (!movesList.isEmpty()) {
-                System.out.print("\n\n");
-                sleep(1500);
-                System.out.print("\n\n\n");
-                System.out.println(this.board.toSymbol(getOpposingPlayer().getColor()));
-            }
-        } else if (chess.simpleSelected())
-            System.out.println(this.board.toSimpleSymbol());
-        else
-            System.out.println(this.board.toSymbol());
-
-        System.out.println(board.getFEN());
-    }
+//    private void printBoard() {
+//        if (this.chess.flipBoardSelected()) {
+//            System.out.println(this.board.toSymbol(curPlayer.getColor()));
+//            if (!movesList.isEmpty()) {
+//                System.out.print("\n\n");
+//                sleep(1500);
+//                System.out.print("\n\n\n");
+//                System.out.println(this.board.toSymbol(getOpposingPlayer().getColor()));
+//            }
+//        } else if (chess.simpleSelected())
+//            System.out.println(this.board.toSimpleSymbol());
+//        else
+//            System.out.println(this.board.toSymbol());
+//    }
 
     private void printMoves() {
         for (int i = 0; i < movesList.size(); i++) {
