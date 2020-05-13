@@ -99,7 +99,7 @@ public class Move implements BoardEvent{
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Move)) {
+        if (!(obj instanceof Move)) {
             return false;
         }
         Move move = (Move) obj;
@@ -107,14 +107,6 @@ public class Move implements BoardEvent{
                 move.getTo().equals(getTo()) &&
                 move.getPromotion().equals(getPromotion());
 
-    }
-
-    public Integer getEval(Board board){
-        board.doMove(this);
-        Integer eval = evaluateBoard(board);
-        board.undoMove();
-
-        return eval;
     }
 
     @Override

@@ -892,47 +892,131 @@ public class Board implements Cloneable, BoardEvent {
         return backup;
     }
 
+//    @Override
+//    public String toString() {
+//        StringBuilder sb = new StringBuilder();
+//
+//        sb.append("\n");
+//        sb.append("    A  B  C  D  E  F  G  H    \n");
+//        sb.append("  +------------------------+  \n");
+//
+//        for (int i = 7; i >= 0; i--) {
+//            Rank r = Rank.values()[i];
+//            for (int n = -1; n <= 8; n++) {
+//                if (n == -1) {
+//                    sb.append((i + 1) + " |");
+//                    continue;
+//                }else if (n == 8){
+//                    sb.append("| " + (i + 1));
+//                    continue;
+//                }
+//
+//                File f = File.values()[n];
+//                if (!File.NONE.equals(f) && !Rank.NONE.equals(r)) {
+//                    Square sq = Square.encode(r, f);
+//                    Piece piece = getPiece(sq);
+//                    if (Piece.NONE.equals(piece)) {
+//                        if (sq.isLightSquare())
+//                            sb.append("   ");
+//                        else
+//                            sb.append(" . ");
+//                    } else if (piece.getPieceSide() == Side.WHITE){
+//                        sb.append(" \033[1;37m" + Constants.getPieceNotation(piece) + "\033[0m ");
+//                    } else {
+//                        sb.append(" \033[1m" + Constants.getPieceNotation(piece) + "\033[0m ");
+//                    }
+//                }
+//            }
+//            sb.append("\n");
+//        }
+//
+//        sb.append("  +------------------------+  \n");
+//        sb.append("    A  B  C  D  E  F  G  H    \n");
+//
+//        //sb.append("Side: " + getSideToMove());
+//
+//        return sb.toString();
+//    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        if (sideToMove == Side.WHITE){
+            sb.append("\n");
+            sb.append("    A  B  C  D  E  F  G  H    \n");
+            sb.append("  +------------------------+  \n");
 
-        sb.append("\n");
-        sb.append("    A  B  C  D  E  F  G  H    \n");
-        sb.append("  +------------------------+  \n");
+            for (int i = 7; i >= 0; i--) {
+                Rank r = Rank.values()[i];
+                for (int n = -1; n <= 8; n++) {
+                    if (n == -1) {
+                        sb.append(i + 1).append(" |");
+                        continue;
+                    }else if (n == 8){
+                        sb.append("| ").append(i + 1);
+                        continue;
+                    }
 
-        for (int i = 7; i >= 0; i--) {
-            Rank r = Rank.values()[i];
-            for (int n = -1; n <= 8; n++) {
-                if (n == -1) {
-                    sb.append((i + 1) + " |");
-                    continue;
-                }else if (n == 8){
-                    sb.append("| " + (i + 1));
-                    continue;
-                }
-
-                File f = File.values()[n];
-                if (!File.NONE.equals(f) && !Rank.NONE.equals(r)) {
-                    Square sq = Square.encode(r, f);
-                    Piece piece = getPiece(sq);
-                    if (Piece.NONE.equals(piece)) {
-                        if (sq.isLightSquare())
-                            sb.append("   ");
-                        else
-                            sb.append(" . ");
-                    } else if (piece.getPieceSide() == Side.WHITE){
-                        sb.append(" \033[1;37m" + Constants.getPieceNotation(piece) + "\033[0m ");
-                    } else {
-                        sb.append(" \033[1m" + Constants.getPieceNotation(piece) + "\033[0m ");
+                    File f = File.values()[n];
+                    if (!File.NONE.equals(f) && !Rank.NONE.equals(r)) {
+                        Square sq = Square.encode(r, f);
+                        Piece piece = getPiece(sq);
+                        if (Piece.NONE.equals(piece)) {
+                            if (sq.isLightSquare())
+                                sb.append("   ");
+                            else
+                                sb.append(" . ");
+                        } else if (piece.getPieceSide() == Side.WHITE){
+                            sb.append(" \033[1;37m").append(Constants.getPieceNotation(piece)).append("\033[0m ");
+                        } else {
+                            sb.append(" \033[1m").append(Constants.getPieceNotation(piece)).append("\033[0m ");
+                        }
                     }
                 }
+                sb.append("\n");
             }
+
+            sb.append("  +------------------------+  \n");
+            sb.append("    A  B  C  D  E  F  G  H    \n");
+
+        } else {
             sb.append("\n");
+            sb.append("    H  G  F  E  D  C  B  A    \n");
+            sb.append("  +------------------------+  \n");
+
+            for (int i = 0; i < 8; i++) {
+                Rank r = Rank.values()[i];
+                for (int n = 8; n >= -1; n--) {
+                    if (n == -1) {
+                        sb.append("| ").append(i + 1);
+                        continue;
+                    } else if (n == 8) {
+                        sb.append(i + 1).append(" |");
+                        continue;
+                    }
+
+                    File f = File.values()[n];
+                    if (!File.NONE.equals(f) && !Rank.NONE.equals(r)) {
+                        Square sq = Square.encode(r, f);
+                        Piece piece = getPiece(sq);
+                        if (Piece.NONE.equals(piece)) {
+                            if (sq.isLightSquare())
+                                sb.append("   ");
+                            else
+                                sb.append(" . ");
+                        } else if (piece.getPieceSide() == Side.WHITE) {
+                            sb.append(" \033[1;37m").append(Constants.getPieceNotation(piece)).append("\033[0m ");
+                        } else {
+                            sb.append(" \033[1m").append(Constants.getPieceNotation(piece)).append("\033[0m ");
+                        }
+                    }
+                }
+                sb.append("\n");
+            }
+
+            sb.append("  +------------------------+  \n");
+            sb.append("    H  G  F  E  D  C  B  A    \n");
         }
-
-        sb.append("  +------------------------+  \n");
-        sb.append("    A  B  C  D  E  F  G  H    \n");
-
         //sb.append("Side: " + getSideToMove());
 
         return sb.toString();
@@ -1393,7 +1477,7 @@ public class Board implements Cloneable, BoardEvent {
     @Override
     public boolean equals(Object obj) {
         boolean result = false;
-        if (obj != null && obj instanceof Board) {
+        if (obj instanceof Board) {
 
             Board board = (Board) obj;
             result = true;
