@@ -1,18 +1,11 @@
 package aomidi.chess.ai.model;
 
-import aomidi.chess.ai.model.Util.*;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import static aomidi.chess.ai.model.Util.*;
 
 import com.github.bhlangonijr.chesslib.*;
-import com.github.bhlangonijr.chesslib.move.Move;
-import com.github.bhlangonijr.chesslib.move.MoveGenerator;
-import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
-import com.github.bhlangonijr.chesslib.move.MoveList;
-import org.graalvm.compiler.lir.LIRInstruction;
+import com.github.bhlangonijr.chesslib.move.*;
 
 public class Game {
     private Chess chess;

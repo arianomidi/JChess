@@ -1,18 +1,10 @@
 package aomidi.chess.ai.model;
+
 import com.github.bhlangonijr.chesslib.*;
-import com.github.bhlangonijr.chesslib.move.Move;
-import com.github.bhlangonijr.chesslib.move.MoveGenerator;
-import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
-import com.github.bhlangonijr.chesslib.move.MoveList;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
+import com.github.bhlangonijr.chesslib.move.*;
 
-import java.sql.SQLInvalidAuthorizationSpecException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static aomidi.chess.model.Util.isFile;
-import static aomidi.chess.model.Util.letterToInt;
 
 public class User extends Player{
     private boolean firstMove;

@@ -3,10 +3,7 @@ package aomidi.chess.ai.model;
 import static aomidi.chess.ai.model.Util.*;
 
 import com.github.bhlangonijr.chesslib.*;
-import com.github.bhlangonijr.chesslib.move.Move;
-import com.github.bhlangonijr.chesslib.move.MoveGenerator;
-import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
-import com.github.bhlangonijr.chesslib.move.MoveList;
+import com.github.bhlangonijr.chesslib.move.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

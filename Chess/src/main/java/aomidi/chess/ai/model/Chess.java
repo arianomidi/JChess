@@ -1,7 +1,6 @@
 package aomidi.chess.ai.model;
 
 import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 
 public class Chess {
     private Game game;

@@ -12,7 +12,7 @@ public class Chess {
 
     public Chess() {
         this.standardGame = true;
-        this.simple = true;
+        this.simple = false;
         this.flipBoard = true;
         // Grey:37 Green:32 Black:30
         boardColor = "32m";
@@ -37,7 +37,7 @@ public class Chess {
     }
 
     public boolean simpleSelected() {
-        return standardGame;
+        return simple;
     }
 
     public boolean flipBoardSelected() {
