@@ -37,7 +37,7 @@ public class AI extends Player{
 
         //printLegalMovesEvals();
         board.doMove(bestMove);
-        System.out.println(board);
+        printBoard(board);
 
         System.out.println(bold("Move Played: ") + bestMove);
         System.out.format("Time Taken: %.3fs, Positions Searched: %d, Pos/s: %.3f\n", timeTaken, positionCount, (positionCount/timeTaken));

@@ -38,6 +38,7 @@ public class MoveBackup implements BoardEvent {
     private Piece movingPiece;
     private boolean castleMove;
     private boolean enPassantMove;
+    private String moveNotation;
 
     /**
      * Instantiates a new Move backup.
@@ -87,6 +88,8 @@ public class MoveBackup implements BoardEvent {
             setRookCastleMove(null);
             setCastleMove(false);
         }
+
+        moveNotation = makeString();
     }
 
     /**
@@ -128,6 +131,17 @@ public class MoveBackup implements BoardEvent {
     public Side getSideToMove() {
         return sideToMove;
     }
+
+    public String getMoveNotation(){ return moveNotation; }
+
+    public void setMoveNotation(String string){
+        if (string.isEmpty())
+            moveNotation = makeString();
+        else
+            moveNotation = string;
+    }
+
+    public void addToMoveNotation(String string){ moveNotation += string; }
 
     /**
      * Sets side to move.
@@ -347,6 +361,24 @@ public class MoveBackup implements BoardEvent {
      */
     public void setEnPassantMove(boolean enPassantMove) {
         this.enPassantMove = enPassantMove;
+    }
+
+    public String makeString(){
+        // Get Piece Notation
+        String pieceNotation = "";
+
+        if (getMovingPiece().getPieceType() != PieceType.PAWN){
+            pieceNotation += Constants.getPieceNotation(getMovingPiece()).toUpperCase();
+        }
+
+        if (getCapturedPiece() != Piece.NONE){
+            if (getMovingPiece().getPieceType() == PieceType.PAWN){
+                pieceNotation += getMove().getFrom().getFile().getNotation().toLowerCase();
+            }
+            pieceNotation += 'x';
+        }
+
+        return pieceNotation + getMove().getTo().value().toLowerCase();
     }
 
 }

@@ -7,10 +7,14 @@ public class Chess {
     private int computerDepth = 4;
     private String startingFEN = "";
 
+    // Grey:37 Green:32 Black:30
+    static String boardColor = "32m";
+
     // ----------- Constructors -------------
 
     public Chess(){
         this.game = new Game(this);
+
     }
 
     // ----------- Setters -------------
@@ -28,6 +32,14 @@ public class Chess {
 
     public int getDepth() {
         return computerDepth;
+    }
+
+    public static String getBoardColor() {
+        return "\033[0;" + boardColor;
+    }
+
+    public static int getLen() {
+        return getBoardColor().length();
     }
 
     // ----------- Main -------------
