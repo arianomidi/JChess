@@ -42,6 +42,10 @@ public class Chess {
         return "\033[1;" + boardColor;
     }
 
+    public static String getUnderlineBoardColor() {
+        return "\033[" + boardColor.substring(0, boardColor.indexOf('m')) + ";4m";
+    }
+
     public static int getLen() {
         return getBoardColor().length();
     }

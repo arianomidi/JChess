@@ -1,6 +1,7 @@
 package aomidi.chess.ai.model;
 
 import com.github.bhlangonijr.chesslib.*;
+import com.github.bhlangonijr.chesslib.move.Move;
 
 import java.util.*;
 
@@ -267,8 +268,103 @@ public class Util {
         return scan.nextLine();
     }
 
+    public static String getSimpleString(String string){
+        String output = string;
+        while (output.contains("\033")) {
+            output = output.replace(output.substring(output.indexOf("\033"), output.indexOf('m', output.indexOf("\033")) + 1), "");
+        }
+        return output;
+    }
+
+    public static String replaceString(String string, String substring, int from, int to) {
+        int strlen = string.length();
+        String s1 = string.substring(0, from - 1 + Chess.getLen());
+        String s2 = string.substring(to + Chess.getLen(), strlen);
+        String s = s1 + substring + s2;
+        return s + Chess.getBoardColor();
+    }
+
+    public static String insertPiece(String string, String substring, int from) {
+        String simpleString = getSimpleString(string);
+
+        String s1 = simpleString.substring(0, from);
+        String s2 = simpleString.substring(from + substring.length(), simpleString.length() - 1) + boardColor("|");
+
+        String output;
+        if (string.contains("\033[107m"))
+            output = boardColor(color(s1, 107)) + bold(substring) + boardColor(color(s2, 107));
+        else
+            output = boardColor(s1) + bold(substring) + boardColor(s2);
+
+//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+        return output;
+
+    }
+
+    public static String insertPiece(String string, String substring, int insertFrom, int underlineAt, int underlineLength) {
+        String simpleString = getSimpleString(string);
+
+        String s1 = simpleString.substring(0, insertFrom);
+        String s2 = simpleString.substring(insertFrom + substring.length(), simpleString.length() - 1) + boardColor("|");
+
+        int underlineIndex = underlineAt - s1.length();
+        String pieceString = bold(substring.substring(0, underlineIndex))
+                + boldAndUnderline(substring.substring(underlineIndex, underlineIndex + underlineLength))
+                + bold(substring.substring(underlineIndex + underlineLength));
+
+        String output;
+        if (string.contains("\033[107m"))
+            output = boardColor(color(s1, 107)) + bold(pieceString) + boardColor(color(s2, 107));
+        else
+            output = boardColor(s1) + bold(pieceString) + boardColor(s2);
+//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+        return output;
+    }
+
+    public static String insertPieceLastColumn(String string, String substring, int insertFrom, int underlineAt, int underlineLength) {
+        String simpleString = getSimpleString(string);
+
+        String s1 = simpleString.substring(0, insertFrom);
+        String s2 = simpleString.substring(insertFrom + substring.length(), simpleString.length() - 1) + boardColor("|");
+
+        int underlineIndex = underlineAt - s1.length();
+        String pieceString = bold(substring.substring(0, underlineIndex))
+                + boldAndUnderline(substring.substring(underlineIndex, underlineIndex + underlineLength))
+                + bold(substring.substring(underlineIndex + underlineLength));
+
+        String output;
+        if (string.contains("\033[107m"))
+            output = boardColor("\033[4m" + color(s1, 107)) + pieceString + boardColor("\033[4m" + color(s2, 107));
+        else
+            output = boardColor("\033[4m" + s1) + pieceString + boardColor("\033[4m" + s2);
+
+//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+        return output;
+    }
+
+    public static String insertPieceLastColumn(String string, String substring, int from) {
+        String simpleString = getSimpleString(string);
+
+        String s1 = "\033[4m" + simpleString.substring(0, from);
+        String s2 = "\033[4m" + simpleString.substring(from + substring.length(), simpleString.length() - 1) + boardColor("|");
+
+        String output;
+        if (string.contains("\033[107m"))
+            output = boardColor(color(s1, 107)) + bold(substring) + boardColor(color(s2, 107));
+        else
+            output = boardColor(s1) + bold(substring) + boardColor(s2);
+//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+        return output;
+    }
+
+
+    // ---------- Color Manipulation ------------
     public static String makeBoardColor(String string) {
         return Chess.getBoardColor() + string.substring(string.indexOf('m') + 1) +  "\033[0m";
+    }
+
+    public static String boardColor(String string){
+        return Chess.getBoardColor() + string + "\033[0m";
     }
 
     public static String boldBoardColor(String string) {
@@ -279,6 +375,15 @@ public class Util {
         return "\033[0m" + string.substring(string.indexOf('m') + 1);
     }
 
+    public static String color(String string, int color){
+        return "\033[" + color + "m" + string + "\033[0m";
+    }
+
+    public static String defaultColor(String string) {
+        return "\033[0m" + string;
+    }
+
+    // ---------- Font Manipulation ------------
     public static String bold(String string) {
         return "\033[0;1m" + string + "\033[0m";
     }
@@ -291,17 +396,11 @@ public class Util {
         return "\033[0m\033[1;4m" + string + Chess.getBoardColor();
     }
 
-    public static String replaceString(String string,   String substring, int from, int to) {
-        int strlen = string.length();
-        String s1 = string.substring(0, from - 1 + Chess.getLen());
-        String s2 = string.substring(to + Chess.getLen(), strlen);
-        String s = s1 + substring + s2;
-        return s + Chess.getBoardColor();
-    }
-
     public static String underline(String string) {
         return "\033[4m" + string + Chess.getBoardColor();
     }
+
+
 
     public static void sleep(int time) {
         try {
@@ -437,6 +536,7 @@ public class Util {
     }
 
     public static void printBoardAndMoves(Board board, Game game){
+        Move move = game.getCurMove();
         String string = Chess.getBoardColor() + "  " + underline("                                                                                                \n");
 
         for (int rank = 7; rank >= 0; rank--) {
@@ -445,7 +545,11 @@ public class Util {
                     if (file == -1) {
                         string += makeBoardColor(" |");
                     } else if (file != 8) {
-                        string += getSymbol(file, rank, column, board);
+                        if (move != null)
+                            string += getSymbol(file, rank, column, board, move);
+                        else
+                            string += getSymbol(file, rank, column, board);
+
                     } else {
                         if (column == 3) {
                             string += boldPiece("   " + (rank + 1));
@@ -489,11 +593,7 @@ public class Util {
                 moveNotation += game.getMoves().get(blackMoveNum).getMoveNotation();
         }
 
-        String string = moveNotation;
-        while (string.contains("\033")) {
-            string = string.replace(string.substring(string.indexOf("\033"), string.indexOf('m', string.indexOf("\033")) + 1), "");
-        }
-        int colorChangersLength = moveNotation.length() - string.length();
+        int colorChangersLength = moveNotation.length() - getSimpleString(moveNotation).length();
 
         while (moveNotation.length() - colorChangersLength < 23)
             moveNotation += " ";
@@ -506,7 +606,7 @@ public class Util {
         Piece piece = board.getPiece(square);
 
         if (piece != Piece.NONE){
-            return getPieceSymbol(piece, square, column);
+            return color(getPieceSymbol(piece, square, column),47);
         } else
             return getSquareSymbol(square, column);
     }
@@ -542,14 +642,14 @@ public class Util {
                     case 1:
                         return string;
                     case 2:
-                        return replaceString(string, boldPiece("()"), 6, 7);
+                        return insertPiece(string, "()", 5);
                     case 3:
-                        return replaceString(string, boldPiece(")("), 6, 7);
+                        return insertPiece(string, ")(", 5);
                     case 4:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{__}"), 5, 8);
+                            return insertPiece(string, "{__}", 4);
                         } else {
-                            return replaceString(string, boldPiece("{") + boldAndUnderline("XX") + boldPiece("}"), 5, 8);
+                            return insertPiece(string, "{XX}", 4, 5, 2);
                         }
                     case 5:
                         return string;
@@ -561,24 +661,24 @@ public class Util {
                     case 0:
                         return string;
                     case 1:
-                        return replaceString(string, boldPiece("_,,"), 4, 6);
+                        return insertPiece(string, "_,,", 3);
                     case 2:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("\"-==\\~"), 3, 8);
+                            return insertPiece(string, "\"-==\\~", 2);
                         } else {
-                            return replaceString(string, boldPiece("\"-XX\\~"), 3, 8);
+                            return insertPiece(string, "\"-XX\\~", 2);
                         }
                     case 3:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece(") ("), 5, 7);
+                            return insertPiece(string, ") (", 4);
                         } else {
-                            return replaceString(string, boldPiece(")X("), 5, 7);
+                            return insertPiece(string, ")X(", 4);
                         }
                     case 4:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{___}"), 4, 8);
+                            return insertPiece(string, "{___}", 3);
                         } else {
-                            return replaceString(string, boldPiece("{") + boldAndUnderline("/X\\") + boldPiece("}"), 4, 8);
+                            return insertPiece(string, "{/X\\}", 3, 4, 3);
                         }
                     case 5:
                         return string;
@@ -588,26 +688,26 @@ public class Util {
             case BISHOP:
                 switch (column) {
                     case 0:
-                        return replaceString(string, boldPiece(","), 6, 6);
+                        return insertPiece(string, ",", 5);
                     case 1:
-                        return replaceString(string, boldPiece("(^)"), 5, 7);
+                        return insertPiece(string, "(^)", 4);
                     case 2:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("/ \\"), 5, 7);
+                            return insertPiece(string, "/ \\", 4);
                         } else {
-                            return replaceString(string, boldPiece("/|\\"), 5, 7);
+                            return insertPiece(string, "/|\\", 4);
                         }
                     case 3:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{|}"), 5, 7);
+                            return insertPiece(string, "{|}", 4);
                         } else {
-                            return replaceString(string, boldPiece("{X}"), 5, 7);
+                            return insertPiece(string, "{X}", 4);
                         }
                     case 4:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{___}"), 4, 8);
+                            return insertPiece(string, "{___}", 3);
                         } else {
-                            return replaceString(string, boldPiece("{") + boldAndUnderline("/X\\") + boldPiece("}"), 4, 8);
+                            return insertPiece(string, "{/X\\}", 3, 4, 3);
                         }
                     case 5:
                         return string;
@@ -619,24 +719,24 @@ public class Util {
                     case 0:
                         return string;
                     case 1:
-                        return replaceString(string, boldAndUnderline("UUU"), 5, 7);
+                        return insertPiece(string, "UUU", 4);
                     case 2:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("[ ]"), 5, 7);
+                            return insertPiece(string, "[ ]", 4);
                         } else {
-                            return replaceString(string, boldPiece("[\\]"), 5, 7);
+                            return insertPiece(string, "[\\]", 4);
                         }
                     case 3:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece(") ("), 5, 7);
+                            return insertPiece(string, ") (", 4);
                         } else {
-                            return replaceString(string, boldPiece(")|("), 5, 7);
+                            return insertPiece(string, ")|(", 4);
                         }
                     case 4:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{___}"), 4, 8);
+                            return insertPiece(string, "{___}", 3);
                         } else {
-                            return replaceString(string, boldPiece("{") + boldAndUnderline("/X\\") + boldPiece("}"), 4, 8);
+                            return insertPiece(string, "{/X\\}", 3, 4, 3);
                         }
                     case 5:
                         return string;
@@ -646,36 +746,36 @@ public class Util {
             case QUEEN:
                 switch (column) {
                     case 0:
-                        return replaceString(string, boldPiece("*"), 6, 6);
+                        return insertPiece(string, "*", 5);
                     case 1:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece(")_("), 5, 7);
+                            return insertPiece(string, ")_(", 4);
                         } else {
-                            return replaceString(string, boldPiece(")X("), 5, 7);
+                            return insertPiece(string, ")X(", 4);
                         }
                     case 2:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{|}"), 5, 7);
+                            return insertPiece(string, "{|}", 4);
                         } else {
-                            return replaceString(string, boldPiece("{|}"), 5, 7);
+                            return insertPiece(string, "{|}", 4);
                         }
                     case 3:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("/_\\"), 5, 7);
+                            return insertPiece(string, "/_\\", 4);
                         } else {
-                            return replaceString(string, boldPiece("/|\\"), 5, 7);
+                            return insertPiece(string, "/|\\", 4);
                         }
                     case 4:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece(") ("), 5, 7);
+                            return insertPiece(string, ") (", 4);
                         } else {
-                            return replaceString(string, boldPiece(")X("), 5, 7);
+                            return insertPiece(string, ")X(", 4);
                         }
                     case 5:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{___}") + "\033[4m", 8, 12);
+                            return insertPieceLastColumn(string, "{___}", 3);
                         } else {
-                            return replaceString(string, boldPiece("{") + boldAndUnderline("/X\\") + boldPiece("}") + "\033[4m", 8, 12);
+                            return insertPieceLastColumn(string, "{/X\\}", 3, 4, 3);
                         }
                     default:
                         throw new IllegalArgumentException("Column out of range: " + column);
@@ -683,36 +783,36 @@ public class Util {
             case KING:
                 switch (column) {
                     case 0:
-                        return replaceString(string, boldPiece("+"), 6, 6);
+                        return insertPiece(string, "+", 5);
                     case 1:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("\\_/"), 5, 7);
+                            return insertPiece(string, "\\_/", 4);
                         } else {
-                            return replaceString(string, boldPiece("\\X/"), 5, 7);
+                            return insertPiece(string, "\\X/", 4);
                         }
                     case 2:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{|}"), 5, 7);
+                            return insertPiece(string, "{|}", 4);
                         } else {
-                            return replaceString(string, boldPiece("{|}"), 5, 7);
+                            return insertPiece(string, "{|}", 4);
                         }
                     case 3:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("/_\\"), 5, 7);
+                            return insertPiece(string, "/_\\", 4);
                         } else {
-                            return replaceString(string, boldPiece("/|\\"), 5, 7);
+                            return insertPiece(string, "/|\\", 4);
                         }
                     case 4:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece(") ("), 5, 7);
+                            return insertPiece(string, ") (", 4);
                         } else {
-                            return replaceString(string, boldPiece(")X("), 5, 7);
+                            return insertPiece(string, ")X(", 4);
                         }
                     case 5:
                         if (piece.getPieceSide() == Side.WHITE) {
-                            return replaceString(string, boldPiece("{___}") + "\033[4m", 8, 12);
+                            return insertPieceLastColumn(string, "{___}", 3);
                         } else {
-                            return replaceString(string, boldPiece("{") + boldAndUnderline("/X\\") + boldPiece("}") + "\033[4m", 8, 12);
+                            return insertPieceLastColumn(string, "{/X\\}", 3, 4, 3);
                         }
                     default:
                         throw new IllegalArgumentException("Column out of range: " + column);
@@ -723,6 +823,241 @@ public class Util {
         }
     }
 
+
+
+    public static String getSymbol(int file, int rank, int column, Board board, Move move){
+        Square square = SQUARES[file][rank];
+        Piece piece = board.getPiece(square);
+
+        if (piece != Piece.NONE){
+            return getPieceSymbolMove(piece, square, column, move);
+        } else {
+            return getSquareSymbolMove(square, column, move);
+        }
+
+    }
+
+    public static String getSquareSymbolMove(Square square, int column, Move move){
+        if (move.getFrom() == square || move.getTo() == square)
+            switch (column) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    if (square.isLightSquare())
+//                        return Chess.getBoardColor() +   ". . . . . .|".replace(".", color("." , 107) + Chess.getBoardColor());
+                        return Chess.getBoardColor() +   color("           ", 107) + Chess.getBoardColor() + "|";
+
+                //                    return Chess.getBoardColor() + "           |";
+                    else
+//                        return Chess.getBoardColor() + " / / / / / |" + Chess.getBoardColor();
+//                        return Chess.getBoardColor() + "./././././.|".replace(".", color("." , 107) + Chess.getBoardColor());
+                        return Chess.getBoardColor() +   color(" / / / / / ", 107) + Chess.getBoardColor() + "|";
+                case 5:
+                    if (square.isLightSquare())
+//                        return Chess.getBoardColor() + underline("           |");
+                        return Chess.getBoardColor() +   underline(color("           ", 107) + Chess.getBoardColor() + "|");
+                    else
+//                        return Chess.getBoardColor() + underline(" / / / / / |");
+                        return Chess.getBoardColor() +   underline(color(" / / / / / ", 107) + Chess.getBoardColor() + "|");
+                default:
+                    throw new IllegalArgumentException("Column out of range: " + column);
+            }
+        else
+            return getSquareSymbol(square, column);
+    }
+
+    public static String getPieceSymbolMove(Piece piece, Square square, int column, Move move) {
+        String string = getSquareSymbolMove(square, column, move);
+
+        switch (piece.getPieceType()) {
+            case PAWN:
+                switch (column) {
+                    case 0:
+                    case 1:
+                        return string;
+                    case 2:
+                        return insertPiece(string, "()", 5);
+                    case 3:
+                        return insertPiece(string, ")(", 5);
+                    case 4:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "{__}", 4);
+                        } else {
+                            return insertPiece(string, "{XX}", 4, 5, 2);
+                        }
+                    case 5:
+                        return string;
+                    default:
+                        throw new IllegalArgumentException("Column out of range: " + column);
+                }
+            case KNIGHT:
+                switch (column) {
+                    case 0:
+                        return string;
+                    case 1:
+                        return insertPiece(string, "_,,", 3);
+                    case 2:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "\"-==\\~", 2);
+                        } else {
+                            return insertPiece(string, "\"-XX\\~", 2);
+                        }
+                    case 3:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, ") (", 4);
+                        } else {
+                            return insertPiece(string, ")X(", 4);
+                        }
+                    case 4:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "{___}", 3);
+                        } else {
+                            return insertPiece(string, "{/X\\}", 3, 4, 3);
+                        }
+                    case 5:
+                        return string;
+                    default:
+                        throw new IllegalArgumentException("Column out of range: " + column);
+                }
+            case BISHOP:
+                switch (column) {
+                    case 0:
+                        return insertPiece(string, ",", 5);
+                    case 1:
+                        return insertPiece(string, "(^)", 4);
+                    case 2:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "/ \\", 4);
+                        } else {
+                            return insertPiece(string, "/|\\", 4);
+                        }
+                    case 3:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "{|}", 4);
+                        } else {
+                            return insertPiece(string, "{X}", 4);
+                        }
+                    case 4:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "{___}", 3);
+                        } else {
+                            return insertPiece(string, "{/X\\}", 3, 4, 3);
+                        }
+                    case 5:
+                        return string;
+                    default:
+                        throw new IllegalArgumentException("Column out of range: " + column);
+                }
+            case ROOK:
+                switch (column) {
+                    case 0:
+                        return string;
+                    case 1:
+                        return insertPiece(string, "UUU", 4);
+                    case 2:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "[ ]", 4);
+                        } else {
+                            return insertPiece(string, "[\\]", 4);
+                        }
+                    case 3:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, ") (", 4);
+                        } else {
+                            return insertPiece(string, ")|(", 4);
+                        }
+                    case 4:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "{___}", 3);
+                        } else {
+                            return insertPiece(string, "{/X\\}", 3, 4, 3);
+                        }
+                    case 5:
+                        return string;
+                    default:
+                        throw new IllegalArgumentException("Column out of range: " + column);
+                }
+            case QUEEN:
+                switch (column) {
+                    case 0:
+                        return insertPiece(string, "*", 5);
+                    case 1:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, ")_(", 4);
+                        } else {
+                            return insertPiece(string, ")X(", 4);
+                        }
+                    case 2:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "{|}", 4);
+                        } else {
+                            return insertPiece(string, "{|}", 4);
+                        }
+                    case 3:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "/_\\", 4);
+                        } else {
+                            return insertPiece(string, "/|\\", 4);
+                        }
+                    case 4:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, ") (", 4);
+                        } else {
+                            return insertPiece(string, ")X(", 4);
+                        }
+                    case 5:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPieceLastColumn(string, "{___}", 3);
+                        } else {
+                            return insertPieceLastColumn(string, "{/X\\}", 3, 4, 3);
+                        }
+                    default:
+                        throw new IllegalArgumentException("Column out of range: " + column);
+                }
+            case KING:
+                switch (column) {
+                    case 0:
+                        return insertPiece(string, "+", 5);
+                    case 1:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "\\_/", 4);
+                        } else {
+                            return insertPiece(string, "\\X/", 4);
+                        }
+                    case 2:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "{|}", 4);
+                        } else {
+                            return insertPiece(string, "{|}", 4);
+                        }
+                    case 3:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, "/_\\", 4);
+                        } else {
+                            return insertPiece(string, "/|\\", 4);
+                        }
+                    case 4:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPiece(string, ") (", 4);
+                        } else {
+                            return insertPiece(string, ")X(", 4);
+                        }
+                    case 5:
+                        if (piece.getPieceSide() == Side.WHITE) {
+                            return insertPieceLastColumn(string, "{___}", 3);
+                        } else {
+                            return insertPieceLastColumn(string, "{/X\\}", 3, 4, 3);
+                        }
+                    default:
+                        throw new IllegalArgumentException("Column out of range: " + column);
+                }
+            default:
+                throw new IllegalArgumentException("Invalid Piece Type" + piece.getPieceType());
+
+        }
+    }
 
 
 

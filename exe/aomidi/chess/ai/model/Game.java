@@ -15,6 +15,7 @@ public class Game {
     // TODO: Pawn Promotions
     private Chess chess;
     private LinkedList<MoveBackup> moves = new LinkedList<>();
+    private MoveBackup curMove;
     private Board board;
     private Engine engine;
     private Player whitePlayer;
@@ -23,6 +24,7 @@ public class Game {
     private boolean isGameOver;
     private boolean isDraw;
     private int moveCounter = 0;
+    private int AIMoveLimit = 20;
 
     // ----------- Constructors -------------
     public Game(Chess chess){
@@ -68,6 +70,12 @@ public class Game {
 
     public LinkedList<MoveBackup> getMoves() {
         return moves;
+    }
+
+    public Move getCurMove() {
+        if (curMove != null)
+            return curMove.getMove();
+        else return null;
     }
 
     // ----------- Actions -------------
@@ -189,7 +197,7 @@ public class Game {
                 return "Draw: Stalemate";
             else
                 return "Draw: Insufficient Material";
-        } else if (moveCounter > 90)
+        } else if (moveCounter > AIMoveLimit)
             isGameOver = true;
 
         return "";
@@ -231,6 +239,11 @@ public class Game {
 
         System.out.println(boldAndUnderline("\nGame Analysis: \n"));
         printBoardAndMoves(viewBoard, this);
+
+//        String s = boldAndUnderline(bold(makeBoardColor("Hey")));
+//        System.out.println( s + " - " + s.length());
+//        System.out.println( getSimpleString(s) + " - " + getSimpleString(s).length());
+
         String input = input("ENTER for Next Move, 'B' for prev move, 'EXIT' to exit").toUpperCase();
 
         while (input.compareTo("EXIT") != 0) {
@@ -239,6 +252,7 @@ public class Game {
                     if (i < moves.size()) {
                         moves.get(i).setMoveNotation(boldBoardColor(moves.get(i).getMoveNotation()));
                         viewBoard.doMove(moves.get(i).getMove());
+                        curMove = moves.get(i);
                         System.out.println();
 
                         if (i > 0)
