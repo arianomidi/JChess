@@ -15,7 +15,6 @@ public class Game {
     // TODO: Pawn Promotions
     private Chess chess;
     private LinkedList<MoveBackup> moves = new LinkedList<>();
-    private MoveBackup curMove;
     private Board board;
     private Engine engine;
     private Player whitePlayer;
@@ -23,8 +22,10 @@ public class Game {
     private Player curPlayer;
     private boolean isGameOver;
     private boolean isDraw;
+
+    // Testing Vars
     private int moveCounter = 0;
-    private int AIMoveLimit = 20;
+    private int AIMoveLimit = 0;
 
     // ----------- Constructors -------------
     public Game(Chess chess){
@@ -35,15 +36,15 @@ public class Game {
         chess.setStartingPosition(board);
 
         // Init Players
-        this.whitePlayer = new AI(2, Side.WHITE, this);
-//        this.whitePlayer = new User(Side.WHITE, this);
-        this.blackPlayer = new AI(1, Side.BLACK, this);
+//        this.whitePlayer = new AI(chess.getDepth(), Side.WHITE, this);
+        this.whitePlayer = new User(Side.WHITE, this);
+        this.blackPlayer = new AI(chess.getDepth(), Side.BLACK, this);
         this.curPlayer = this.whitePlayer;
 
         this.isGameOver = false;
 
         // Print the chessboard
-        printBoard(board);
+        printBoard(board, this);
     }
 
     // ----------- Getters -------------
@@ -72,12 +73,6 @@ public class Game {
         return moves;
     }
 
-    public Move getCurMove() {
-        if (curMove != null)
-            return curMove.getMove();
-        else return null;
-    }
-
     // ----------- Actions -------------
 
     public boolean playerTurn(Player curPlayer) {
@@ -94,8 +89,7 @@ public class Game {
                 // Get player input
                 String input = input(" * Enter Move: ");
                 switch (input.toUpperCase()) {
-                    case "CLOSE":
-                    case "EXIT":
+                    case "CLOSE": case "EXIT":
                         isGameOver = true;
                         throw new Exception("Exit Game");
                     case "RESIGN":
@@ -105,7 +99,7 @@ public class Game {
                         //DrawOffer();
                         break;
                     case "EVAL": case "EVALUATION":
-                        System.out.println("\033[0;1mEval:\033[0m " + Util.evaluateBoard(board) + "\n");
+                        System.out.println("\033[0;1mEval:\033[0m " + engine.getPositionEval() + "\n");
                         break;
                     case "HINT":
                         Move bestMove = engine.miniMaxRoot();
@@ -116,14 +110,14 @@ public class Game {
                         board.undoMove(); board.undoMove();
                         moves.removeLast(); moves.removeLast();
 
-                        printBoard(board); break;
+                        printBoard(board, this); break;
                     default:
                         // Try to move to piece
                         pieceMoved = curPlayer.movePiece(input);
 
                 }
             } else {
-//                input(" * Cont: ");
+                input(" * Cont: ");
                 pieceMoved = ((AI) curPlayer).movePiece();
             }
 
@@ -145,22 +139,27 @@ public class Game {
         while (!isGameOver) {
             if (pieceMoved) {
                 moveCounter++;
+
+                // Get Game Status
+                String status = GameStatus();
+
                 if (curPlayer instanceof User) {
                     // Reset players moves
                     ((User) curPlayer).setFirstMove(true);
                     // Print Board And Info
-                    printBoard(board);
-                    System.out.println(bold("Move Played: ") + board.getBackup().getLast().getMove() + '\n');
+                    printBoard(board, this);
+
                     System.out.println(bold(getOpposingPlayer().getColor() + " Player's Turn"));
+                } else {
+                    printBoard(board, this);
+                    System.out.format("Time Taken: %.3fs, Positions Searched: %d, Pos/s: %.3f\n", ((AI) curPlayer).getMoveTime(), ((AI) curPlayer).getPositionCount(), ((AI) curPlayer).getPositionCount()/((AI) curPlayer).getMoveTime());
                 }
+
                 // Switch players
                 curPlayer = getOpposingPlayer();
 
-
-                // Check Game Status
-                System.out.println(bold(GameStatus()));
-                //TODO: Make notation sidebar on print board
-//                printMoves();
+                // Print Game Status
+                System.out.println(bold(status));
 
                 if (isGameOver)
                     break;
@@ -174,7 +173,7 @@ public class Game {
 
     // ----------- Game Functions -------------
 
-    public String GameStatus() {
+    private String GameStatus() {
 
         if (board.isKingAttacked()) {
             Move last_move = moves.getLast().getMove();
@@ -183,21 +182,21 @@ public class Game {
                 // Change last move notation to checkmate
                 moves.getLast().addToMoveNotation("#");
                 isGameOver = true;
-                return "Checkmate";
+                return "\nCheckmate\n";
             } else {
                 // TODO
                 // Change last move notation to check
                 moves.getLast().addToMoveNotation("+");
-                return "Check";
+                return "\nCheck\n";
             }
         } else if (board.isDraw()){
             isGameOver = true;
             isDraw = true;
             if (board.isStaleMate())
-                return "Draw: Stalemate";
+                return "\nDraw: Stalemate\n";
             else
-                return "Draw: Insufficient Material";
-        } else if (moveCounter > AIMoveLimit)
+                return "\nDraw: Insufficient Material\n";
+        } else if (AIMoveLimit > 0 && moveCounter > AIMoveLimit)
             isGameOver = true;
 
         return "";
@@ -224,7 +223,7 @@ public class Game {
 //        }
 //    }
 
-    public void GameOver() {
+    private void GameOver() {
         if (isDraw)
             System.out.println(boldAndUnderline("Game Over: Game Drawn\n") + "\033[0;0m");
         else
@@ -232,33 +231,43 @@ public class Game {
 
         printMoves();
 
-        // View Moves
+        if (chess.getDoAnalysis())
+            analysis();
+    }
+
+    private void analysis(){
+        // Continue to Analysis
+        String input = input("Press 'ENTER' to continue to Game Analysis").toUpperCase();
+
+        if (input.compareTo("") != 0)
+            return;
+
+
+        System.out.println(boldAndUnderline("\nGame Analysis: \n"));
+
+        // View Starting Board
         Board viewBoard = new Board();
         chess.setStartingPosition(viewBoard);
         int i = 0;
 
-        System.out.println(boldAndUnderline("\nGame Analysis: \n"));
-        printBoardAndMoves(viewBoard, this);
+        printBoard(viewBoard, this);
 
-//        String s = boldAndUnderline(bold(makeBoardColor("Hey")));
-//        System.out.println( s + " - " + s.length());
-//        System.out.println( getSimpleString(s) + " - " + getSimpleString(s).length());
-
-        String input = input("ENTER for Next Move, 'B' for prev move, 'EXIT' to exit").toUpperCase();
+        input = input("ENTER for Next Move, 'B' for prev move, 'EXIT' to exit").toUpperCase();
 
         while (input.compareTo("EXIT") != 0) {
             switch (input) {
                 case "\n": case "": case "N":
                     if (i < moves.size()) {
                         moves.get(i).setMoveNotation(boldBoardColor(moves.get(i).getMoveNotation()));
+
                         viewBoard.doMove(moves.get(i).getMove());
-                        curMove = moves.get(i);
+
                         System.out.println();
 
                         if (i > 0)
-                            moves.get(i-1).setMoveNotation(makeDefaultColor(moves.get(i-1).getMoveNotation()));
+                            moves.get(i-1).setMoveNotation(defaultColor(moves.get(i-1).getMoveNotation()));
 
-                        printBoardAndMoves(viewBoard, this);
+                        printBoard(viewBoard, this);
                         i++;
                     }
                     break;
@@ -267,11 +276,11 @@ public class Game {
                         viewBoard.undoMove();
                         System.out.println();
 
-                        moves.get(i - 1).setMoveNotation(makeDefaultColor(moves.get(i-1).getMoveNotation()));
+                        moves.get(i - 1).setMoveNotation(defaultColor(moves.get(i-1).getMoveNotation()));
                         if (i > 1)
-                            moves.get(i - 2).setMoveNotation(boldBoardColor(moves.get(i).getMoveNotation()));
+                            moves.get(i - 2).setMoveNotation(boldBoardColor(moves.get(i-2).getMoveNotation()));
 
-                        printBoardAndMoves(viewBoard, this);
+                        printBoard(viewBoard, this);
                         i--;
                     }
                     break;

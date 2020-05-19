@@ -7,10 +7,7 @@ import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import com.github.bhlangonijr.chesslib.move.MoveList;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static aomidi.chess.ai.model.Util.evaluateBoard;
@@ -48,6 +45,17 @@ public class Engine {
     public HashMap<Move, Double> getMoveEvals() {
         return moveEvals;
     }
+
+    public double getPositionEval() throws MoveGeneratorException {
+        MoveList moves = MoveGenerator.generateLegalMoves(board);
+
+        double newEval = evaluateBoard(board, moves) / 10;
+//        double oldEval = evaluateBoard(board) / 10;
+//        System.out.format("old eval: %.3f, new eval: %.3f\n", oldEval, newEval);
+
+        return newEval;
+    }
+
 
     // ----------- Setters -------------
 
@@ -121,9 +129,9 @@ public class Engine {
 
     public double miniMax(int depth, Board board, double alpha, double beta, boolean isMaximisingPlayer) throws MoveGeneratorException {
         positionCount++;
-        if (depth == 0){
+
+        if (depth == 0)
             return evaluateBoard(board);
-        }
 
         MoveList moves = MoveGenerator.generateLegalMoves(board);
 

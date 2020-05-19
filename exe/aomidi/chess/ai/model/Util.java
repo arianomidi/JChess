@@ -2,10 +2,15 @@ package aomidi.chess.ai.model;
 
 import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.bhlangonijr.chesslib.move.MoveGenerator;
+import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
+import com.github.bhlangonijr.chesslib.move.MoveList;
 
 import java.util.*;
 
 public class Util {
+    private static String highlight = Chess.getHighlight();
+
     public static final String StandardStartingPosition = " r n b q k b n r  p p p p p p p p    .   .   .   .  .   .   .   .      .   .   .   .  .   .   .   .    P P P P P P P P  R N B Q K B N R ";
 
     // ----------- Enumeration -------------
@@ -125,29 +130,6 @@ public class Util {
 
     // ----------- Conversion Functions -------------
 
-    public static String intToLetter(int file) {
-        switch (file) {
-            case 1:
-                return "A";
-            case 2:
-                return "B";
-            case 3:
-                return "C";
-            case 4:
-                return "D";
-            case 5:
-                return "E";
-            case 6:
-                return "F";
-            case 7:
-                return "G";
-            case 8:
-                return "H";
-            default:
-                throw new java.lang.IllegalArgumentException("Illegal file number: " + file);
-        }
-    }
-
     public static int letterToInt(String file) {
         file = file.toUpperCase();
         switch (file) {
@@ -176,25 +158,6 @@ public class Util {
        return letterToInt(file.getNotation()) - 1;
     }
 
-    public static String getTypeLetter(PieceType type) {
-        switch (type) {
-            case Pawn:
-                return "P";
-            case Knight:
-                return "N";
-            case Bishop:
-                return "B";
-            case Rook:
-                return "R";
-            case Queen:
-                return "Q";
-            case King:
-                return "K";
-            default:
-                throw new java.lang.IllegalArgumentException("Illegal PieceType: " + type);
-        }
-    }
-
     public static PieceType getPieceType(String piece) {
         piece = piece.toUpperCase();
         switch (piece) {
@@ -215,17 +178,6 @@ public class Util {
         }
     }
 
-    public static String getColorLetter(Color color) {
-        switch (color) {
-            case Black:
-                return "b";
-            case White:
-                return "w";
-            default:
-                throw new java.lang.IllegalArgumentException("Illegal Color: " + color);
-        }
-    }
-
     public static Color getColor(Side side) {
         switch (side) {
             case WHITE:
@@ -237,27 +189,11 @@ public class Util {
         }
     }
 
-    // ----------- Checkers -------------
-
-    public static boolean isFile(Character s) {
-        s = Character.toUpperCase(s);
-        switch (s) {
-            case 'A':
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-            case 'G':
-            case 'H':
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public static boolean isRank(Character c) {
-        return '0' < c && c <= '8';
+    public static Side getOppositeSide(Side side){
+        if (side == Side.WHITE)
+            return Side.BLACK;
+        else
+            return Side.WHITE;
     }
 
     // ---------- String Manipulation ------------
@@ -291,12 +227,12 @@ public class Util {
         String s2 = simpleString.substring(from + substring.length(), simpleString.length() - 1) + boardColor("|");
 
         String output;
-        if (string.contains("\033[107m"))
-            output = boardColor(color(s1, 107)) + bold(substring) + boardColor(color(s2, 107));
+        if (string.contains("\033[" + highlight ))
+            output = boardColor(color(s1, highlight)) + bold(substring) + boardColor(color(s2, highlight));
         else
             output = boardColor(s1) + bold(substring) + boardColor(s2);
 
-//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+//        return output.replace(".", color(".", highlight) + Chess.getBoardColor());
         return output;
 
     }
@@ -313,11 +249,11 @@ public class Util {
                 + bold(substring.substring(underlineIndex + underlineLength));
 
         String output;
-        if (string.contains("\033[107m"))
-            output = boardColor(color(s1, 107)) + bold(pieceString) + boardColor(color(s2, 107));
+        if (string.contains("\033[" + highlight))
+            output = boardColor(color(s1, highlight)) + bold(pieceString) + boardColor(color(s2, highlight));
         else
             output = boardColor(s1) + bold(pieceString) + boardColor(s2);
-//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+//        return output.replace(".", color(".", highlight) + Chess.getBoardColor());
         return output;
     }
 
@@ -333,12 +269,12 @@ public class Util {
                 + bold(substring.substring(underlineIndex + underlineLength));
 
         String output;
-        if (string.contains("\033[107m"))
-            output = boardColor("\033[4m" + color(s1, 107)) + pieceString + boardColor("\033[4m" + color(s2, 107));
+        if (string.contains("\033[" + highlight))
+            output = boardColor("\033[4m" + color(s1, highlight)) + pieceString + boardColor("\033[4m" + color(s2, highlight));
         else
             output = boardColor("\033[4m" + s1) + pieceString + boardColor("\033[4m" + s2);
 
-//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+//        return output.replace(".", color(".", highlight) + Chess.getBoardColor());
         return output;
     }
 
@@ -349,55 +285,58 @@ public class Util {
         String s2 = "\033[4m" + simpleString.substring(from + substring.length(), simpleString.length() - 1) + boardColor("|");
 
         String output;
-        if (string.contains("\033[107m"))
-            output = boardColor(color(s1, 107)) + bold(substring) + boardColor(color(s2, 107));
+        if (string.contains("\033[" + highlight))
+            output = boardColor(color(s1, highlight)) + bold(substring) + boardColor(color(s2, highlight));
         else
             output = boardColor(s1) + bold(substring) + boardColor(s2);
-//        return output.replace(".", color(".", 107) + Chess.getBoardColor());
+//        return output.replace(".", color(".", highlight) + Chess.getBoardColor());
         return output;
     }
 
 
     // ---------- Color Manipulation ------------
-    public static String makeBoardColor(String string) {
-        return Chess.getBoardColor() + string.substring(string.indexOf('m') + 1) +  "\033[0m";
-    }
 
     public static String boardColor(String string){
+
         return Chess.getBoardColor() + string + "\033[0m";
     }
 
     public static String boldBoardColor(String string) {
-        return Chess.getBoldBoardColor() + string.substring(string.indexOf('m') + 1) +  "\033[0m";
+        return "\033[1;0;38;5;" + Chess.boardColor + string +  "\033[0m";
     }
 
-    public static String makeDefaultColor(String string) {
-        return "\033[0m" + string.substring(string.indexOf('m') + 1);
+    public static String underlineBoardColor(String string) {
+        return"\033[0;4;38;5;" + Chess.boardColor + string + "\033[0m";
+    }
+
+    public static String boldAndUnderlineBoardColor(String string) {
+        return"\033[1;4;38;5;" + Chess.boardColor + string + "\033[0m";
     }
 
     public static String color(String string, int color){
         return "\033[" + color + "m" + string + "\033[0m";
     }
 
+    public static String color(String string, String color){
+        return "\033[" + color + string + "\033[0m";
+    }
+
     public static String defaultColor(String string) {
-        return "\033[0m" + string;
+        return getSimpleString(string);
     }
 
     // ---------- Font Manipulation ------------
     public static String bold(String string) {
-        return "\033[0;1m" + string + "\033[0m";
-    }
-
-    public static String boldPiece(String string) {
-        return "\033[0;1m" + string + Chess.getBoardColor();
+        return "\033[0;0;0;0;1m" + defaultColor(string) + "\033[0m";
     }
 
     public static String boldAndUnderline(String string) {
-        return "\033[0m\033[1;4m" + string + Chess.getBoardColor();
+        return "\033[1;4m" + string + "\033[0m";
     }
 
     public static String underline(String string) {
-        return "\033[4m" + string + Chess.getBoardColor();
+        return underlineBoardColor(string);
+//        return "\033[0;4m" + string + "\033[0m";
     }
 
 
@@ -418,14 +357,16 @@ public class Util {
         switch (piece.getPieceType()){
             case PAWN:
                 value = 10; break;
-            case KNIGHT: case BISHOP:
-                value = 30; break;
+            case KNIGHT:
+                value = 32; break;
+            case BISHOP:
+                value = 33; break;
             case ROOK:
                 value = 50; break;
             case QUEEN:
                 value = 90; break;
             case KING:
-                value = 900; break;
+                value = 2000; break;
         }
 
         if (piece.getPieceSide() == Side.BLACK)
@@ -474,19 +415,6 @@ public class Util {
         return pieceEval[8 - Integer.parseInt(square.getRank().getNotation()) ][fileToInt(square.getFile())];
     }
 
-    public static ArrayList<Piece> getAllPieces(Board board){
-        ArrayList<Piece> pieces = new ArrayList<>();
-        Square[] squares = Square.values();
-
-        for (int i = 0; i < 64; i++) {
-            Piece piece = board.getPiece(squares[i]);
-            if (piece != Piece.NONE)
-                pieces.add(piece);
-        }
-
-        return pieces;
-    }
-
     public static double evaluateBoard(Board board){
         double eval = 0.0;
 
@@ -502,6 +430,35 @@ public class Util {
         return eval;
     }
 
+    public static double evaluateBoard(Board board, MoveList moves) throws MoveGeneratorException {
+        double eval = 0.0;
+        Square[] squares = Square.values();
+
+        for (int i = 0; i < 64; i++) {
+            Piece piece = board.getPiece(squares[i]);
+            if (piece != Piece.NONE) {
+                eval += getPieceValue(piece) + getEvalFactor(piece, squares[i]);
+            }
+        }
+
+        board.setSideToMove(getOppositeSide(board.getSideToMove()));
+
+        int movingSideLegalMoves = moves.size();
+        int opponentSideLegalMoves =  MoveGenerator.generateLegalMoves(board).size();
+
+        board.setSideToMove(getOppositeSide(board.getSideToMove()));
+
+        if (board.getSideToMove() == Side.WHITE)
+            opponentSideLegalMoves = -opponentSideLegalMoves;
+        else
+            movingSideLegalMoves = -movingSideLegalMoves;
+
+       eval += movingSideLegalMoves + opponentSideLegalMoves;
+
+        return eval;
+    }
+
+
     // ---------- Board GUI ------------
 
     public static String getBoardFEN(Board board){
@@ -510,40 +467,46 @@ public class Util {
         return FEN.substring(0, FEN.indexOf(' '));
     }
 
-    public static void printBoard(Board board){
-        String string = Chess.getBoardColor() + "  " + underline("                                                                                                \n");
+//    public static void printBoard(Board board){
+//        String string = Chess.getBoardColor() + "  " + underline("                                                                                                \n");
+//
+//        for (int rank = 7; rank >= 0; rank--) {
+//            for (int column = 0; column < 6; column++) {
+//                for (int file = -1; file <= 8; file++) {
+//                    if (file == -1) {
+//                        string += " |";
+//                    } else if (file != 8) {
+//                        string += getSymbol(file, rank, column, board);
+//                    } else {
+//                        if (column == 3) {
+//                            string += boldPiece("   " + (rank + 1));
+//                        }
+//                    }
+//                }
+//                string += "\n";
+//            }
+//        }
+//        string += bold("\n       A           B           C           D           E           F           G           H\n");
+//
+//
+//        System.out.println(string);
+//    }
+
+
+    public static void printBoard(Board board, Game game){
+        // Get Last Move
+        Move move = null;
+        if (board.getBackup().size() != 0)
+             move = board.getBackup().getLast().getMove();
+
+
+        String string =  "  " + underlineBoardColor("                                                                                                \n");
 
         for (int rank = 7; rank >= 0; rank--) {
             for (int column = 0; column < 6; column++) {
                 for (int file = -1; file <= 8; file++) {
                     if (file == -1) {
-                        string += " |";
-                    } else if (file != 8) {
-                        string += getSymbol(file, rank, column, board);
-                    } else {
-                        if (column == 3) {
-                            string += boldPiece("   " + (rank + 1));
-                        }
-                    }
-                }
-                string += "\n";
-            }
-        }
-        string += bold("\n       A           B           C           D           E           F           G           H\n");
-
-
-        System.out.println(string);
-    }
-
-    public static void printBoardAndMoves(Board board, Game game){
-        Move move = game.getCurMove();
-        String string = Chess.getBoardColor() + "  " + underline("                                                                                                \n");
-
-        for (int rank = 7; rank >= 0; rank--) {
-            for (int column = 0; column < 6; column++) {
-                for (int file = -1; file <= 8; file++) {
-                    if (file == -1) {
-                        string += makeBoardColor(" |");
+                        string += boardColor(" |");
                     } else if (file != 8) {
                         if (move != null)
                             string += getSymbol(file, rank, column, board, move);
@@ -552,13 +515,13 @@ public class Util {
 
                     } else {
                         if (column == 3) {
-                            string += boldPiece("   " + (rank + 1));
+                            string += bold("   " + (rank + 1));
                         } else {
                             string += "    ";
                         }
 
                         if (rank == 7 && column == 0) {
-                            string += "           "  + boldAndUnderline("Moves:");
+                            string += "           "  + boldAndUnderlineBoardColor("Moves:");
                         } else if (column % 2 == 0)
                             string += "           " + getMoveNotationRow(rank, column, game);
                     }
@@ -846,21 +809,21 @@ public class Util {
                 case 3:
                 case 4:
                     if (square.isLightSquare())
-//                        return Chess.getBoardColor() +   ". . . . . .|".replace(".", color("." , 107) + Chess.getBoardColor());
-                        return Chess.getBoardColor() +   color("           ", 107) + Chess.getBoardColor() + "|";
+//                        return Chess.getBoardColor() +   ". . . . . .|".replace(".", color("." , highlight) + Chess.getBoardColor());
+                        return Chess.getBoardColor() +   color("           ", highlight) + Chess.getBoardColor() + "|";
 
                 //                    return Chess.getBoardColor() + "           |";
                     else
 //                        return Chess.getBoardColor() + " / / / / / |" + Chess.getBoardColor();
-//                        return Chess.getBoardColor() + "./././././.|".replace(".", color("." , 107) + Chess.getBoardColor());
-                        return Chess.getBoardColor() +   color(" / / / / / ", 107) + Chess.getBoardColor() + "|";
+//                        return Chess.getBoardColor() + "./././././.|".replace(".", color("." , highlight) + Chess.getBoardColor());
+                        return Chess.getBoardColor() +   color(" / / / / / ", highlight) + Chess.getBoardColor() + "|";
                 case 5:
                     if (square.isLightSquare())
 //                        return Chess.getBoardColor() + underline("           |");
-                        return Chess.getBoardColor() +   underline(color("           ", 107) + Chess.getBoardColor() + "|");
+                        return Chess.getBoardColor() +   underline(color("           ", highlight) + Chess.getBoardColor() + "|");
                     else
 //                        return Chess.getBoardColor() + underline(" / / / / / |");
-                        return Chess.getBoardColor() +   underline(color(" / / / / / ", 107) + Chess.getBoardColor() + "|");
+                        return Chess.getBoardColor() +   underline(color(" / / / / / ", highlight) + Chess.getBoardColor() + "|");
                 default:
                     throw new IllegalArgumentException("Column out of range: " + column);
             }

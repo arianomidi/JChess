@@ -4,17 +4,31 @@ import com.github.bhlangonijr.chesslib.Board;
 
 public class Chess {
     private Game game;
-    private int computerDepth = 3;
-    private String startingFEN = "";
 
-    // Grey:37 Green:32 Black:30
-    static String boardColor = "32m";
+    // Game Options
+    private int computerDepth = 4;
+    private String startingFEN = "";//"8/P3P3/1b1K2P1/q4Q1p/7r/5pP1/n3PPp1/3k4 w - - 0 1";
+
+    // Features
+    private boolean doAnalysis = false;
+
+
+    // Colors: https://misc.flogisoft.com/bash/tip_colors_and_formatting
+
+    // Wood:52/53 Dark Gray:90 Grey:37 Pink:35 Blue:34 Green:32 Black:30
+    public static String boardColor = "52m";
+    // Light Yellow:230 White:255 BabyBlue:195
+    private static String moveHighlight = "48;5;230m";
+
 
     // ----------- Constructors -------------
 
     public Chess(){
         this.game = new Game(this);
+    }
 
+    public static String getHighlight() {
+        return moveHighlight;
     }
 
     // ----------- Setters -------------
@@ -34,16 +48,18 @@ public class Chess {
         return computerDepth;
     }
 
+    public boolean getDoAnalysis() { return doAnalysis;}
+
     public static String getBoardColor() {
-        return "\033[0;" + boardColor;
+        return "\033[49;38;5;" + boardColor;
     }
 
     public static String getBoldBoardColor() {
-        return "\033[1;" + boardColor;
+        return "\033[1;0;38;5;" + boardColor;
     }
 
     public static String getUnderlineBoardColor() {
-        return "\033[" + boardColor.substring(0, boardColor.indexOf('m')) + ";4m";
+        return "\033[0;4;38;5;" + boardColor;
     }
 
     public static int getLen() {
