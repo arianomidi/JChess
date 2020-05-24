@@ -372,20 +372,23 @@ public class MoveBackup implements BoardEvent {
             return "O-O";
         else {
             // Get Piece Notation
-            String pieceNotation = "";
+            String pieceNotation = "", pawnPromotion = "";
 
-            if (getMovingPiece().getPieceType() != PieceType.PAWN) {
+
+            if (getMovingPiece().getPieceType() != PieceType.PAWN && getMove().getPromotion().equals(Piece.NONE)) {
                 pieceNotation += Constants.getPieceNotation(getMovingPiece()).toUpperCase();
+            } else if (getMove().getTo().getRank() == Rank.RANK_8 || getMove().getTo().getRank() == Rank.RANK_1){
+                pawnPromotion = "=" + Constants.getPieceNotation(getMove().getPromotion()).toUpperCase();
             }
 
             if (getCapturedPiece() != Piece.NONE) {
-                if (getMovingPiece().getPieceType() == PieceType.PAWN) {
+                if (getMovingPiece().getPieceType() == PieceType.PAWN || !getMove().getPromotion().equals(Piece.NONE)) {
                     pieceNotation += getMove().getFrom().getFile().getNotation().toLowerCase();
                 }
                 pieceNotation += 'x';
             }
 
-            return pieceNotation + getMove().getTo().value().toLowerCase();
+            return pieceNotation + getMove().getTo().value().toLowerCase() + pawnPromotion;
         }
     }
 
