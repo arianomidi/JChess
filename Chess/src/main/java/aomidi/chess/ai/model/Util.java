@@ -161,8 +161,6 @@ public class Util {
     public static PieceType getPieceType(String piece) {
         piece = piece.toUpperCase();
         switch (piece) {
-            case "P":
-                return PieceType.Pawn;
             case "N":
                 return PieceType.Knight;
             case "B":
@@ -171,11 +169,39 @@ public class Util {
                 return PieceType.Rook;
             case "Q":
                 return PieceType.Queen;
-            case "K":
-                return PieceType.King;
             default:
                 throw new java.lang.IllegalArgumentException("Illegal Input: " + piece);
         }
+    }
+
+    public static Piece getPromotionPiece(String piece, Side side) {
+        piece = piece.toUpperCase();
+        if (side == Side.WHITE)
+            switch (piece) {
+                case "N":
+                    return Piece.WHITE_KNIGHT;
+                case "B":
+                    return Piece.WHITE_BISHOP;
+                case "R":
+                    return Piece.WHITE_ROOK;
+                case "Q":
+                    return Piece.WHITE_QUEEN;
+                default:
+                    throw new java.lang.IllegalArgumentException("Illegal Input: " + piece);
+            }
+        else
+            switch (piece) {
+                case "N":
+                    return Piece.BLACK_KNIGHT;
+                case "B":
+                    return Piece.BLACK_BISHOP;
+                case "R":
+                    return Piece.BLACK_ROOK;
+                case "Q":
+                    return Piece.BLACK_QUEEN;
+                default:
+                    throw new java.lang.IllegalArgumentException("Illegal Input: " + piece);
+            }
     }
 
     public static Color getColor(Side side) {

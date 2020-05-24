@@ -6,6 +6,9 @@ import com.github.bhlangonijr.chesslib.move.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static aomidi.chess.ai.model.Util.getPromotionPiece;
+import static aomidi.chess.ai.model.Util.input;
+
 public class User extends Player{
     private boolean firstMove;
 
@@ -105,11 +108,17 @@ public class User extends Player{
     public boolean movePiece(String input) throws MoveGeneratorException {
         Map<String, Object> moveInput = getMoveInput(input);
         Board board = getGame().getBoard();
+        Move move;
 
         Square cur_square = (Square) moveInput.get("from");
         Square new_square = (Square) moveInput.get("to");
+        Piece piece = board.getPiece(cur_square);
 
-        Move move = new Move(cur_square, new_square);
+        if (piece.getPieceType() == PieceType.PAWN && (new_square.getRank() == Rank.RANK_8 || new_square.getRank() == Rank.RANK_1))
+             move = new Move(cur_square, new_square, getPromotionPiece(input("Enter Promotion: (N/B/R/Q)"), getSide()));
+        else
+            move = new Move(cur_square, new_square);
+
 
         if (isLegalMove(move)) {
             return board.doMove(move);

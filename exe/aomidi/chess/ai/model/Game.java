@@ -12,7 +12,6 @@ import com.github.bhlangonijr.chesslib.game.GameContext;
 import com.github.bhlangonijr.chesslib.move.*;
 
 public class Game {
-    // TODO: Pawn Promotions
     private Chess chess;
     private LinkedList<MoveBackup> moves = new LinkedList<>();
     private Board board;
@@ -43,7 +42,7 @@ public class Game {
 
         this.isGameOver = false;
 
-        // Print the chessboard
+        // Print the init chessboard
         printBoard(board, this);
     }
 
@@ -117,7 +116,7 @@ public class Game {
 
                 }
             } else {
-                input(" * Cont: ");
+//                input(" * Cont: ");
                 pieceMoved = ((AI) curPlayer).movePiece();
             }
 
@@ -178,13 +177,11 @@ public class Game {
         if (board.isKingAttacked()) {
             Move last_move = moves.getLast().getMove();
             if (board.isMated()) {
-                // TODO
                 // Change last move notation to checkmate
                 moves.getLast().addToMoveNotation("#");
                 isGameOver = true;
                 return "\nCheckmate\n";
             } else {
-                // TODO
                 // Change last move notation to check
                 moves.getLast().addToMoveNotation("+");
                 return "\nCheck\n";
