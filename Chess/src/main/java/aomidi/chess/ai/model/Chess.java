@@ -8,8 +8,8 @@ public class Chess {
     private Game game;
 
     // Game Options
-    private int computerDepth = 0;
-    private String startingFEN = "";//"8/P3P3/1b1K2P1/q4Q1p/7r/5pP1/n3PPp1/3k4 w - - 0 1";
+    private int computerDepth = 6;
+    private String startingFEN = "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1";
 
     // Features
     private boolean doAnalysis = true;

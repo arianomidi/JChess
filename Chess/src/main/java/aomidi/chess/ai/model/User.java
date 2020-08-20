@@ -119,6 +119,7 @@ public class User extends Player{
         else
             move = new Move(cur_square, new_square);
 
+        System.out.println(board.isMoveCapture(move));
 
         if (isLegalMove(move)) {
             return board.doMove(move);

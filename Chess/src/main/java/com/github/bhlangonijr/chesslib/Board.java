@@ -1105,6 +1105,13 @@ public class Board implements Cloneable, BoardEvent {
         return result;
     }
 
+    public boolean isMoveCapture(Move move) {
+        if (getPiece(move.getTo()) != Piece.NONE){
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Square attacked by a given piece type and side
      *

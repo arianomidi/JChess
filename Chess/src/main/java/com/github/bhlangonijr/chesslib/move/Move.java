@@ -97,6 +97,15 @@ public class Move implements BoardEvent{
         return promotion;
     }
 
+    /**
+     * Check if the move is a capture.
+     *
+     * @return true or false
+     */
+//    public boolean isCapture(){
+//
+//    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Move)) {
