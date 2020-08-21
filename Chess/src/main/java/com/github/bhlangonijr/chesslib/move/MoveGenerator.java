@@ -264,21 +264,6 @@ public class MoveGenerator {
      * @return move list
      * @throws MoveGeneratorException the move generator exception
      */
-//    public static MoveList generateLegalMoves(Board board) throws MoveGeneratorException {
-//        MoveList legalMoves = new MoveList();
-//        try {
-//            MoveList moves = generatePseudoLegalMoves(board);
-//            for (Move move : moves) {
-//                if (board.isMoveLegal(move, false)) {
-//                    legalMoves.add(move);
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new MoveGeneratorException("Couldn't generate Legal moves: ", e);
-//        }
-//
-//        return legalMoves;
-//    }
 
     public static MoveList generateLegalMoves(Board board) throws MoveGeneratorException {
         MoveList legalMoves = new MoveList();

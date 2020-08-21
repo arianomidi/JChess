@@ -42,7 +42,7 @@ public class AI extends Player{
 
     public boolean movePiece() throws MoveGeneratorException {
         long t1 = new Date().getTime();
-        Move bestMove = engine.miniMaxRoot();
+        Move bestMove = engine.getBestMove();
         long t2 = new Date().getTime();
 
         moveTime = (t2 - t1)/1000.0;

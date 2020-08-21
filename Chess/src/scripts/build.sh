@@ -10,6 +10,7 @@ build(){
 	#fi
 	
 	cp -r src/main/java/ build/
+	cp -r resources build/
 	
 	cd build
 	javac ChessApplication.java

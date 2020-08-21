@@ -1,7 +1,12 @@
 package aomidi.chess.ai.model;
 
+import aomidi.chess.openingbook.MoveNode;
+import aomidi.chess.openingbook.OpeningBook;
+import aomidi.chess.openingbook.OpeningBookParser;
 import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.MoveBackup;
 import com.github.bhlangonijr.chesslib.Side;
+import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
@@ -18,10 +23,14 @@ public class Engine {
     private Board board;
     private Side side;
     private int positionCount;
+    private OpeningBook openingBook;
+    private boolean out_of_opening_book = false;
 
     public Engine(int depth, Board board){
         this.board = board;
         this.depth = depth;
+
+        this.openingBook = runOpeningBookParser();
     }
 
     // ----------- Getters -------------
@@ -48,12 +57,7 @@ public class Engine {
 
     public double getPositionEval() throws MoveGeneratorException {
         MoveList moves = MoveGenerator.generateLegalMoves(board);
-
-        double newEval = evaluateBoard(board, moves) / 10;
-//        double oldEval = evaluateBoard(board) / 10;
-//        System.out.format("old eval: %.3f, new eval: %.3f\n", oldEval, newEval);
-
-        return newEval;
+        return evaluateBoard(board, moves) / 10;
     }
 
 
@@ -72,7 +76,7 @@ public class Engine {
     }
 
     public void setMoveEvals(HashMap<Move, Double> moveEvals) {
-        moveEvals = moveEvals;
+        this.moveEvals = moveEvals;
     }
 
     public void resetMoveEvals() {
@@ -80,6 +84,21 @@ public class Engine {
     }
 
     // ----------- Engine -------------
+
+    public Move getBestMove() throws MoveGeneratorException {
+        if (!out_of_opening_book) {
+            Move move = null;
+
+            if (in_opening_book())
+                move = get_opening_move();
+
+            if (move != null && board.isMoveLegal(move, true))
+                return move;
+        }
+
+        return miniMaxRoot();
+    }
+
 
     public Move miniMaxRoot() throws MoveGeneratorException {
         positionCount = 0;
@@ -199,5 +218,45 @@ public class Engine {
         System.out.print("\n");
     }
 
+    // ----------- Opening Book -------------
+
+    public Move get_opening_move(){
+        ArrayList<MoveNode> known_moves = openingBook.getCur_move().getMovesList();
+
+        if (known_moves.isEmpty())
+            return null;
+
+        for (MoveNode moveNode : known_moves){
+            System.out.print(moveNode.getMove() + ", ");
+        }
+
+        Random random = new Random();
+        MoveNode randomElement = known_moves.get(random.nextInt(known_moves.size()));
+
+        System.out.println(": Selected: " + randomElement.getMove());
+
+        openingBook.doMove(randomElement);
+
+        return new Move(randomElement.getMove());
+    }
+
+    public boolean in_opening_book(){
+        LinkedList<MoveBackup> moves = board.getBackup();
+
+        // Last move played by User
+        Move lastMove = moves.getLast().getMove();
+//        System.out.println("\"" + (lastMove.getFrom().value() + lastMove.getTo().value()).toLowerCase() + "\"");
+
+        String move = (lastMove.getFrom().value() + lastMove.getTo().value()).toLowerCase();
+
+        this.out_of_opening_book = !openingBook.doMove(move);
+
+        return !out_of_opening_book;
+    }
+
+    public OpeningBook runOpeningBookParser(){
+        OpeningBookParser.parseFile();
+        return OpeningBookParser.getOpeningBook();
+    }
 
 }

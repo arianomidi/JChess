@@ -41,6 +41,13 @@ public class Move implements BoardEvent{
         this(from, to, Piece.NONE);
     }
 
+    public Move(String input) {
+        input = input.toUpperCase();
+        this.from = Square.fromValue(input.substring(0,2));
+        this.to = Square.fromValue(input.substring(2, 4));
+        this.promotion = Piece.NONE;
+    }
+
     /**
      * Instantiates a new Move.
      *
@@ -96,15 +103,6 @@ public class Move implements BoardEvent{
     public Piece getPromotion() {
         return promotion;
     }
-
-    /**
-     * Check if the move is a capture.
-     *
-     * @return true or false
-     */
-//    public boolean isCapture(){
-//
-//    }
 
     @Override
     public boolean equals(Object obj) {

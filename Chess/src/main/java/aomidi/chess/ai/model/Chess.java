@@ -8,8 +8,8 @@ public class Chess {
     private Game game;
 
     // Game Options
-    private int computerDepth = 6;
-    private String startingFEN = "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1";
+    private int computerDepth = 0;
+    private String startingFEN = ""; //"r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1";
 
     // Features
     private boolean doAnalysis = true;
@@ -57,7 +57,7 @@ public class Chess {
 
     public void startGame(){
         if (computerDepth == 0) {
-            computerDepth = Integer.parseInt(input(boldAndUnderlineBoardColor("\nEnter Computer Strength 1-5 (Recomended 4):")));
+            computerDepth = Integer.parseInt(input(boldAndUnderlineBoardColor("\nEnter Computer Strength 1-7 (Recomended 5):")));
             System.out.println();
         }
 
