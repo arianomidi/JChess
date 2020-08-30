@@ -705,6 +705,20 @@ public class Board implements Cloneable, BoardEvent {
     }
 
     /**
+     * ADDED BY aomidi
+     *
+     * return if square has piece
+     *
+     * @param sq the sq
+     * @return boolean
+     */
+    public boolean isSquareOccupied(Square sq) {
+        if (getPiece(sq) == Piece.NONE)
+            return false;
+        return true;
+    }
+
+    /**
      * Gets bitboard.
      *
      * @return the bitboard
@@ -1534,6 +1548,8 @@ public class Board implements Cloneable, BoardEvent {
         copy.loadFromFen(this.getFen());
         return copy;
     }
+
+
 
 
 }

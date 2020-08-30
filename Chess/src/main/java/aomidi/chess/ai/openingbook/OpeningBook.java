@@ -1,6 +1,4 @@
-package aomidi.chess.openingbook;
-
-import com.github.bhlangonijr.chesslib.move.Move;
+package aomidi.chess.ai.openingbook;
 
 public class OpeningBook {
 

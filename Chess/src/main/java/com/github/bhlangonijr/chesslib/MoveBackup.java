@@ -392,4 +392,11 @@ public class MoveBackup implements BoardEvent {
         }
     }
 
+    public boolean isCapture(){
+        if (getCapturedPiece() == Piece.NONE)
+            return false;
+
+        return true;
+    }
+
 }

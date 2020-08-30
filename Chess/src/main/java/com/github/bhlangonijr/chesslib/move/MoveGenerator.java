@@ -284,4 +284,29 @@ public class MoveGenerator {
         return legalMoves;
     }
 
+    public static MoveList generateLegalMovesForPieceOnSquare(Square square, Board board){
+        if (square == Square.NONE)
+            return new MoveList();
+
+        Piece piece = board.getPiece(square);
+        if (piece == Piece.NONE || piece.getPieceSide() != board.getSideToMove())
+            return new MoveList();
+
+        MoveList allLegalMoves = new MoveList();
+        try {
+            allLegalMoves = MoveGenerator.generateLegalMoves(board);
+        } catch (MoveGeneratorException e) {
+            e.printStackTrace();
+        }
+
+        MoveList legalMoves = new MoveList();
+        for (Move move : allLegalMoves){
+            if (square == move.getFrom()){
+                legalMoves.add(move);
+            }
+        }
+
+        return legalMoves;
+    }
+
 }

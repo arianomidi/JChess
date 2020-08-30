@@ -1,12 +1,11 @@
 package aomidi.chess.ai.model;
 
-import aomidi.chess.openingbook.MoveNode;
-import aomidi.chess.openingbook.OpeningBook;
-import aomidi.chess.openingbook.OpeningBookParser;
+import aomidi.chess.ai.openingbook.MoveNode;
+import aomidi.chess.ai.openingbook.OpeningBook;
+import aomidi.chess.ai.openingbook.OpeningBookParser;
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.MoveBackup;
 import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;

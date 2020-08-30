@@ -93,7 +93,6 @@ public class User extends Player{
         Board board = getGame().getBoard();
 
         if (board.isMoveLegal(move, true)) {
-
             for (Move m : MoveGenerator.generateLegalMoves(board)){
                 if (move.equals(m))
                     return true;

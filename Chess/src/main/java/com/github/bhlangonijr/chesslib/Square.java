@@ -18,6 +18,8 @@ package com.github.bhlangonijr.chesslib;
 
 import java.util.EnumMap;
 
+import static java.lang.Math.ceil;
+
 /**
  * The enum Square.
  */
@@ -282,6 +284,16 @@ public enum Square {
             return Square.NONE;
         }
         return Square.values()[index];
+    }
+
+    public static Square squareAtGUI(int index) {
+        if (index >= Square.values().length) {
+            return Square.NONE;
+        }
+
+        int n = 8 - (2 * (index % 8) + 1);
+
+        return Square.values()[index + n];
     }
 
     /**
