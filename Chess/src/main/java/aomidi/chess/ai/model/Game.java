@@ -30,7 +30,7 @@ public class Game {
     public Game(Chess chess){
         this.chess = chess;
         this.board = new Board();
-        this.engine = new Engine(chess.getDepth(), board);
+        this.engine = new Engine(chess.getDepth());
 
         chess.setStartingPosition(board);
 
@@ -98,10 +98,10 @@ public class Game {
                         //DrawOffer();
                         break;
                     case "EVAL": case "EVALUATION":
-                        System.out.println("\033[0;1mEval:\033[0m " + engine.getPositionEval() + "\n");
+                        System.out.println("\033[0;1mEval:\033[0m " + engine.getPositionEval(board) + "\n");
                         break;
                     case "HINT":
-                        Move bestMove = engine.miniMaxRoot();
+                        Move bestMove = engine.miniMaxRoot(board);
                         System.out.println(bold("Best Move: ") + bestMove + "\n");
                         break;
                     case "UNDO": case "TAKE BACK":

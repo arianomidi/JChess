@@ -24,7 +24,7 @@ public class AI extends Player{
         if (depth == game.getEngine().getDepth())
             this.engine = game.getEngine();
         else
-            this.engine = new Engine(depth, board);
+            this.engine = new Engine(depth);
     }
 
     public double getMoveTime() {
@@ -42,7 +42,7 @@ public class AI extends Player{
 
     public boolean movePiece() throws MoveGeneratorException {
         long t1 = new Date().getTime();
-        Move bestMove = engine.getBestMove();
+        Move bestMove = engine.getBestMove(board);
         long t2 = new Date().getTime();
 
         moveTime = (t2 - t1)/1000.0;

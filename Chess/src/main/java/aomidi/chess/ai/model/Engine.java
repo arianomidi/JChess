@@ -19,14 +19,12 @@ import static aomidi.chess.ai.model.Util.evaluateBoard;
 public class Engine {
     private HashMap<Move, Double> moveEvals;
     private int depth;
-    private Board board;
     private Side side;
     private int positionCount;
     private OpeningBook openingBook;
     private boolean out_of_opening_book = false;
 
-    public Engine(int depth, Board board){
-        this.board = board;
+    public Engine(int depth){
         this.depth = depth;
 
         this.openingBook = runOpeningBookParser();
@@ -36,10 +34,6 @@ public class Engine {
 
     public int getPositionCount() {
         return positionCount;
-    }
-
-    public Board getBoard() {
-        return board;
     }
 
     public int getDepth() {
@@ -54,17 +48,19 @@ public class Engine {
         return moveEvals;
     }
 
-    public double getPositionEval() throws MoveGeneratorException {
-        MoveList moves = MoveGenerator.generateLegalMoves(board);
-        return evaluateBoard(board, moves) / 10;
+    public double getPositionEval(Board board){
+        MoveList moves = null;
+        try {
+            moves = MoveGenerator.generateLegalMoves(board);
+            return evaluateBoard(board, moves) / 10;
+        } catch (MoveGeneratorException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 
     // ----------- Setters -------------
-
-    public void setBoard(Board board) {
-        this.board = board;
-    }
 
     public void setDepth(int depth) {
         this.depth = depth;
@@ -84,22 +80,30 @@ public class Engine {
 
     // ----------- Engine -------------
 
-    public Move getBestMove() throws MoveGeneratorException {
+    public Move getBestMove(Board board) {
         if (!out_of_opening_book) {
             Move move = null;
 
-            if (in_opening_book())
+            if (in_opening_book(board))
                 move = get_opening_move();
 
-            if (move != null && board.isMoveLegal(move, true))
+
+            if (move != null && board.isMoveLegal(move, true)) {
+                System.out.println("OPENING THEORY");
                 return move;
+            }
+
         }
 
-        return miniMaxRoot();
+        try {
+            return miniMaxRoot(board.clone());
+        } catch (MoveGeneratorException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-
-    public Move miniMaxRoot() throws MoveGeneratorException {
+    public Move miniMaxRoot(Board board) throws MoveGeneratorException {
         positionCount = 0;
         side = board.getSideToMove();
         resetMoveEvals();
@@ -145,7 +149,8 @@ public class Engine {
         return bestMoveFound;
     }
 
-    public double miniMax(int depth, Board board, double alpha, double beta, boolean isMaximisingPlayer) throws MoveGeneratorException {
+
+    private double miniMax(int depth, Board board, double alpha, double beta, boolean isMaximisingPlayer) throws MoveGeneratorException {
         positionCount++;
 
         if (depth == 0)
@@ -239,18 +244,21 @@ public class Engine {
         return new Move(randomElement.getMove());
     }
 
-    public boolean in_opening_book(){
-        LinkedList<MoveBackup> moves = board.getBackup();
+    public boolean in_opening_book(Board board){
+        openingBook.resetCurMove();
+        LinkedList<MoveBackup> movesPlayed = board.getBackup();
 
-        // Last move played by User
-        Move lastMove = moves.getLast().getMove();
-//        System.out.println("\"" + (lastMove.getFrom().value() + lastMove.getTo().value()).toLowerCase() + "\"");
+        for (MoveBackup moveBackup : movesPlayed){
+            Move move = moveBackup.getMove();
+            String moveString = (move.getFrom().value() + move.getTo().value()).toLowerCase();
 
-        String move = (lastMove.getFrom().value() + lastMove.getTo().value()).toLowerCase();
+            this.out_of_opening_book = !openingBook.doMove(moveString);
 
-        this.out_of_opening_book = !openingBook.doMove(move);
+            if (out_of_opening_book)
+                return false;
+        }
 
-        return !out_of_opening_book;
+        return true;
     }
 
     public OpeningBook runOpeningBookParser(){

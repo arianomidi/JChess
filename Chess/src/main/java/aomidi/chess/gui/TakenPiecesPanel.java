@@ -28,7 +28,7 @@ public class TakenPiecesPanel extends JPanel {
 
     private static final EtchedBorder PANEL_BORDER = new EtchedBorder(EtchedBorder.RAISED);
     private static final Color PANEL_COLOR = Color.decode("0xEBEDE9");
-    private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(40,700);
+    private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(700 / 16,700);
     private static String defaultImagesPath = "resources/art/pieces/plain/";
 
 
@@ -84,11 +84,12 @@ public class TakenPiecesPanel extends JPanel {
 
         for (final Piece capturedPiece : whiteTakenPieces){
             try {
-                System.out.println(defaultImagesPath + capturedPiece.value() + ".png");
                 final BufferedImage image = ImageIO.read(new File(defaultImagesPath + capturedPiece.value() + ".png"));
-                final ImageIcon icon = new ImageIcon(image);
+                Image dimg = image.getScaledInstance(this.getHeight() / 16, this.getHeight() / 16, Image.SCALE_SMOOTH);
+
+                final ImageIcon icon = new ImageIcon(dimg);
                 final JLabel imageLabel = new JLabel(icon);
-                this.southPanel.add(imageLabel);
+                this.northPanel.add(imageLabel);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -97,7 +98,9 @@ public class TakenPiecesPanel extends JPanel {
         for (final Piece capturedPiece : blackTakenPieces){
             try {
                 final BufferedImage image = ImageIO.read(new File(defaultImagesPath + capturedPiece.value() + ".png"));
-                final ImageIcon icon = new ImageIcon(image);
+
+                Image dimg = image.getScaledInstance(this.getHeight() / 16, this.getHeight() / 16, Image.SCALE_SMOOTH);
+                final ImageIcon icon = new ImageIcon(dimg);
                 final JLabel imageLabel = new JLabel(icon);
                 this.southPanel.add(imageLabel);
             } catch (IOException e) {
