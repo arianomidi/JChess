@@ -97,9 +97,9 @@ public class Game {
                     case "DRAW":
                         //DrawOffer();
                         break;
-                    case "EVAL": case "EVALUATION":
-                        System.out.println("\033[0;1mEval:\033[0m " + engine.getPositionEval(board) + "\n");
-                        break;
+//                    case "EVAL": case "EVALUATION":
+//                        System.out.println("\033[0;1mEval:\033[0m " + engine.getPositionEval(board) + "\n");
+//                        break;
                     case "HINT":
                         Move bestMove = engine.miniMaxRoot(board);
                         System.out.println(bold("Best Move: ") + bestMove + "\n");

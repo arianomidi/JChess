@@ -3,9 +3,7 @@ package aomidi.chess.ai.model;
 import aomidi.chess.ai.openingbook.MoveNode;
 import aomidi.chess.ai.openingbook.OpeningBook;
 import aomidi.chess.ai.openingbook.OpeningBookParser;
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.MoveBackup;
-import com.github.bhlangonijr.chesslib.Side;
+import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
@@ -14,7 +12,7 @@ import com.github.bhlangonijr.chesslib.move.MoveList;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static aomidi.chess.ai.model.Util.evaluateBoard;
+import static aomidi.chess.ai.model.Util.*;
 
 public class Engine {
     private HashMap<Move, Double> moveEvals;
@@ -48,22 +46,26 @@ public class Engine {
         return moveEvals;
     }
 
-    public double getPositionEval(Board board){
-        MoveList moves = null;
-        try {
-            moves = MoveGenerator.generateLegalMoves(board);
-            return evaluateBoard(board, moves) / 10;
-        } catch (MoveGeneratorException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
+//    public double getPositionEval(Board board){
+//        MoveList moves = null;
+//        try {
+//            moves = MoveGenerator.generateLegalMoves(board);
+//            return evaluateBoard(board, moves) / 10;
+//        } catch (MoveGeneratorException e) {
+//            e.printStackTrace();
+//        }
+//        return 0;
+//    }
 
 
     // ----------- Setters -------------
 
     public void setDepth(int depth) {
         this.depth = depth;
+    }
+
+    public void setUseOpeningBook(boolean useOpeningBook){
+        this.out_of_opening_book = !useOpeningBook;
     }
 
     public void setPositionCount(int positionCount) {
@@ -126,7 +128,7 @@ public class Engine {
                     bestMoveFound = move;
                 }
 
-                addMove(move, value);
+//                addMove(move, value);
             }
         } else {
             bestMove = 10000;
@@ -142,7 +144,7 @@ public class Engine {
                     bestMoveFound = move;
                 }
 
-                addMove(move, value);
+//                addMove(move, value);
             }
         }
 
@@ -184,6 +186,26 @@ public class Engine {
             return bestMove;
         }
     }
+
+    public static double evaluateBoard(Board board){
+        double eval = 0.0;
+
+        // TODO EFFEICENT DRAW CHECKER
+//        if (board.isDraw() || board.isStaleMate())
+//            return eval;
+
+        Square[] squares = Square.values();
+
+        for (int i = 0; i < 64; i++) {
+            Piece piece = board.getPiece(squares[i]);
+            if (piece != Piece.NONE) {
+                eval += getPieceValue(piece) + getEvalFactor(piece, squares[i]);
+            }
+        }
+
+        return eval;
+    }
+
 
     // ----------- Move Map Functions -------------
 

@@ -47,7 +47,7 @@ class GameSetup extends JDialog {
         myPanel.add(blackComputerButton);
 
         myPanel.add(new JLabel("Search"));
-        this.searchDepthSpinner = addLabeledSpinner(myPanel, "Search Depth", new SpinnerNumberModel(4, 0, Integer.MAX_VALUE, 1));
+        this.searchDepthSpinner = addLabeledSpinner(myPanel, "Search Depth", new SpinnerNumberModel(5, 1, Integer.MAX_VALUE, 1));
 
         final JButton cancelButton = new JButton("Cancel");
         final JButton okButton = new JButton("OK");
@@ -78,13 +78,6 @@ class GameSetup extends JDialog {
     void promptUser() {
         setVisible(true);
         repaint();
-    }
-
-    boolean isAIPlayer(final Player player) {
-        if(player.getSide() == Side.WHITE) {
-            return getWhitePlayerType() == PlayerType.ENGINE;
-        }
-        return getBlackPlayerType() == PlayerType.ENGINE;
     }
 
     boolean isAIPlayer(final Side side) {

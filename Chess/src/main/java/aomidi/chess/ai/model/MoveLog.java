@@ -33,6 +33,10 @@ public class MoveLog {
         return this.moves.remove(index);
     }
 
+    public MoveBackup removeLastMove(){
+        return  this.moves.removeLast();
+    }
+
     public boolean removeMove(final MoveBackup move){
         return this.moves.remove(move);
     }

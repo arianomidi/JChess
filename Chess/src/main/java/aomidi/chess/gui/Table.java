@@ -21,15 +21,14 @@ import java.util.*;
 import java.util.List;
 
 import static aomidi.chess.ai.model.Util.getPromotionPiece;
-import static aomidi.chess.ai.model.Util.input;
+import static javax.swing.JFrame.setDefaultLookAndFeelDecorated;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
 public class Table extends Observable {
-    private final Board chessBoard;
+    private Board chessBoard;
+    private final Engine engine;
     private final MoveLog moveLog;
-    private static Player whitePlayer;
-    private static Player blackPlayer;
 
     private final JFrame gameFrame;
     private final GameSetup gameSetup;
@@ -45,32 +44,31 @@ public class Table extends Observable {
     private Piece humanMovedPiece = Piece.NONE;
 
     private static Dimension FRAME_DIMENSION = new Dimension(820,700);
-    private static Dimension BOARD_PANEL_SIZE = new Dimension(400, 400);
-    private static Dimension TILE_PANEL_SIZE = new Dimension(10, 10);
+    private static Dimension BOARD_PANEL_SIZE = new Dimension(640, 640);
+    private static Dimension TILE_PANEL_SIZE = new Dimension(BOARD_PANEL_SIZE.width / 8, BOARD_PANEL_SIZE.height / 8);
 
-    private final Color lightTileColor = Color.decode("#ECD9B9");
-    private final Color darkTileColor = Color.decode("#AE8968");
+
+    private static final Color defaultLightTileColor = Color.decode("#ECD9B9");
+    private static final Color defaultDarkTileColor = Color.decode("#AE8968");
+    private Color lightTileColor = Color.decode("#ECD9B9");
+    private Color darkTileColor = Color.decode("#AE8968");
     private final Color lightTileSelectedColor = Color.decode("#8A966F");
     private final Color darkTileSelectedColor = Color.decode("#6B6E47");
     private final Color darkTilePreviousMoveColor = Color.decode("#AAA256");
     private final Color lightTilePreviousMoveColor = Color.decode("#CFD186");
-    private static String defaultImagesPath = "resources/art/pieces/plain/";
+    private static String pieceIconPath = "resources/art/pieces/plain/";
     private Move computerMove;
 
     private static final Table INSTANCE = new Table();
 
     private Table(){
         this.chessBoard = new Board();
-//        this.chessBoard.loadFromFen("3qkbnr/P2ppppp/8/8/8/8/3PPPPP/R2QKBNR w KQk - 0 1");
         this.moveLog = new MoveLog();
 
         this.gameFrame = new JFrame("JChess");
         this.gameFrame.setLayout(new BorderLayout());
-
-//        todo delete next line if unused
-        final JMenuBar menuBar = populateMenuBar();
-        this.gameFrame.setJMenuBar(menuBar);
         this.gameFrame.setSize(FRAME_DIMENSION);
+        this.gameFrame.setJMenuBar(populateMenuBar());
 
         this.gameSetup = new GameSetup(this.gameFrame, true);
         this.gameHistoryPanel = new GameHistoryPanel();
@@ -78,13 +76,17 @@ public class Table extends Observable {
 
         this.boardPanel = new BoardPanel();
         this.boardOrientation = BoardOrientation.WHITE_DOWN;
-        this.highlightLegalMoves = false;
+        this.highlightLegalMoves = true;
 
         this.gameFrame.add(this.takenPiecesPanel, BorderLayout.WEST);
         this.gameFrame.add(this.boardPanel, BorderLayout.CENTER);
         this.gameFrame.add(this.gameHistoryPanel, BorderLayout.EAST);
+        setDefaultLookAndFeelDecorated(true);
+        this.gameFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        center(this.gameFrame);
         this.gameFrame.setVisible(true);
 
+        this.engine = new Engine(gameSetup.getSearchDepth());
         this.addObserver(new TableGameAIObserver());
     }
 
@@ -99,12 +101,31 @@ public class Table extends Observable {
         Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
     }
 
+    public void redraw(){
+        Table.get().getGameHistoryPanel().redo(chessBoard, Table.get().getMoveLog());
+        Table.get().getTakenPiecesPanel().redo(Table.get().getMoveLog());
+        Table.get().getBoardPanel().drawBoard(chessBoard);
+    }
+
+    private static void center(final JFrame frame) {
+        final Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        final int w = frame.getSize().width;
+        final int h = frame.getSize().height;
+        final int x = (dim.width - w) / 2;
+        final int y = (dim.height - h) / 2;
+        frame.setLocation(x, y);
+    }
+
     private JFrame getGameFrame() {
         return this.gameFrame;
     }
 
     private Board getGameBoard() {
         return this.chessBoard;
+    }
+
+    private Engine getEngine() {
+        return this.engine;
     }
 
     private MoveLog getMoveLog() {
@@ -129,16 +150,6 @@ public class Table extends Observable {
 
     private boolean getHighlightLegalMoves() {
         return this.highlightLegalMoves;
-    }
-
-//    private boolean getUseBook() {
-//        return this.useBook;
-//    }
-    private static Player getPlayer(Side side){
-        if (side == Side.WHITE)
-            return whitePlayer;
-        else
-            return blackPlayer;
     }
 
     private void setupUpdate(GameSetup gameSetup){
@@ -188,6 +199,8 @@ public class Table extends Observable {
         });
         preferencesMenu.add(flipBoard);
 
+        preferencesMenu.addSeparator();
+
         final JCheckBoxMenuItem highlightMovesItem = new JCheckBoxMenuItem("Highlight Legal Moves", false);
         highlightMovesItem.addActionListener(new ActionListener() {
             @Override
@@ -197,6 +210,119 @@ public class Table extends Observable {
         });
         preferencesMenu.add(highlightMovesItem);
 
+        preferencesMenu.addSeparator();
+
+        final JMenu chessMenChoiceSubMenu = new JMenu("Choose Piece Set");
+
+        final JCheckBoxMenuItem defaultMenuItem = new JCheckBoxMenuItem("Plain (Default)", true);
+        chessMenChoiceSubMenu.add(defaultMenuItem);
+
+        final JCheckBoxMenuItem abstractMenMenuItem = new JCheckBoxMenuItem("Abstract");
+        chessMenChoiceSubMenu.add(abstractMenMenuItem);
+
+        final JCheckBoxMenuItem holyWarriorsMenuItem = new JCheckBoxMenuItem("Holy");
+        chessMenChoiceSubMenu.add(holyWarriorsMenuItem);
+
+        final JCheckBoxMenuItem fancyMenMenuItem = new JCheckBoxMenuItem("Fancy");
+        chessMenChoiceSubMenu.add(fancyMenMenuItem);
+
+        final JCheckBoxMenuItem fancyMenMenuItem2 = new JCheckBoxMenuItem("Fancy 2");
+        chessMenChoiceSubMenu.add(fancyMenMenuItem2);
+
+
+        defaultMenuItem.addActionListener(e -> {
+            for (Component jCheckBoxMenuItem : chessMenChoiceSubMenu.getMenuComponents()){
+                if (jCheckBoxMenuItem instanceof JCheckBoxMenuItem)
+                    ((JCheckBoxMenuItem) jCheckBoxMenuItem).setState(false);
+            }
+            defaultMenuItem.setState(true);
+
+            pieceIconPath = "resources/art/pieces/plain/";
+            Table.get().getBoardPanel().drawBoard(chessBoard);
+        });
+
+        abstractMenMenuItem.addActionListener(e -> {
+            for (Component jCheckBoxMenuItem : chessMenChoiceSubMenu.getMenuComponents()){
+                if (jCheckBoxMenuItem instanceof JCheckBoxMenuItem)
+                    ((JCheckBoxMenuItem) jCheckBoxMenuItem).setState(false);
+            }
+            abstractMenMenuItem.setState(true);
+
+            pieceIconPath = "resources/art/pieces/simple/";
+            Table.get().getBoardPanel().drawBoard(chessBoard);
+        });
+
+        holyWarriorsMenuItem.addActionListener(e -> {
+            for (Component jCheckBoxMenuItem : chessMenChoiceSubMenu.getMenuComponents()){
+                if (jCheckBoxMenuItem instanceof JCheckBoxMenuItem)
+                    ((JCheckBoxMenuItem) jCheckBoxMenuItem).setState(false);
+            }
+            holyWarriorsMenuItem.setState(true);
+
+            pieceIconPath = "resources/art/pieces/holywarriors/";
+            Table.get().getBoardPanel().drawBoard(chessBoard);
+        });
+
+        fancyMenMenuItem2.addActionListener(e -> {
+            for (Component jCheckBoxMenuItem : chessMenChoiceSubMenu.getMenuComponents()){
+                if (jCheckBoxMenuItem instanceof JCheckBoxMenuItem)
+                    ((JCheckBoxMenuItem) jCheckBoxMenuItem).setState(false);
+            }
+            fancyMenMenuItem2.setState(true);
+
+            pieceIconPath = "resources/art/pieces/fancy2/";
+            Table.get().getBoardPanel().drawBoard(chessBoard);
+        });
+
+        fancyMenMenuItem.addActionListener(e -> {
+            for (Component jCheckBoxMenuItem : chessMenChoiceSubMenu.getMenuComponents()){
+                if (jCheckBoxMenuItem instanceof JCheckBoxMenuItem)
+                    ((JCheckBoxMenuItem) jCheckBoxMenuItem).setState(false);
+            }
+            fancyMenMenuItem.setState(true);
+
+            pieceIconPath = "resources/art/pieces/fancy/";
+            Table.get().getBoardPanel().drawBoard(chessBoard);
+        });
+
+        preferencesMenu.add(chessMenChoiceSubMenu);
+
+        final JMenu colorChooserSubMenu = new JMenu("Choose Board Colors");
+        colorChooserSubMenu.setMnemonic(KeyEvent.VK_S);
+
+        final JMenuItem defaultColorsMenuItem = new JMenuItem(
+                "Default Colors");
+        colorChooserSubMenu.add(defaultColorsMenuItem);
+
+        final JMenuItem chooseDarkMenuItem = new JMenuItem("Choose Dark Tile Color");
+        colorChooserSubMenu.add(chooseDarkMenuItem);
+
+        final JMenuItem chooseLightMenuItem = new JMenuItem("Choose Light Tile Color");
+        colorChooserSubMenu.add(chooseLightMenuItem);
+
+        preferencesMenu.add(colorChooserSubMenu);
+
+        defaultColorsMenuItem.addActionListener(e -> {
+            Table.get().getBoardPanel().setTileLightColor(chessBoard, defaultLightTileColor);
+            Table.get().getBoardPanel().setTileDarkColor(chessBoard, defaultDarkTileColor);
+        });
+
+        chooseDarkMenuItem.addActionListener(e -> {
+            final Color colorChoice = JColorChooser.showDialog(Table.get().getGameFrame(), "Choose Dark Tile Color",
+                    Table.get().getGameFrame().getBackground());
+            if (colorChoice != null) {
+                Table.get().getBoardPanel().setTileDarkColor(chessBoard, colorChoice);
+            }
+        });
+
+        chooseLightMenuItem.addActionListener(e -> {
+            final Color colorChoice = JColorChooser.showDialog(Table.get().getGameFrame(), "Choose Light Tile Color",
+                    Table.get().getGameFrame().getBackground());
+            if (colorChoice != null) {
+                Table.get().getBoardPanel().setTileLightColor(chessBoard, colorChoice);
+            }
+        });
+
         return preferencesMenu;
     }
 
@@ -205,40 +331,9 @@ public class Table extends Observable {
         final JMenu optionsMenu = new JMenu("Options");
         optionsMenu.setMnemonic(KeyEvent.VK_O);
 
-//        final JMenuItem resetMenuItem = new JMenuItem("New Game", KeyEvent.VK_P);
-//        resetMenuItem.addActionListener(e -> undoAllMoves());
-//        optionsMenu.add(resetMenuItem);
-
-//        final JMenuItem evaluateBoardMenuItem = new JMenuItem("Evaluate Board", KeyEvent.VK_E);
-//        evaluateBoardMenuItem.addActionListener(e -> System.out.println(StandardBoardEvaluator.get().evaluationDetails(chessBoard, gameSetup.getSearchDepth())));
-//        optionsMenu.add(evaluateBoardMenuItem);
-
-//        final JMenuItem escapeAnalysis = new JMenuItem("Escape Analysis Score", KeyEvent.VK_S);
-//        escapeAnalysis.addActionListener(e -> {
-//            final Move lastMove = moveLog.getMoves().get(moveLog.size() - 1);
-//            if(lastMove != null) {
-//                System.out.println(MoveUtils.exchangeScore(lastMove));
-//            }
-//
-//        });
-//        optionsMenu.add(escapeAnalysis);
-
-//        final JMenuItem legalMovesMenuItem = new JMenuItem("Current State", KeyEvent.VK_L);
-//        legalMovesMenuItem.addActionListener(e -> {
-////            System.out.println(chessBoard.getWhitePieces());
-////            System.out.println(chessBoard.getBlackPieces());
-////            System.out.println(playerInfo(chessBoard.currentPlayer()));
-////            System.out.println(playerInfo(chessBoard.currentPlayer().getOpponent()));
-//        });
-//        optionsMenu.add(legalMovesMenuItem);
-//
-//        final JMenuItem undoMoveMenuItem = new JMenuItem("Undo last move", KeyEvent.VK_M);
-//        undoMoveMenuItem.addActionListener(e -> {
-//            if(Table.get().getMoveLog().size() > 0) {
-//                undoLastMove();
-//            }
-//        });
-//        optionsMenu.add(undoMoveMenuItem);
+        final JMenuItem resetMenuItem = new JMenuItem("New Game", KeyEvent.VK_P);
+        resetMenuItem.addActionListener(e -> resetGame());
+        optionsMenu.add(resetMenuItem);
 
         final JMenuItem setupGameMenuItem = new JMenuItem("Setup Game", KeyEvent.VK_S);
         setupGameMenuItem.addActionListener(new ActionListener() {
@@ -250,6 +345,25 @@ public class Table extends Observable {
         });
         optionsMenu.add(setupGameMenuItem);
 
+        // TODO BOARD EVAL
+//        final JMenuItem evaluateBoardMenuItem = new JMenuItem("Evaluate Board", KeyEvent.VK_E);
+//        evaluateBoardMenuItem.addActionListener(e -> System.out.println(StandardBoardEvaluator.get().evaluationDetails(chessBoard, gameSetup.getSearchDepth())));
+//        optionsMenu.add(evaluateBoardMenuItem);
+
+        final JMenuItem undoMoveMenuItem = new JMenuItem("Undo last move", KeyEvent.VK_M);
+        undoMoveMenuItem.addActionListener(e -> {
+            if(Table.get().getMoveLog().size() > 0) {
+                undoLastMove();
+            }
+        });
+        optionsMenu.add(undoMoveMenuItem);
+        optionsMenu.addSeparator();
+
+        final JCheckBoxMenuItem cbUseBookMoves = new JCheckBoxMenuItem(
+                "Use Book Moves", true);
+        cbUseBookMoves.addActionListener(e -> engine.setUseOpeningBook(cbUseBookMoves.isSelected()));
+        optionsMenu.add(cbUseBookMoves);
+
         return optionsMenu;
     }
 
@@ -260,25 +374,33 @@ public class Table extends Observable {
 
             if (Table.get().getGameSetup().isAIPlayer(Table.get().getGameBoard().getSideToMove()) &&
                     !Table.get().getGameBoard().isMated() &&
-                    !Table.get().getGameBoard().isStaleMate()) {
-                System.out.println(Table.get().getGameBoard().getSideToMove() + " is set to AI, thinking....");
+                    !Table.get().getGameBoard().isStaleMate() && !Table.get().getGameBoard().isDraw()) {
+                System.out.println(Table.get().getGameBoard().getSideToMove() + " (AI) is thinking....");
                 final AIThinkTank thinkTank = new AIThinkTank();
                 thinkTank.execute();
             }
 
             if (Table.get().getGameBoard().isMated()) {
                 JOptionPane.showMessageDialog(Table.get().getBoardPanel(),
-                        "Game Over: Player " + Table.get().getGameBoard().getSideToMove() + " is in checkmate!", "Game Over",
+                        "Game Over: " + Table.get().getGameBoard().getSideToMove() + " is in checkmate!", "Game Over",
                         JOptionPane.INFORMATION_MESSAGE);
             }
 
             if (Table.get().getGameBoard().isStaleMate()) {
                 JOptionPane.showMessageDialog(Table.get().getBoardPanel(),
-                        "Game Over: Player " + Table.get().getGameBoard().getSideToMove() + " is in stalemate!", "Game Over",
+                        "Game Over: " + Table.get().getGameBoard().getSideToMove() + " is in stalemate!", "Game Over",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            if (Table.get().getGameBoard().isDraw()) {
+                JOptionPane.showMessageDialog(Table.get().getBoardPanel(),
+                        "Game Over: Draw", "Draw",
                         JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
+
+    // --- Game Functions --- //
 
     public void updateComputerMove(Move move){
         this.computerMove = move;
@@ -288,6 +410,27 @@ public class Table extends Observable {
         setChanged();
         notifyObservers(playerType);
     }
+
+    private void undoLastMove() {
+        this.computerMove = null;
+        Table.get().getMoveLog().removeLastMove();
+        this.chessBoard.undoMove();
+
+        if (this.gameSetup.isAIPlayer(this.chessBoard.getSideToMove())) {
+            Table.get().getMoveLog().removeLastMove();
+            this.chessBoard.undoMove();
+        }
+
+        redraw();
+    }
+
+    private void resetGame() {
+        this.computerMove = null;
+        Table.get().getMoveLog().clear();
+        this.chessBoard = new Board();
+
+        redraw();
+    }
     
     private static class AIThinkTank extends SwingWorker<Move, String> {
 
@@ -296,36 +439,21 @@ public class Table extends Observable {
 
         @Override
         protected Move doInBackground() {
-            final Move bestMove;
-//            final Move bookMove = Table.get().getUseBook()
-//                    ? MySqlGamePersistence.get().getNextBestMove(Table.get().getGameBoard(),
-//                    Table.get().getGameBoard().currentPlayer(),
-//                    Table.get().getMoveLog().getMoves().toString().replaceAll("\\[", "").replaceAll("]", ""))
-//                    : MoveFactory.getNullMove();
-//            if (Table.get().getUseBook() && bookMove != MoveFactory.getNullMove()) {
-//                bestMove = bookMove;
-//            }
-//            else {
-
-            final Engine engine = new Engine(Table.get().getGameSetup().getSearchDepth());
-//            engine.addObserver(Table.get().getDebugPanel());
-            bestMove = engine.getBestMove(Table.get().getGameBoard());
-
+            Table.get().getEngine().setDepth(Table.get().getGameSetup().getSearchDepth());
+            final Move bestMove = Table.get().getEngine().getBestMove(Table.get().getGameBoard());
             return bestMove;
         }
-
 
         @Override
         public void done() {
             try {
                 final Move bestMove = get();
                 Table.get().updateComputerMove(bestMove);
-                Table.get().getGameBoard().doMove(bestMove);
+                Table.get().getGameBoard().doMove(bestMove, true);
                 Table.get().getMoveLog().addMove(Table.get().getGameBoard().getBackup().getLast());
                 Table.get().getGameHistoryPanel().redo(Table.get().getGameBoard(), Table.get().getMoveLog());
                 Table.get().getTakenPiecesPanel().redo(Table.get().getMoveLog());
                 Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
-//                Table.get().getDebugPanel().redo();
                 Table.get().moveMadeUpdate(PlayerType.ENGINE);
             } catch (final Exception e) {
                 e.printStackTrace();
@@ -351,6 +479,9 @@ public class Table extends Observable {
             }
 
             setPreferredSize(BOARD_PANEL_SIZE);
+            setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
+            setBackground(Color.decode("#8B4726"));
+
             validate();
         }
 
@@ -365,6 +496,22 @@ public class Table extends Observable {
             }
             validate();
             repaint();
+        }
+
+        void setTileDarkColor(final Board board,
+                              final Color darkColor) {
+            for (final TilePanel boardTile : boardTiles) {
+                boardTile.setDarkTileColor(darkColor);
+            }
+            drawBoard(board);
+        }
+
+        void setTileLightColor(final Board board,
+                               final Color lightColor) {
+            for (final TilePanel boardTile : boardTiles) {
+                boardTile.setLightTileColor(lightColor);
+            }
+            drawBoard(board);
         }
     }
 
@@ -473,6 +620,14 @@ public class Table extends Observable {
 
         // --- Drawing & Tile Visuals --- //
 
+        void setLightTileColor(final Color color) {
+            lightTileColor = color;
+        }
+
+        void setDarkTileColor(final Color color) {
+            darkTileColor = color;
+        }
+
         private void assignTileColor() {
             if (this.square.isLightSquare())
                 setBackground(lightTileColor);
@@ -486,16 +641,55 @@ public class Table extends Observable {
             if (board.isSquareOccupied(this.square)){
                 try {
                     final BufferedImage image =
-                            ImageIO.read(new File(
-                            defaultImagesPath + board.getPiece(this.square).value() + ".png" ));
-//                    final BufferedImage image =
-//                            ImageIO.read(new File(
-//                                    defaultImagesPath + "ChessPiecesSprite_resized.png" ));
-                    add(new JLabel(new ImageIcon(image)));
+                            ImageIO.read(new File(pieceIconPath + board.getPiece(this.square).value() + ".png" ));
+                    Image scaledImage = image.getScaledInstance(TILE_PANEL_SIZE.width, TILE_PANEL_SIZE.height, Image.SCALE_SMOOTH);
+                    add(new JLabel(new ImageIcon(scaledImage)));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
 
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            highlightLegalMoves(Table.get().getGameBoard(), g);
+        }
+
+        private void highlightLegalMoves(final Board board, Graphics g){
+            if (highlightLegalMoves){
+                for (Move move : MoveGenerator.generateLegalMovesForPieceOnSquare(sourceTile, board)){
+                    if (move.getTo() == square){
+                        if (!board.isSquareOccupied(square)) {
+                            Graphics2D g2 = (Graphics2D) g;
+                            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                            if (square.isLightSquare())
+                                g2.setColor(Color.decode("#89956E"));
+                            else
+                                g2.setColor(Color.decode("#6B6D46"));
+
+                            g2.fillOval(this.getWidth() / 2 - 10, this.getHeight() / 2 - 10, 20, 20);
+                        } else {
+                            assignTileColor();
+
+                            Graphics2D g2 = (Graphics2D) g;
+                            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                            if (square.isLightSquare())
+                                g2.setColor(Color.decode("#B1B086"));
+                            else
+                                g2.setColor(Color.decode("#85794E"));
+
+                            final int[][] xPoints = {{0, 0, 20}, {getWidth(), getWidth() - 20, getWidth()}, {getWidth(), getWidth() - 20, getWidth()}, {0, 0, 20}};
+                            final int[][] yPoints = {{0, 20, 0}, {0, 0, 20}, {getHeight(), getHeight(), getHeight() - 20}, {getHeight(), getHeight() - 20, getHeight()}};
+
+                            g2.fillPolygon(xPoints[0], yPoints[0], 3);
+                            g2.fillPolygon(xPoints[1], yPoints[1], 3);
+                            g2.fillPolygon(xPoints[2], yPoints[2], 3);
+                            g2.fillPolygon(xPoints[3], yPoints[3], 3);
+                        }
+                    }
+                }
             }
         }
 
@@ -503,11 +697,11 @@ public class Table extends Observable {
             if (highlightLegalMoves){
                 for (Move move : MoveGenerator.generateLegalMovesForPieceOnSquare(sourceTile, board)){
                     if (move.getTo() == square){
-                        try {
-                            add(new JLabel(new ImageIcon(ImageIO.read(new File("resources/art/misc/green_dot.png")))));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            add(new JLabel(new ImageIcon(ImageIO.read(new File("resources/art/misc/green_dot.png")))));
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 }
             }

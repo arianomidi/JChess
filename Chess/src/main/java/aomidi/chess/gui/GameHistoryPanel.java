@@ -6,7 +6,7 @@ import com.github.bhlangonijr.chesslib.MoveBackup;
 import com.github.bhlangonijr.chesslib.Side;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,21 +16,49 @@ public class GameHistoryPanel extends JPanel {
     private final DataModel model;
     private final JScrollPane scrollPane;
 
-    private static final Dimension HISTORY_PANEL_DIMENSION = new Dimension(100,40);
+    private static final Dimension HISTORY_PANEL_DIMENSION = new Dimension(130,40);
     private static final Color PANEL_COLOR = Color.decode("0xEBEDE9");
 
     public GameHistoryPanel(){
         this.setLayout(new BorderLayout());
         this.model = new DataModel();
-        final JTable table = new JTable(model);
+        final JTable table = new JTable(model){
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer, int row,
+            int col) {
+            Component comp = super.prepareRenderer(renderer, row, col);
+            ((JLabel) comp).setHorizontalAlignment(JLabel.CENTER);
+            return comp;
+        }};
+
         table.setRowHeight(20);
+        table.setBackground(PANEL_COLOR);
+        table.setShowVerticalLines(false);
+        table.setShowHorizontalLines(false);
+        JTableHeader tableHeader = table.getTableHeader();
+
         this.scrollPane = new JScrollPane(table);
-        scrollPane.setColumnHeaderView(table.getTableHeader());
+        scrollPane.setColumnHeaderView(tableHeader);
 
 
         setBackground(PANEL_COLOR);
 
         scrollPane.setPreferredSize(HISTORY_PANEL_DIMENSION);
+        scrollPane.setBackground(Color.gray);
+
+        TableColumn column;
+        for (int i = 0; i < 3; i++) {
+            column = table.getColumnModel().getColumn(i);
+            if (i == 0) {
+                column.setPreferredWidth(30); //sport column is bigger
+            } else {
+                column.setPreferredWidth(50);
+            }
+        }
+
+
+
+
         this.add(scrollPane, BorderLayout.CENTER);
         this.setVisible(true);
 
@@ -43,9 +71,10 @@ public class GameHistoryPanel extends JPanel {
         for (final MoveBackup move : moveLog.getMoves()){
             final String moveText = move.getMoveNotation();
             if (move.getMovingPiece().getPieceSide() == Side.WHITE){
-                this.model.setValueAt(moveText, currentRow, 0);
-            } else if (move.getMovingPiece().getPieceSide() == Side.BLACK){
                 this.model.setValueAt(moveText, currentRow, 1);
+                this.model.setValueAt(currentRow + 1, currentRow, 0);
+            } else if (move.getMovingPiece().getPieceSide() == Side.BLACK){
+                this.model.setValueAt(moveText, currentRow, 2);
                 currentRow++;
             }
         }
@@ -55,9 +84,9 @@ public class GameHistoryPanel extends JPanel {
             final String moveText = lastMove.getMoveNotation();
 
             if (lastMove.getMovingPiece().getPieceSide() == Side.WHITE){
-                this.model.setValueAt(moveText + calculateCheckAndMateHash(board), currentRow, 0);
+                this.model.setValueAt(moveText + calculateCheckAndMateHash(board), currentRow, 1);
             } else if (lastMove.getMovingPiece().getPieceSide() == Side.BLACK){
-                this.model.setValueAt(moveText + calculateCheckAndMateHash(board), currentRow - 1, 1);
+                this.model.setValueAt(moveText + calculateCheckAndMateHash(board), currentRow - 1, 2);
             }
         }
 
@@ -77,7 +106,7 @@ public class GameHistoryPanel extends JPanel {
 
     private static class DataModel extends DefaultTableModel{
         private final List<Row> values;
-        private static final String[] NAMES = {"WHITE", "BLACK"};
+        private static final String[] NAMES = {"", "White", "Black"};
 
         DataModel(){
             this.values = new ArrayList<>();
@@ -105,8 +134,10 @@ public class GameHistoryPanel extends JPanel {
             final Row currentRow = this.values.get(row);
 
             if (column == 0)
-                return currentRow.getWhiteMove();
+                return currentRow.getMoveNum();
             else if (column == 1)
+                return currentRow.getWhiteMove();
+            else if (column == 2)
                 return currentRow.getBlackMove();
             return null;
         }
@@ -122,10 +153,13 @@ public class GameHistoryPanel extends JPanel {
                 currentRow = this.values.get(row);
             }
 
-            if (column == 0){
+            if (column == 1){
                 currentRow.setWhiteMove((String) value);
                 fireTableRowsInserted(row, row);
-            } else if (column == 1){
+            } else  if (column == 0) {
+                currentRow.setMoveNum((Integer) value);
+                fireTableCellUpdated(row, column);
+            } else if (column == 2){
                 currentRow.setBlackMove((String) value);
                 fireTableCellUpdated(row, column);
             }
@@ -144,6 +178,7 @@ public class GameHistoryPanel extends JPanel {
         private static class Row {
             private String whiteMove;
             private String blackMove;
+            private String moveNum;
 
             Row(){
             }
@@ -156,12 +191,20 @@ public class GameHistoryPanel extends JPanel {
                 return blackMove;
             }
 
+            public String getMoveNum() {
+                return moveNum;
+            }
+
             public void setWhiteMove(String move) {
                 this.whiteMove = move;
             }
 
             public void setBlackMove(String move) {
                 this.blackMove = move;
+            }
+
+            public void setMoveNum(int moveNum) {
+                this.moveNum = moveNum + ".";
             }
         }
     }

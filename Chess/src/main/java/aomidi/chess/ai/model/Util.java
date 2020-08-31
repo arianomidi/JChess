@@ -401,7 +401,7 @@ public class Util {
             return value;
     }
 
-    private static double getEvalFactor(Piece piece, Square square){
+    static double getEvalFactor(Piece piece, Square square){
         double[][] pieceEval;
         switch (piece.getPieceType()){
             case PAWN:
