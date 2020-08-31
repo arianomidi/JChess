@@ -1,5 +1,6 @@
 package aomidi.chess.ai.model;
 
+import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.MoveBackup;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveList;

@@ -1,14 +1,17 @@
 package aomidi.chess.gui;
 
 import aomidi.chess.ai.model.Engine;
-import aomidi.chess.ai.model.Game;
 import aomidi.chess.ai.model.MoveLog;
 import aomidi.chess.ai.model.Player;
 import com.github.bhlangonijr.chesslib.*;
+import com.github.bhlangonijr.chesslib.game.Event;
+import com.github.bhlangonijr.chesslib.game.Game;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
+import com.github.bhlangonijr.chesslib.game.Round;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
+import com.github.bhlangonijr.chesslib.pgn.PgnHolder;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -43,7 +46,7 @@ public class Table extends Observable {
     private Square destinationTile = Square.NONE;;
     private Piece humanMovedPiece = Piece.NONE;
 
-    private static Dimension FRAME_DIMENSION = new Dimension(820,700);
+    private static Dimension FRAME_DIMENSION = new Dimension(875,660);
     private static Dimension BOARD_PANEL_SIZE = new Dimension(640, 640);
     private static Dimension TILE_PANEL_SIZE = new Dimension(BOARD_PANEL_SIZE.width / 8, BOARD_PANEL_SIZE.height / 8);
 
@@ -170,9 +173,32 @@ public class Table extends Observable {
     private JMenu createFileMenu() {
         final JMenu fileMenu = new JMenu("File");
 
-        final JMenuItem openPGN = new JMenuItem("Load PGN File");
-        openPGN.addActionListener(e -> System.out.println("PGN Reading Not Added Yet"));
+        final JMenuItem openPGN = new JMenuItem("Load PGN File", KeyEvent.VK_O);
+        openPGN.addActionListener(e -> {
+            JFileChooser chooser = new JFileChooser();
+            int option = chooser.showOpenDialog(Table.get().getGameFrame());
+            if (option == JFileChooser.APPROVE_OPTION) {
+                PgnHolder pgnHolder = new PgnHolder(chooser.getSelectedFile());
+                try {
+                    pgnHolder.loadPgn();
+                    System.out.println(pgnHolder.toString());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
         fileMenu.add(openPGN);
+
+        final JMenuItem openFEN = new JMenuItem("Load FEN File", KeyEvent.VK_F);
+        openFEN.addActionListener(e -> {
+            String fenString = JOptionPane.showInputDialog("Input FEN");
+            if(fenString != null) {
+                resetGame();
+                chessBoard.loadFromFen(fenString);
+                Table.get().getBoardPanel().drawBoard(chessBoard);
+            }
+        });
+        fileMenu.add(openFEN);
 
         final JMenuItem exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.addActionListener(new ActionListener() {

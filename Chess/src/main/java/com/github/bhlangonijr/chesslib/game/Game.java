@@ -472,7 +472,6 @@ public class Game {
         sb.append(getResult().getDescription());
         return sb.toString();
 
-
     }
 
     private int translateVariation(StringBuilder sb, MoveList variation, int parent,

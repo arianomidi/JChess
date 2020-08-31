@@ -20,6 +20,7 @@ import com.github.bhlangonijr.chesslib.game.*;
 import com.github.bhlangonijr.chesslib.util.LargeFile;
 import com.github.bhlangonijr.chesslib.util.StringUtil;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,6 +52,11 @@ public class PgnHolder {
      */
     public PgnHolder(String filename) {
         setFileName(filename);
+        setLazyLoad(false);
+    }
+
+    public PgnHolder(File file) {
+        setFileName(file.getAbsolutePath());
         setLazyLoad(false);
     }
 

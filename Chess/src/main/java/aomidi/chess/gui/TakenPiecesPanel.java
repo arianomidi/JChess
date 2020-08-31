@@ -28,7 +28,7 @@ public class TakenPiecesPanel extends JPanel {
 
     private static final EtchedBorder PANEL_BORDER = new EtchedBorder(EtchedBorder.RAISED);
     private static final Color PANEL_COLOR = Color.decode("0xEBEDE9");
-    private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(700 / 16,700);
+    private static final Dimension TAKEN_PIECES_DIMENSION = new Dimension(700 / 12,700);
     private static String defaultImagesPath = "resources/art/pieces/plain/";
 
 
@@ -108,6 +108,7 @@ public class TakenPiecesPanel extends JPanel {
             }
         }
 
+        repaint();
         validate();
     }
 }

@@ -18,6 +18,8 @@ package com.github.bhlangonijr.chesslib;
 
 import com.github.bhlangonijr.chesslib.game.GameContext;
 import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.bhlangonijr.chesslib.move.MoveGenerator;
+import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 
 import java.util.EnumMap;
 
@@ -90,7 +92,7 @@ public class MoveBackup implements BoardEvent {
             setCastleMove(false);
         }
 
-        moveNotation = makeString();
+        moveNotation = makeString(board);
     }
 
     /**
@@ -380,6 +382,56 @@ public class MoveBackup implements BoardEvent {
             } else if (getMove().getTo().getRank() == Rank.RANK_8 || getMove().getTo().getRank() == Rank.RANK_1){
                 pawnPromotion = "=" + Constants.getPieceNotation(getMove().getPromotion()).toUpperCase();
             }
+
+            if (getCapturedPiece() != Piece.NONE) {
+                if (getMovingPiece().getPieceType() == PieceType.PAWN || !getMove().getPromotion().equals(Piece.NONE)) {
+                    pieceNotation += getMove().getFrom().getFile().getNotation().toLowerCase();
+                }
+                pieceNotation += 'x';
+            }
+
+            return pieceNotation + getMove().getTo().value().toLowerCase() + pawnPromotion;
+        }
+    }
+
+    public String makeString(Board board){
+        // Check if Castle Move
+        if (GameContext.isQueenSideCastle(this.getMove()))
+            return "O-O-O";
+        else if (GameContext.isKingSideCastle(this.getMove()))
+            return "O-O";
+        else {
+            // Get Piece Notation
+            String pieceNotation = "", pawnPromotion = "";
+
+            // Pawn Notation
+            if (getMovingPiece().getPieceType() != PieceType.PAWN && getMove().getPromotion().equals(Piece.NONE)) {
+                pieceNotation += Constants.getPieceNotation(getMovingPiece()).toUpperCase();
+            } else if (getMove().getTo().getRank() == Rank.RANK_8 || getMove().getTo().getRank() == Rank.RANK_1){
+                pawnPromotion = "=" + Constants.getPieceNotation(getMove().getPromotion()).toUpperCase();
+            }
+
+            // Disambiguator
+            try {
+                for (Move legalMove : MoveGenerator.generateLegalMoves(board)) {
+                    if (board.getPiece(legalMove.getFrom()).getPieceType() != PieceType.PAWN ||
+                            board.getPiece(legalMove.getFrom()).getPieceType() != PieceType.KING) {
+
+                        if (legalMove.getTo() == getCapturedSquare() && legalMove.getFrom() != getMove().getFrom()
+                                && board.getPiece(legalMove.getFrom()) == getMovingPiece()) {
+
+                            if (legalMove.getFrom().getFile() != move.getFrom().getFile())
+                                pieceNotation += move.getFrom().getFile().getNotation().toLowerCase();
+                            else
+                                pieceNotation += move.getFrom().getRank().getNotation().toLowerCase();
+
+                        }
+                    }
+                }
+            } catch (MoveGeneratorException e) {
+                e.printStackTrace();
+            }
+
 
             if (getCapturedPiece() != Piece.NONE) {
                 if (getMovingPiece().getPieceType() == PieceType.PAWN || !getMove().getPromotion().equals(Piece.NONE)) {

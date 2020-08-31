@@ -16,7 +16,7 @@ public class GameHistoryPanel extends JPanel {
     private final DataModel model;
     private final JScrollPane scrollPane;
 
-    private static final Dimension HISTORY_PANEL_DIMENSION = new Dimension(130,40);
+    private static final Dimension HISTORY_PANEL_DIMENSION = new Dimension(150,40);
     private static final Color PANEL_COLOR = Color.decode("0xEBEDE9");
 
     public GameHistoryPanel(){
@@ -52,11 +52,9 @@ public class GameHistoryPanel extends JPanel {
             if (i == 0) {
                 column.setPreferredWidth(30); //sport column is bigger
             } else {
-                column.setPreferredWidth(50);
+                column.setPreferredWidth(60);
             }
         }
-
-
 
 
         this.add(scrollPane, BorderLayout.CENTER);
@@ -93,6 +91,8 @@ public class GameHistoryPanel extends JPanel {
         final JScrollBar vertical = scrollPane.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());
 
+        repaint();
+        validate();
     }
 
     private String calculateCheckAndMateHash(Board board) {
