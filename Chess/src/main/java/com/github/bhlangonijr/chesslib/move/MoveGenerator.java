@@ -309,4 +309,47 @@ public class MoveGenerator {
         return legalMoves;
     }
 
+    public static MoveList generatePieceLegalMoves(Board board, PieceType pieceType, boolean isPawnCapture) throws MoveGeneratorException {
+        MoveList legalMoves = new MoveList();
+        try {
+            MoveList moves = new MoveList();
+
+            switch (pieceType) {
+                case PAWN:
+                    if (isPawnCapture)
+                        generatePawnCaptures(board, moves);
+                    else
+                        generatePawnMoves(board, moves);
+                    break;
+                case BISHOP:
+                    generateBishopMoves(board, moves);
+                    break;
+                case KNIGHT:
+                    generateKnightMoves(board, moves);
+                    break;
+                case ROOK:
+                    generateRookMoves(board, moves);
+                    break;
+                case QUEEN:
+                    generateQueenMoves(board, moves);
+                    break;
+                case KING:
+                    generateKingMoves(board, moves);
+                    break;
+                case NONE:
+                    break;
+            }
+
+            for (Move move : moves) {
+                if (board.isMoveLegal(move, false)) {
+                    legalMoves.add(move);
+                }
+            }
+        } catch (Exception e) {
+            throw new MoveGeneratorException("Couldn't generate Legal moves: ", e);
+        }
+
+        return legalMoves;
+    }
+
 }

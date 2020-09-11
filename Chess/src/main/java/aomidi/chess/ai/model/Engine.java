@@ -89,12 +89,10 @@ public class Engine {
             if (in_opening_book(board))
                 move = get_opening_move();
 
-
             if (move != null && board.isMoveLegal(move, true)) {
                 System.out.println("OPENING THEORY");
                 return move;
             }
-
         }
 
         try {
@@ -247,34 +245,31 @@ public class Engine {
     // ----------- Opening Book -------------
 
     public Move get_opening_move(){
+        Move selected_move = openingBook.getWeightedMove();
         ArrayList<MoveNode> known_moves = openingBook.getCur_move().getMovesList();
 
         if (known_moves.isEmpty())
             return null;
 
         for (MoveNode moveNode : known_moves){
-            System.out.print(moveNode.getMove() + ", ");
+            System.out.print(moveNode.getMove().toString() + "-" + moveNode.getWeight() + ", ");
         }
 
-        Random random = new Random();
-        MoveNode randomElement = known_moves.get(random.nextInt(known_moves.size()));
+        System.out.println(": Selected: " + selected_move + " - " + openingBook.getOpeningName());
 
-        System.out.println(": Selected: " + randomElement.getMove());
+        openingBook.doMove(selected_move);
 
-        openingBook.doMove(randomElement);
-
-        return new Move(randomElement.getMove());
+        return selected_move;
     }
 
     public boolean in_opening_book(Board board){
-        openingBook.resetCurMove();
+        openingBook.reset();
         LinkedList<MoveBackup> movesPlayed = board.getBackup();
 
         for (MoveBackup moveBackup : movesPlayed){
             Move move = moveBackup.getMove();
-            String moveString = (move.getFrom().value() + move.getTo().value()).toLowerCase();
 
-            this.out_of_opening_book = !openingBook.doMove(moveString);
+            this.out_of_opening_book = !openingBook.doMove(move);
 
             if (out_of_opening_book)
                 return false;

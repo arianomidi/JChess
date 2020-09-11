@@ -1,12 +1,17 @@
 package aomidi.chess.ai.openingbook;
 
+import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.move.Move;
+
+import java.util.Random;
+
 public class OpeningBook {
 
     private MoveNode root;
     private MoveNode cur_move;
 
     public OpeningBook(){
-        this.root = new MoveNode("root", null);
+        this.root = new MoveNode(null, null, "");
         this.cur_move = this.root;
     }
 
@@ -14,11 +19,11 @@ public class OpeningBook {
         this.cur_move.addToMoveList(node);
     }
 
-    public void addNode(String move){
-        this.cur_move = this.cur_move.addToMoveList(move);
+    public void addNode(Move move, String opening_name){
+        this.cur_move = this.cur_move.addToMoveList(move, opening_name);
     }
 
-    public boolean doMove(String move){
+    public boolean doMove(Move move){
         MoveNode new_move = cur_move.getMoveNode(move);
 
         if (new_move != null) {
@@ -48,12 +53,36 @@ public class OpeningBook {
         return false;
     }
 
-    public void resetCurMove(){
+    public void reset(){
         cur_move = root;
     }
 
     public MoveNode getCur_move() {
         return cur_move;
+    }
+
+    public Move getWeightedMove(){
+        if (cur_move.getMovesList().isEmpty())
+            return null;
+
+        int total_sum = 0;
+        Random random = new Random();
+        for (MoveNode moveNode : cur_move.getMovesList()){
+            total_sum += moveNode.getWeight();
+        }
+
+        int index = random.nextInt(total_sum);
+        int sum = 0;
+        int i = 0;
+        while(sum < index ) {
+            sum += cur_move.getMovesList().get(i++).getWeight();
+        }
+
+        return cur_move.getMovesList().get(Math.max(0,i-1)).getMove();
+    }
+
+    public String getOpeningName(){
+        return cur_move.getOpeningName();
     }
 
 }
