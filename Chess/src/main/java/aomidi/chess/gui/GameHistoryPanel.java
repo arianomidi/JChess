@@ -79,12 +79,11 @@ public class GameHistoryPanel extends JPanel {
 
         if (moveLog.size() > 0){
             final MoveBackup lastMove = moveLog.getMoves().getLast();
-            final String moveText = lastMove.getMoveNotation();
 
             if (lastMove.getMovingPiece().getPieceSide() == Side.WHITE){
-                this.model.setValueAt(moveText + calculateCheckAndMateHash(board), currentRow, 1);
+                this.model.setValueAt(lastMove.getMoveNotation(), currentRow, 1);
             } else if (lastMove.getMovingPiece().getPieceSide() == Side.BLACK){
-                this.model.setValueAt(moveText + calculateCheckAndMateHash(board), currentRow - 1, 2);
+                this.model.setValueAt(lastMove.getMoveNotation(), currentRow - 1, 2);
             }
         }
 
@@ -93,15 +92,6 @@ public class GameHistoryPanel extends JPanel {
 
         repaint();
         validate();
-    }
-
-    private String calculateCheckAndMateHash(Board board) {
-        if (board.isKingAttacked()){
-            if (board.isMated())
-                return "#";
-            return "+";
-        }
-        return "";
     }
 
     private static class DataModel extends DefaultTableModel{

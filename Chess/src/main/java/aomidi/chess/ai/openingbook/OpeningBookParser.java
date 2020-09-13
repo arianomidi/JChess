@@ -20,19 +20,19 @@ public class OpeningBookParser {
     private static String filename = "./resources/openings/openings_eco.cvs";
     private static boolean isPGN = false;
     private static boolean isECO = !isPGN;
-    private static String opening_name = "";
 
     public static void parseFile(){
         try {
             File openingsFile = new File(filename);
-
             Scanner myReader = new Scanner(openingsFile);
+            String opening_name = "";
+
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();
 
                 if (data.length() > 0 && data.charAt(0) == '1')
-                    addToOpeningBook(data);
-                else;
+                    addToOpeningBook(data, opening_name);
+                else
                     opening_name = data;
             }
             myReader.close();
@@ -42,11 +42,10 @@ public class OpeningBookParser {
         }
     }
 
-    public static void addToOpeningBook(String opening){
+    public static void addToOpeningBook(String opening, String opening_name){
         List<String> moves = Arrays.asList(opening.split(" "));
         Board board = new Board();
 
-        System.out.println(opening);
         for (int i = 0; i < moves.size(); i++){
             boolean isDigit = Character.isDigit(moves.get(i).charAt(0));
             String move;

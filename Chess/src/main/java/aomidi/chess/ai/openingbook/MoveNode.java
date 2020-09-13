@@ -34,6 +34,8 @@ public class MoveNode {
                 node = new MoveNode(move, this, opening_name);
             movesList.add(node);
         } else {
+            if (opening_name.compareTo("") != 0)
+                node.setOpeningName(opening_name);
             node.weight++;
 //            node.setOpeningName(opening_name);
         }

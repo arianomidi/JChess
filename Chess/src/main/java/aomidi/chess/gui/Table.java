@@ -32,6 +32,7 @@ public class Table extends Observable {
     private Board chessBoard;
     private final Engine engine;
     private final MoveLog moveLog;
+    private boolean player_move_made;
 
     private final JFrame gameFrame;
     private final GameSetup gameSetup;
@@ -67,6 +68,7 @@ public class Table extends Observable {
     private Table(){
         this.chessBoard = new Board();
         this.moveLog = new MoveLog();
+        this.player_move_made = false;
 
         this.gameFrame = new JFrame("JChess");
         this.gameFrame.setLayout(new BorderLayout());
@@ -227,7 +229,7 @@ public class Table extends Observable {
 
         preferencesMenu.addSeparator();
 
-        final JCheckBoxMenuItem highlightMovesItem = new JCheckBoxMenuItem("Highlight Legal Moves", false);
+        final JCheckBoxMenuItem highlightMovesItem = new JCheckBoxMenuItem("Highlight Legal Moves", true);
         highlightMovesItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -404,6 +406,8 @@ public class Table extends Observable {
                 System.out.println(Table.get().getGameBoard().getSideToMove() + " (AI) is thinking....");
                 final AIThinkTank thinkTank = new AIThinkTank();
                 thinkTank.execute();
+            } else {
+                System.out.println("Opening Theory: " + Table.get().getEngine().getOpeningBook().getOpeningName());
             }
 
             if (Table.get().getGameBoard().isMated()) {
@@ -447,11 +451,13 @@ public class Table extends Observable {
             this.chessBoard.undoMove();
         }
 
+        engine.reset();
         redraw();
     }
 
     private void resetGame() {
         this.computerMove = null;
+        engine.reset();
         Table.get().getMoveLog().clear();
         this.chessBoard = new Board();
 
@@ -476,7 +482,7 @@ public class Table extends Observable {
                 final Move bestMove = get();
                 Table.get().updateComputerMove(bestMove);
                 Table.get().getGameBoard().doMove(bestMove, true);
-                Table.get().getMoveLog().addMove(Table.get().getGameBoard().getBackup().getLast());
+                Table.get().getMoveLog().addLastMove(Table.get().getGameBoard());
                 Table.get().getGameHistoryPanel().redo(Table.get().getGameBoard(), Table.get().getMoveLog());
                 Table.get().getTakenPiecesPanel().redo(Table.get().getMoveLog());
                 Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
@@ -524,6 +530,12 @@ public class Table extends Observable {
             repaint();
         }
 
+        public void removeTileSelections(){
+            for (final TilePanel tilePanel : boardTiles){
+                tilePanel.setIsHighlighted(false);
+            }
+        }
+
         void setTileDarkColor(final Board board,
                               final Color darkColor) {
             for (final TilePanel boardTile : boardTiles) {
@@ -544,11 +556,13 @@ public class Table extends Observable {
 
     private class TilePanel extends JPanel{
         private final Square square;
+        private boolean is_highlighted;
 
         TilePanel(final BoardPanel boardPanel, final int tileId){
             super(new GridBagLayout());
 
             this.square = Square.squareAtGUI(tileId);
+            this.is_highlighted = false;
 
             setPreferredSize(TILE_PANEL_SIZE);
             assignTileColor();
@@ -563,7 +577,9 @@ public class Table extends Observable {
                 public void mousePressed(MouseEvent e) {
                     if (isRightMouseButton(e)){
                         resetSelectedTiles();
+                        is_highlighted = !is_highlighted;
                     } else if (isLeftMouseButton(e)){
+                        boardPanel.removeTileSelections();
                         if (sourceTile == Square.NONE){
                             selectSourceTile();
                         } else {
@@ -582,7 +598,8 @@ public class Table extends Observable {
                                 try {
                                     if (MoveGenerator.generateLegalMoves(chessBoard).contains(move)) {
                                         chessBoard.doMove(move, true);
-                                        moveLog.addMove(chessBoard.getBackup().getLast());
+                                        moveLog.addLastMove(chessBoard);
+                                        player_move_made = true;
                                     }
                                 } catch (MoveGeneratorException ex) {
                                     ex.printStackTrace();
@@ -597,9 +614,12 @@ public class Table extends Observable {
                         public void run() {
                             gameHistoryPanel.redo(chessBoard, moveLog);
                             takenPiecesPanel.redo(moveLog);
-                            Table.get().moveMadeUpdate(PlayerType.HUMAN);
-
                             boardPanel.drawBoard(chessBoard);
+
+                            if (player_move_made) {
+                                player_move_made = false;
+                                Table.get().moveMadeUpdate(PlayerType.HUMAN);
+                            }
                         }
                     });
                 }
@@ -631,7 +651,7 @@ public class Table extends Observable {
 
             if (humanMovedPiece == Piece.NONE)
                 sourceTile = Square.NONE;
-            else if (humanMovedPiece.getPieceSide() != chessBoard.getSideToMove()) {
+            else if (humanMovedPiece.getPieceSide() != chessBoard.getSideToMove() || Table.get().getGameSetup().isAIPlayer(humanMovedPiece.getPieceSide())) {
                 sourceTile = Square.NONE;
                 humanMovedPiece = Piece.NONE;
             }
@@ -652,6 +672,10 @@ public class Table extends Observable {
 
         void setDarkTileColor(final Color color) {
             darkTileColor = color;
+        }
+
+        public void setIsHighlighted(boolean is_highlighted) {
+            this.is_highlighted = is_highlighted;
         }
 
         private void assignTileColor() {
@@ -676,10 +700,35 @@ public class Table extends Observable {
             }
         }
 
+//        private void assignPieceIcon(Graphics g){
+//
+//            if (Table.get().getGameBoard().isSquareOccupied(this.square)){
+//                try {
+//                    final BufferedImage image =
+//                            ImageIO.read(new File(pieceIconPath + Table.get().getGameBoard().getPiece(this.square).value() + ".png" ));
+//                    Image scaledImage = image.getScaledInstance(TILE_PANEL_SIZE.width, TILE_PANEL_SIZE.height, Image.SCALE_SMOOTH);
+//
+//                    Insets insets = getInsets();
+//
+//                    int width = getWidth() - 1 - (insets.left + insets.right);
+//                    int height = getHeight() - 1 - (insets.top + insets.bottom);
+//
+//                    int x = (width - scaledImage.getWidth(this)) / 2;
+//                    int y = (height - scaledImage.getHeight(this)) / 2;
+//
+//                    g.drawImage(scaledImage, x, y, this);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
+//            assignPieceIcon(g);
             highlightLegalMoves(Table.get().getGameBoard(), g);
+            highlightSelectedTile(g);
         }
 
         private void highlightLegalMoves(final Board board, Graphics g){
@@ -719,23 +768,19 @@ public class Table extends Observable {
             }
         }
 
-        private void highlightLegalMoves(final Board board){
-            if (highlightLegalMoves){
-                for (Move move : MoveGenerator.generateLegalMovesForPieceOnSquare(sourceTile, board)){
-                    if (move.getTo() == square){
-//                        try {
-//                            add(new JLabel(new ImageIcon(ImageIO.read(new File("resources/art/misc/green_dot.png")))));
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-                    }
-                }
-            }
-        }
+        private void highlightSelectedTile(Graphics g) {
+            if(is_highlighted) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        private void highlightTileBorder() {
-            if(humanMovedPiece != Piece.NONE && sourceTile == square) {
-                setBorder(BorderFactory.createLineBorder(Color.cyan));
+                if (square.isLightSquare())
+                    g2.setColor(Color.decode("#809D64"));
+                else
+                    g2.setColor(Color.decode("#677D43"));
+
+                int width = 5;
+                g2.setStroke(new BasicStroke(width));
+                g2.drawOval(width / 2, width / 2, this.getWidth() - width, this.getHeight() - width);
             }
         }
 
@@ -762,7 +807,6 @@ public class Table extends Observable {
         public void drawTile(final Board board){
             assignTileColor();
             assignPieceIcon(board);
-            highlightLegalMoves(board);
             highlightLastMove();
             highlightSelectedPiece();
             validate();

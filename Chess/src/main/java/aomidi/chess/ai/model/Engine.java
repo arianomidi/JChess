@@ -34,6 +34,10 @@ public class Engine {
         return positionCount;
     }
 
+    public OpeningBook getOpeningBook(){
+        return openingBook;
+    }
+
     public int getDepth() {
         return depth;
     }
@@ -255,8 +259,6 @@ public class Engine {
             System.out.print(moveNode.getMove().toString() + "-" + moveNode.getWeight() + ", ");
         }
 
-        System.out.println(": Selected: " + selected_move + " - " + openingBook.getOpeningName());
-
         openingBook.doMove(selected_move);
 
         return selected_move;
@@ -281,6 +283,10 @@ public class Engine {
     public OpeningBook runOpeningBookParser(){
         OpeningBookParser.parseFile();
         return OpeningBookParser.getOpeningBook();
+    }
+
+    public void reset(){
+        out_of_opening_book = false;
     }
 
 }

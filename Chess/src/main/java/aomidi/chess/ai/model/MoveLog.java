@@ -22,6 +22,11 @@ public class MoveLog {
         this.moves.addLast(move);
     }
 
+    public void addLastMove(Board board){
+        board.getBackup().getLast().addToMoveNotation(calculateCheckAndMateHash(board));
+        this.addMove(board.getBackup().getLast());
+    }
+
     public int size(){
         return this.moves.size();
     }
@@ -40,5 +45,14 @@ public class MoveLog {
 
     public boolean removeMove(final MoveBackup move){
         return this.moves.remove(move);
+    }
+
+    private String calculateCheckAndMateHash(Board board) {
+        if (board.isKingAttacked()){
+            if (board.isMated())
+                return "#";
+            return "+";
+        }
+        return "";
     }
 }
