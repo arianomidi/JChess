@@ -109,6 +109,7 @@ public class Table extends Observable {
     public void redraw(){
         Table.get().getGameHistoryPanel().redo(chessBoard, Table.get().getMoveLog());
         Table.get().getTakenPiecesPanel().redo(Table.get().getMoveLog());
+        Table.get().getBoardPanel().removeAllTileSelections();
         Table.get().getBoardPanel().drawBoard(chessBoard);
     }
 
@@ -485,6 +486,7 @@ public class Table extends Observable {
                 Table.get().getMoveLog().addLastMove(Table.get().getGameBoard());
                 Table.get().getGameHistoryPanel().redo(Table.get().getGameBoard(), Table.get().getMoveLog());
                 Table.get().getTakenPiecesPanel().redo(Table.get().getMoveLog());
+                Table.get().getBoardPanel().removeTileSelections();
                 Table.get().getBoardPanel().drawBoard(Table.get().getGameBoard());
                 Table.get().moveMadeUpdate(PlayerType.ENGINE);
             } catch (final Exception e) {
@@ -528,6 +530,13 @@ public class Table extends Observable {
             }
             validate();
             repaint();
+        }
+
+        public void removeAllTileSelections(){
+            for (final TilePanel tilePanel : boardTiles){
+                tilePanel.setIsHighlighted(false);
+                tilePanel.resetSelectedTiles();
+            }
         }
 
         public void removeTileSelections(){

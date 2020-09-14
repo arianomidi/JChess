@@ -71,8 +71,6 @@ public class Chess {
         }
 
         this.game = new Game(this);
-
-        this.game.playGame();
     }
 
 }
