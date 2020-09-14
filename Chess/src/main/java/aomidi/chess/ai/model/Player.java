@@ -3,30 +3,50 @@ package aomidi.chess.ai.model;
 import aomidi.chess.ai.model.Util.*;
 
 import com.github.bhlangonijr.chesslib.*;
+import com.github.bhlangonijr.chesslib.game.PlayerType;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 
-public abstract class Player {
+public class Player {
     private Side side;
-    private Game game;
+    private PlayerType playerType;
+    private String name;
 
     // ----------- Constructors -------------
-    public Player(Side side, Game game) {
+    public Player(Side side, PlayerType playerType) {
         this.side = side;
-        this.game = game;
+        this.playerType = playerType;
+    }
+
+    public Player(Side side, String name) {
+        this.side = side;
+        this.name = name;
     }
 
     // ----------- Getters -------------
-
-    public Game getGame() { return game; }
 
     public Side getSide() {
         return side;
     }
 
-    public Color getColor() { return Util.getColor(side); }
+    public String getName(){
+        return name;
+    }
 
-    // ----------- Action -------------
+    public PlayerType getPlayerType() {
+        return playerType;
+    }
 
-    abstract public boolean movePiece(String input) throws MoveGeneratorException;
+    // ----------- Setters -------------
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPlayerType(PlayerType playerType) {
+        this.playerType = playerType;
+    }
+
+    public void setSide(Side side) {
+        this.side = side;
+    }
 }

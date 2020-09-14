@@ -70,7 +70,7 @@ public class Chess {
                 startingFEN = input("Enter Starting FEN");
         }
 
-        this.game = new Game(this);
+        this.game = new Game(5);
     }
 
 }

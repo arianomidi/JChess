@@ -62,7 +62,7 @@ public class GameHistoryPanel extends JPanel {
 
     }
 
-    public void redo(final Board board, final MoveLog moveLog){
+    public void redo(final MoveLog moveLog){
         int currentRow = 0;
         this.model.clear();
 

@@ -1,25 +1,27 @@
 package aomidi.chess.gui;
 
 
+import aomidi.chess.ai.model.Game;
 import aomidi.chess.ai.model.Player;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class GameSetup extends JDialog {
-
+    private JSpinner searchDepthSpinner;
     private PlayerType whitePlayerType;
     private PlayerType blackPlayerType;
-    private JSpinner searchDepthSpinner;
 
     private static final String HUMAN_TEXT = "Human";
     private static final String COMPUTER_TEXT = "Computer";
 
-    GameSetup(final JFrame frame,
+    GameSetup(final Game game, final JFrame frame,
               final boolean modal) {
         super(frame, modal);
         final JPanel myPanel = new JPanel(new GridLayout(0, 1));
@@ -36,7 +38,7 @@ class GameSetup extends JDialog {
         final ButtonGroup blackGroup = new ButtonGroup();
         blackGroup.add(blackHumanButton);
         blackGroup.add(blackComputerButton);
-        blackComputerButton.setSelected(true);
+        blackHumanButton.setSelected(true);
 
         getContentPane().add(myPanel);
         myPanel.add(new JLabel("White"));
@@ -54,8 +56,14 @@ class GameSetup extends JDialog {
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                game.setWhitePlayer(whiteComputerButton.isSelected());
+                game.setBlackPlayer(blackComputerButton.isSelected());
+                game.setEngineDepth((Integer)searchDepthSpinner.getValue());
+
+                // For observer
                 whitePlayerType = whiteComputerButton.isSelected() ? PlayerType.ENGINE : PlayerType.HUMAN;
                 blackPlayerType = blackComputerButton.isSelected() ? PlayerType.ENGINE : PlayerType.HUMAN;
+
                 GameSetup.this.setVisible(false);
             }
         });

@@ -15,19 +15,6 @@ public class Util {
 
     // ----------- Enumeration -------------
 
-    public enum Color {
-        Black,
-        White
-    }
-
-    public enum PieceType {
-        Pawn,
-        Knight,
-        Bishop,
-        Rook,
-        Queen,
-        King
-    }
 
     // ----------- Piece Valuation Arrays -------------
 
@@ -158,21 +145,6 @@ public class Util {
        return letterToInt(file.getNotation()) - 1;
     }
 
-    public static PieceType getPieceType(String piece) {
-        piece = piece.toUpperCase();
-        switch (piece) {
-            case "N":
-                return PieceType.Knight;
-            case "B":
-                return PieceType.Bishop;
-            case "R":
-                return PieceType.Rook;
-            case "Q":
-                return PieceType.Queen;
-            default:
-                throw new java.lang.IllegalArgumentException("Illegal Input: " + piece);
-        }
-    }
 
     public static Piece getPromotionPiece(String piece, Side side) {
         piece = piece.toUpperCase();
@@ -202,17 +174,6 @@ public class Util {
                 default:
                     throw new java.lang.IllegalArgumentException("Illegal Input: " + piece);
             }
-    }
-
-    public static Color getColor(Side side) {
-        switch (side) {
-            case WHITE:
-                return Color.White;
-            case BLACK:
-                return Color.Black;
-            default:
-                throw new java.lang.IllegalArgumentException("Illegal Side: " + side);
-        }
     }
 
     public static Side getOppositeSide(Side side){
@@ -519,76 +480,76 @@ public class Util {
 //    }
 
 
-    public static void printBoard(Board board, Game game){
-        // Get Last Move
-        Move move = null;
-        if (board.getBackup().size() != 0)
-             move = board.getBackup().getLast().getMove();
+//    public static void printBoard(Board board, Game game){
+//        // Get Last Move
+//        Move move = null;
+//        if (board.getBackup().size() != 0)
+//             move = board.getBackup().getLast().getMove();
+//
+//
+//        String string =  "  " + underlineBoardColor("                                                                                                \n");
+//
+//        for (int rank = 7; rank >= 0; rank--) {
+//            for (int column = 0; column < 6; column++) {
+//                for (int file = -1; file <= 8; file++) {
+//                    if (file == -1) {
+//                        string += boardColor(" |");
+//                    } else if (file != 8) {
+//                        if (move != null)
+//                            string += getSymbol(file, rank, column, board, move);
+//                        else
+//                            string += getSymbol(file, rank, column, board);
+//
+//                    } else {
+//                        if (column == 3) {
+//                            string += bold("   " + (rank + 1));
+//                        } else {
+//                            string += "    ";
+//                        }
+//
+//                        if (rank == 7 && column == 0) {
+//                            string += "           "  + boldAndUnderlineBoardColor("Moves:");
+//                        } else if (column % 2 == 0)
+//                            string += "           " + getMoveNotationRow(rank, column, game);
+//                    }
+//                }
+//                string += "\n";
+//            }
+//        }
+//        string += bold("\n       A           B           C           D           E           F           G           H\n");
+//
+//
+//        System.out.println(string);
+//    }
 
-
-        String string =  "  " + underlineBoardColor("                                                                                                \n");
-
-        for (int rank = 7; rank >= 0; rank--) {
-            for (int column = 0; column < 6; column++) {
-                for (int file = -1; file <= 8; file++) {
-                    if (file == -1) {
-                        string += boardColor(" |");
-                    } else if (file != 8) {
-                        if (move != null)
-                            string += getSymbol(file, rank, column, board, move);
-                        else
-                            string += getSymbol(file, rank, column, board);
-
-                    } else {
-                        if (column == 3) {
-                            string += bold("   " + (rank + 1));
-                        } else {
-                            string += "    ";
-                        }
-
-                        if (rank == 7 && column == 0) {
-                            string += "           "  + boldAndUnderlineBoardColor("Moves:");
-                        } else if (column % 2 == 0)
-                            string += "           " + getMoveNotationRow(rank, column, game);
-                    }
-                }
-                string += "\n";
-            }
-        }
-        string += bold("\n       A           B           C           D           E           F           G           H\n");
-
-
-        System.out.println(string);
-    }
-
-    public static String getMoveNotationRow(int rank, int column, Game game){
-        String moveNotationRow = "";
-
-        for (int factor = 0; factor < game.getMoves().size(); factor += 23 * 2 ){
-            int whiteMoveNum = ((7-rank) * 3 + (column / 2) - 1) * 2 + factor;
-
-            moveNotationRow += getMoveNotation(whiteMoveNum, game);
-        }
-
-        return moveNotationRow;
-    }
-
-    public static String getMoveNotation(int whiteMoveNum, Game game){
-        String moveNotation = "";
-        int blackMoveNum = whiteMoveNum + 1;
-        if (whiteMoveNum < game.getMoves().size()) {
-            moveNotation += bold(((whiteMoveNum / 2 + 1) + ". ")) + game.getMoves().get(whiteMoveNum).getMoveNotation() + " ";
-            if (blackMoveNum < game.getMoves().size())
-                moveNotation += game.getMoves().get(blackMoveNum).getMoveNotation();
-        }
-
-        int colorChangersLength = moveNotation.length() - getSimpleString(moveNotation).length();
-
-        while (moveNotation.length() - colorChangersLength < 23)
-            moveNotation += " ";
-
-        return moveNotation;
-    }
+//    public static String getMoveNotationRow(int rank, int column, Game game){
+//        String moveNotationRow = "";
+//
+//        for (int factor = 0; factor < game.getMoves().size(); factor += 23 * 2 ){
+//            int whiteMoveNum = ((7-rank) * 3 + (column / 2) - 1) * 2 + factor;
+//
+//            moveNotationRow += getMoveNotation(whiteMoveNum, game);
+//        }
+//
+//        return moveNotationRow;
+//    }
+//
+//    public static String getMoveNotation(int whiteMoveNum, Game game){
+//        String moveNotation = "";
+//        int blackMoveNum = whiteMoveNum + 1;
+//        if (whiteMoveNum < game.getMoves().size()) {
+//            moveNotation += bold(((whiteMoveNum / 2 + 1) + ". ")) + game.getMoves().get(whiteMoveNum).getMoveNotation() + " ";
+//            if (blackMoveNum < game.getMoves().size())
+//                moveNotation += game.getMoves().get(blackMoveNum).getMoveNotation();
+//        }
+//
+//        int colorChangersLength = moveNotation.length() - getSimpleString(moveNotation).length();
+//
+//        while (moveNotation.length() - colorChangersLength < 23)
+//            moveNotation += " ";
+//
+//        return moveNotation;
+//    }
 
     public static String getSymbol(int file, int rank, int column, Board board){
         Square square = SQUARES[file][rank];
