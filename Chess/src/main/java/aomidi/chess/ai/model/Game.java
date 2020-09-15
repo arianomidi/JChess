@@ -167,7 +167,6 @@ public class Game {
 
     public enum GameStatus{
         InProgress,
-        Check,
         Checkmate,
         Stalemate,
         InsufficientMaterial,
@@ -177,8 +176,6 @@ public class Game {
     public GameStatus getGameStatus() {
         if (board.isMated()) {
             return GameStatus.Checkmate;
-        } else if (board.isKingAttacked()) {
-            return GameStatus.Check;
         } else if (board.isStaleMate()) {
             return GameStatus.Stalemate;
         } else if (board.isInsufficientMaterial()){

@@ -20,6 +20,14 @@ public class MoveNode {
         this.movesList = new ArrayList<>();
     }
 
+    public MoveNode(Move move, String opening_name, int weight, MoveNode parent){
+        this.move = move;
+        this.parent = parent;
+        this.weight = weight;
+        this.opening_name = opening_name;
+        this.movesList = new ArrayList<>();
+    }
+
     public void addToMoveList(MoveNode node){
         movesList.add(node);
     }
@@ -37,19 +45,27 @@ public class MoveNode {
             if (opening_name.compareTo("") != 0)
                 node.setOpeningName(opening_name);
             node.weight++;
-//            node.setOpeningName(opening_name);
         }
 
         return node;
     }
 
-    public MoveNode getNodeFromMoveList(Move move){
+    public MoveNode getNodeFromMoveList(MoveNode moveNode){
         for (MoveNode node : movesList){
-            if (node.getMove().equals(move)){
+            if (node.equals(moveNode)){
                 return node;
             }
         }
         return null;
+    }
+
+    public boolean hasMoveNodeInList(MoveNode moveNode){
+        for (MoveNode node : movesList){
+            if (node.equals(moveNode)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean moveListHas(Move move){
@@ -59,6 +75,10 @@ public class MoveNode {
             }
         }
         return false;
+    }
+
+    public boolean hasChild(){
+        return !movesList.isEmpty();
     }
 
     public MoveNode getMoveNode(Move move){
@@ -96,5 +116,11 @@ public class MoveNode {
 
     public void setOpeningName(String opening_name) {
         this.opening_name = opening_name;
+    }
+
+    public boolean equals(MoveNode moveNode){
+        return moveNode.getMove().toString().compareTo(move.toString()) == 0 &&
+                moveNode.getOpeningName().compareTo(opening_name) == 0 &&
+                moveNode.getWeight() == weight;
     }
 }

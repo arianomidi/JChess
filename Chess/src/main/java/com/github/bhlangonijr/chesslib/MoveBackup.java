@@ -412,26 +412,27 @@ public class MoveBackup implements BoardEvent {
             }
 
             // Disambiguator
-            try {
-                for (Move legalMove : MoveGenerator.generateLegalMoves(board)) {
-                    if (board.getPiece(legalMove.getFrom()).getPieceType() != PieceType.PAWN ||
-                            board.getPiece(legalMove.getFrom()).getPieceType() != PieceType.KING) {
+            if (getMovingPiece().getPieceType() != PieceType.PAWN) {
+                try {
+                    for (Move legalMove : MoveGenerator.generateLegalMoves(board)) {
+                        if (board.getPiece(legalMove.getFrom()).getPieceType() != PieceType.PAWN ||
+                                board.getPiece(legalMove.getFrom()).getPieceType() != PieceType.KING) {
 
-                        if (legalMove.getTo() == getCapturedSquare() && legalMove.getFrom() != getMove().getFrom()
-                                && board.getPiece(legalMove.getFrom()) == getMovingPiece()) {
+                            if (legalMove.getTo() == getCapturedSquare() && legalMove.getFrom() != getMove().getFrom()
+                                    && board.getPiece(legalMove.getFrom()) == getMovingPiece()) {
 
-                            if (legalMove.getFrom().getFile() != move.getFrom().getFile())
-                                pieceNotation += move.getFrom().getFile().getNotation().toLowerCase();
-                            else
-                                pieceNotation += move.getFrom().getRank().getNotation().toLowerCase();
+                                if (legalMove.getFrom().getFile() != move.getFrom().getFile())
+                                    pieceNotation += move.getFrom().getFile().getNotation().toLowerCase();
+                                else
+                                    pieceNotation += move.getFrom().getRank().getNotation().toLowerCase();
 
+                            }
                         }
                     }
+                } catch (MoveGeneratorException e) {
+                    e.printStackTrace();
                 }
-            } catch (MoveGeneratorException e) {
-                e.printStackTrace();
             }
-
 
             if (getCapturedPiece() != Piece.NONE) {
                 if (getMovingPiece().getPieceType() == PieceType.PAWN || !getMove().getPromotion().equals(Piece.NONE)) {
@@ -445,10 +446,7 @@ public class MoveBackup implements BoardEvent {
     }
 
     public boolean isCapture(){
-        if (getCapturedPiece() == Piece.NONE)
-            return false;
-
-        return true;
+        return getCapturedPiece() != Piece.NONE;
     }
 
 }

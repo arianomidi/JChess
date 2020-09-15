@@ -1,5 +1,6 @@
 package aomidi.chess.ai.model;
 
+import aomidi.chess.ai.openingbook.OpeningBookEncoder;
 import aomidi.chess.ai.openingbook.OpeningBook;
 import aomidi.chess.ai.openingbook.OpeningBookParser;
 import com.github.bhlangonijr.chesslib.*;
@@ -9,7 +10,6 @@ import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import com.github.bhlangonijr.chesslib.move.MoveList;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static aomidi.chess.ai.model.Util.*;
 
@@ -25,6 +25,9 @@ public class Engine {
     public Engine(int depth){
         this.depth = depth;
         this.openingBook = runOpeningBookParser();
+
+//        OpeningBook ob2 = OpeningBookEncoder.decodeOpeningBook(OpeningBookEncoder.encodeOpeningBook(openingBook));
+//        openingBook = ob2;
     }
 
     // ----------- Getters -------------
@@ -159,9 +162,7 @@ public class Engine {
 
         if (board.getSideToMove() == Side.WHITE){
             bestMove = -10000;
-            for (int i = 0; i < moves.size(); i++){
-                Move move = moves.get(i);
-
+            for (Move move : moves) {
                 board.doMove(move);
                 double value = miniMax(depth - 1, board, -10000, 10000, false);
                 board.undoMove();
@@ -175,9 +176,7 @@ public class Engine {
             }
         } else {
             bestMove = 10000;
-            for (int i = 0; i < moves.size(); i++){
-                Move move = moves.get(i);
-
+            for (Move move : moves) {
                 board.doMove(move);
                 double value = miniMax(depth - 1, board, -10000, 10000, true);
                 board.undoMove();
@@ -205,8 +204,8 @@ public class Engine {
 
         if (isMaximisingPlayer){
             double bestMove = -10000;
-            for (int i = 0; i < moves.size(); i++){
-                board.doMove(moves.get(i));
+            for (Move move : moves) {
+                board.doMove(move);
                 bestMove = Math.max(bestMove, miniMax(depth - 1, board, alpha, beta, false));
                 board.undoMove();
 
@@ -217,8 +216,8 @@ public class Engine {
             return bestMove;
         } else {
             double bestMove = 10000;
-            for (int i = 0; i < moves.size(); i++){
-                board.doMove(moves.get(i));
+            for (Move move : moves) {
+                board.doMove(move);
                 bestMove = Math.min(bestMove, miniMax(depth - 1, board, alpha, beta, true));
                 board.undoMove();
 
@@ -229,6 +228,8 @@ public class Engine {
             return bestMove;
         }
     }
+
+    // ----------- Board Evaluation ------------- //
 
     public static double evaluateBoard(Board board){
         double eval = 0.0;

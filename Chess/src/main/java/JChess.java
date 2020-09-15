@@ -1,6 +1,4 @@
-package aomidi.chess.gui;
-
-import com.github.bhlangonijr.chesslib.Board;
+import aomidi.chess.gui.Table;
 
 public class JChess {
 

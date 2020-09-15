@@ -15,9 +15,6 @@ import java.awt.event.ActionListener;
 
 class GameSetup extends JDialog {
     private JSpinner searchDepthSpinner;
-    private PlayerType whitePlayerType;
-    private PlayerType blackPlayerType;
-
     private static final String HUMAN_TEXT = "Human";
     private static final String COMPUTER_TEXT = "Computer";
 
@@ -60,10 +57,6 @@ class GameSetup extends JDialog {
                 game.setBlackPlayer(blackComputerButton.isSelected());
                 game.setEngineDepth((Integer)searchDepthSpinner.getValue());
 
-                // For observer
-                whitePlayerType = whiteComputerButton.isSelected() ? PlayerType.ENGINE : PlayerType.HUMAN;
-                blackPlayerType = blackComputerButton.isSelected() ? PlayerType.ENGINE : PlayerType.HUMAN;
-
                 GameSetup.this.setVisible(false);
             }
         });
@@ -86,21 +79,6 @@ class GameSetup extends JDialog {
     void promptUser() {
         setVisible(true);
         repaint();
-    }
-
-    boolean isAIPlayer(final Side side) {
-        if(side == Side.WHITE) {
-            return getWhitePlayerType() == PlayerType.ENGINE;
-        }
-        return getBlackPlayerType() == PlayerType.ENGINE;
-    }
-
-    PlayerType getWhitePlayerType() {
-        return this.whitePlayerType;
-    }
-
-    PlayerType getBlackPlayerType() {
-        return this.blackPlayerType;
     }
 
     private static JSpinner addLabeledSpinner(final Container c,

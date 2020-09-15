@@ -15,11 +15,7 @@
  */
 
 package com.github.bhlangonijr.chesslib.move;
-
-import aomidi.chess.ai.model.Util;
 import com.github.bhlangonijr.chesslib.*;
-
-import static aomidi.chess.ai.model.Util.evaluateBoard;
 
 /**
  * The type Move.

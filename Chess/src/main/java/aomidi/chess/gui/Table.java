@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-import static aomidi.chess.ai.model.Util.getPromotionPiece;
 import static javax.swing.JFrame.setDefaultLookAndFeelDecorated;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
@@ -405,12 +404,6 @@ public class Table extends Observable {
                     System.out.println(" -> Opening: " + Table.get().getGame().getOpeningName());
                 }
             }
-//
-//            if (Table.get().getGameSetup().isAIPlayer(Table.get().getGame().getBoard().getSideToMove()) && Table.get().getGame().getGameStatus() == Game.GameStatus.InProgress) {
-//                System.out.println(Table.get().getGame().getBoard().getSideToMove() + " (AI) is thinking....");
-//                final AIThinkTank thinkTank = new AIThinkTank();
-//                thinkTank.execute();
-//            }
 
             if (Table.get().getGame().getGameStatus() == Game.GameStatus.Checkmate) {
                 JOptionPane.showMessageDialog(Table.get().getBoardPanel(),
@@ -450,7 +443,6 @@ public class Table extends Observable {
 
         @Override
         protected Move doInBackground() {
-            Table.get().getGame().setEngineDepth(Table.get().getGameSetup().getSearchDepth());
             return Table.get().getGame().getEngine().getBestMove(Table.get().getGame().getBoard());
         }
 
