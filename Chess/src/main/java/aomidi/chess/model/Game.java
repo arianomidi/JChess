@@ -8,16 +8,22 @@ import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
 import com.github.bhlangonijr.chesslib.move.*;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 public class Game {
     private Board board;
     private final Engine engine;
     private MoveLog moveLog;
 
-
     private Player whitePlayer;
     private Player blackPlayer;
     private Player curPlayer;
     private boolean isGameOver;
+
+    private final LocalDateTime gameDate;
+    private final String gameLocation;
+    private final String gameEvent;
 
     // ----------- Constructors -------------
     public Game(int engine_depth){
@@ -31,6 +37,10 @@ public class Game {
         this.curPlayer = this.whitePlayer;
 
         this.isGameOver = false;
+        this.gameDate = LocalDateTime.now();
+        this.gameLocation = "Online";
+        this.gameEvent = "AOChess Engine Friendly";
+
     }
 
     // ----------- Getters -------------
@@ -53,6 +63,26 @@ public class Game {
 
     public MoveLog getMoveLog() {
         return moveLog;
+    }
+
+    public String getPlayerName(Side side){
+        if (side == Side.WHITE) {
+            return whitePlayer.getName();
+        } else {
+            return blackPlayer.getName();
+        }
+    }
+
+    public LocalDateTime getDate(){
+        return gameDate;
+    }
+
+    public String getSite(){
+        return gameLocation;
+    }
+
+    public String getGameEvent() {
+        return gameEvent;
     }
 
     // ----------- Setters -------------
@@ -184,6 +214,21 @@ public class Game {
     public String getOpeningName(){
         return engine.getOpeningName(board);
     }
+
+    // ----------- Game Results ------------- //
+
+    // todo: Add resignation method
+    public String getGameResult(){
+        if (getGameStatus() == GameStatus.Checkmate){
+            if (board.getSideToMove() == Side.WHITE){
+                return "0-1";
+            } else {
+                return "1-0";
+            }
+        }
+        return "1/2-1/2";
+    }
+
 
 }
 

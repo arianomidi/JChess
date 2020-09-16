@@ -12,6 +12,11 @@ public class Player {
     public Player(Side side, PlayerType playerType) {
         this.side = side;
         this.playerType = playerType;
+
+        if (playerType == PlayerType.ENGINE)
+            this.name = "AOChess Engine";
+        else
+            this.name = "Human";
     }
 
     public Player(Side side, String name) {
@@ -41,6 +46,10 @@ public class Player {
 
     public void setPlayerType(PlayerType playerType) {
         this.playerType = playerType;
+        if (playerType == PlayerType.ENGINE)
+            this.name = "AOChess Engine";
+        else
+            this.name = "Human";
     }
 
     public void setSide(Side side) {

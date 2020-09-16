@@ -31,6 +31,10 @@ public class MoveLog {
         return this.moves.size();
     }
 
+    public int getNumOfMoves() {
+        return (moves.size() + 2 - 1) / 2;
+    }
+
     public void clear(){
         this.moves.clear();
     }

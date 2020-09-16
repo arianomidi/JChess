@@ -1,6 +1,8 @@
 package aomidi.chess.gui;
 
 import aomidi.chess.model.Game;
+import aomidi.chess.model.PGNHandler;
+import aomidi.chess.model.PGNHolder;
 import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
 import com.github.bhlangonijr.chesslib.move.Move;
@@ -160,30 +162,15 @@ public class Table extends Observable {
         final JMenuItem savePGN = new JMenuItem("Save PGN", KeyEvent.VK_S);
         savePGN.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
-            chooser.setCurrentDirectory(new java.io.File("."));
-            chooser.setDialogTitle("Select Location");
-            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            chooser.setAcceptAllFileFilterUsed(false);
+            chooser.setCurrentDirectory(new java.io.File("./resources/pgns/"));
+            chooser.setDialogTitle("Select Save Location");
 
-            int option = chooser.showOpenDialog(Table.get().getGameFrame());
+            int userSelection = chooser.showSaveDialog(Table.get().getGameFrame());
 
-            if (option == JFileChooser.APPROVE_OPTION) {
-                System.out.println("getCurrentDirectory(): "
-                        +  chooser.getCurrentDirectory());
-                System.out.println("getSelectedFile() : "
-                        +  chooser.getSelectedFile());
-
-                try {
-                    File file = new File(chooser.getSelectedFile() + "/" + "tst.pgn");
-                    OutputStream out = new FileOutputStream(file);
-                    out.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }  else {
-                System.out.println("No Selection ");
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                PGNHolder pgnHolder = new PGNHolder(game, chooser.getSelectedFile());
+                PGNHandler.writePGNFile(pgnHolder);
             }
-
         });
         fileMenu.add(savePGN);
 
