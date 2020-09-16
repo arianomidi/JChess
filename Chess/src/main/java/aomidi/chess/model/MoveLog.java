@@ -1,4 +1,4 @@
-package aomidi.chess.ai.model;
+package aomidi.chess.model;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.MoveBackup;

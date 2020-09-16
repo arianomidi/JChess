@@ -3,10 +3,48 @@ package aomidi.chess.ai.openingbook;
 import com.github.bhlangonijr.chesslib.move.Move;
 import org.graalvm.compiler.nodes.calc.IntegerDivRemNode;
 
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class OpeningBookEncoder {
+
+    private static final String defaultPath = "./resources/structures/";
+    private static final String defaultFilename = "opening_book.txt";
+
+    // --- RETRIEVING & WRITING --- //
+
+    public static void writeOpeningBookToFile(OpeningBook openingBook, String filename) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(defaultPath + filename));
+            writer.write(encodeOpeningBook(openingBook));
+            writer.close();
+        } catch (IOException e){
+            e.getMessage();
+        }
+    }
+
+    public static void writeOpeningBookToFile(OpeningBook openingBook) {
+        writeOpeningBookToFile(openingBook, defaultFilename);
+    }
+
+    public static OpeningBook getSavedOpeningBook(String filename){
+        try {
+            File encodedOpeningBookFile = new File(defaultPath + filename);
+            Scanner myReader = new Scanner(encodedOpeningBookFile);
+
+            return decodeOpeningBook(myReader.nextLine());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return new OpeningBook();
+    }
+
+    public static OpeningBook getSavedOpeningBook(){
+        return getSavedOpeningBook(defaultFilename);
+    }
 
     // --- ENCODING --- //
 

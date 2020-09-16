@@ -1,10 +1,9 @@
 package aomidi.chess.gui;
 
-import aomidi.chess.ai.model.MoveLog;
+import aomidi.chess.model.MoveLog;
 import com.github.bhlangonijr.chesslib.MoveBackup;
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.move.Move;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,7 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static aomidi.chess.ai.model.Util.getPieceValue;
+import static aomidi.chess.model.Util.getPieceValue;
 
 public class TakenPiecesPanel extends JPanel {
 

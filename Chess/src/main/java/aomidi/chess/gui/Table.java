@@ -1,16 +1,10 @@
 package aomidi.chess.gui;
 
-import aomidi.chess.ai.model.Engine;
-import aomidi.chess.ai.model.Game;
-import aomidi.chess.ai.model.MoveLog;
-import aomidi.chess.ai.model.Player;
+import aomidi.chess.model.Game;
 import com.github.bhlangonijr.chesslib.*;
-import com.github.bhlangonijr.chesslib.game.Event;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
-import com.github.bhlangonijr.chesslib.game.Round;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
-import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import com.github.bhlangonijr.chesslib.pgn.PgnHolder;
 
 import javax.imageio.ImageIO;
@@ -18,8 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -163,6 +157,36 @@ public class Table extends Observable {
     private JMenu createFileMenu() {
         final JMenu fileMenu = new JMenu("File");
 
+        final JMenuItem savePGN = new JMenuItem("Save PGN", KeyEvent.VK_S);
+        savePGN.addActionListener(e -> {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setCurrentDirectory(new java.io.File("."));
+            chooser.setDialogTitle("Select Location");
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setAcceptAllFileFilterUsed(false);
+
+            int option = chooser.showOpenDialog(Table.get().getGameFrame());
+
+            if (option == JFileChooser.APPROVE_OPTION) {
+                System.out.println("getCurrentDirectory(): "
+                        +  chooser.getCurrentDirectory());
+                System.out.println("getSelectedFile() : "
+                        +  chooser.getSelectedFile());
+
+                try {
+                    File file = new File(chooser.getSelectedFile() + "/" + "tst.pgn");
+                    OutputStream out = new FileOutputStream(file);
+                    out.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }  else {
+                System.out.println("No Selection ");
+            }
+
+        });
+        fileMenu.add(savePGN);
+
         final JMenuItem openPGN = new JMenuItem("Load PGN File", KeyEvent.VK_O);
         openPGN.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -179,7 +203,7 @@ public class Table extends Observable {
         });
         fileMenu.add(openPGN);
 
-        final JMenuItem openFEN = new JMenuItem("Load FEN File", KeyEvent.VK_F);
+        final JMenuItem openFEN = new JMenuItem("Load from FEN", KeyEvent.VK_F);
         openFEN.addActionListener(e -> {
             String fenString = JOptionPane.showInputDialog("Input FEN");
             if(fenString != null) {

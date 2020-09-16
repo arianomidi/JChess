@@ -1,14 +1,9 @@
 package aomidi.chess.gui;
 
 
-import aomidi.chess.ai.model.Game;
-import aomidi.chess.ai.model.Player;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.game.PlayerType;
+import aomidi.chess.model.Game;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -11,7 +11,7 @@ import com.github.bhlangonijr.chesslib.move.MoveList;
 
 import java.util.*;
 
-import static aomidi.chess.ai.model.Util.*;
+import static aomidi.chess.model.Util.*;
 
 public class Engine {
 
@@ -24,10 +24,7 @@ public class Engine {
 
     public Engine(int depth){
         this.depth = depth;
-        this.openingBook = runOpeningBookParser();
-
-//        OpeningBook ob2 = OpeningBookEncoder.decodeOpeningBook(OpeningBookEncoder.encodeOpeningBook(openingBook));
-//        openingBook = ob2;
+        this.openingBook = OpeningBookEncoder.getSavedOpeningBook();
     }
 
     // ----------- Getters -------------

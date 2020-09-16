@@ -1,7 +1,6 @@
 package aomidi.chess.gui;
 
-import aomidi.chess.ai.model.MoveLog;
-import com.github.bhlangonijr.chesslib.Board;
+import aomidi.chess.model.MoveLog;
 import com.github.bhlangonijr.chesslib.MoveBackup;
 import com.github.bhlangonijr.chesslib.Side;
 
