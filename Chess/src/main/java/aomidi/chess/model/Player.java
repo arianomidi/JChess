@@ -19,8 +19,8 @@ public class Player {
             this.name = "Human";
     }
 
-    public Player(Side side, String name) {
-        this.side = side;
+    public Player(Side side, PlayerType playerType, String name) {
+        this(side, playerType);
         this.name = name;
     }
 

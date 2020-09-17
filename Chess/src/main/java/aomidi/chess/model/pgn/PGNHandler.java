@@ -1,4 +1,4 @@
-package aomidi.chess.model;
+package aomidi.chess.model.pgn;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -1,5 +1,6 @@
-package aomidi.chess.model;
+package aomidi.chess.model.pgn;
 
+import aomidi.chess.model.Game;
 import com.github.bhlangonijr.chesslib.Side;
 
 import java.io.File;

@@ -13,7 +13,7 @@ class GameSetup extends JDialog {
     private static final String HUMAN_TEXT = "Human";
     private static final String COMPUTER_TEXT = "Computer";
 
-    GameSetup(final Game game, final JFrame frame,
+    GameSetup(final JFrame frame,
               final boolean modal) {
         super(frame, modal);
         final JPanel myPanel = new JPanel(new GridLayout(0, 1));
@@ -48,9 +48,9 @@ class GameSetup extends JDialog {
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                game.setWhitePlayer(whiteComputerButton.isSelected());
-                game.setBlackPlayer(blackComputerButton.isSelected());
-                game.setEngineDepth((Integer)searchDepthSpinner.getValue());
+                Table.get().getGame().setWhitePlayer(whiteComputerButton.isSelected());
+                Table.get().getGame().setBlackPlayer(blackComputerButton.isSelected());
+                Table.get().getGame().setEngineDepth((Integer)searchDepthSpinner.getValue());
 
                 GameSetup.this.setVisible(false);
             }

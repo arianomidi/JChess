@@ -7,6 +7,7 @@ import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
 import com.github.bhlangonijr.chesslib.move.*;
+import sun.jvm.hotspot.code.Location;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -28,7 +29,7 @@ public class Game {
     // ----------- Constructors -------------
     public Game(int engine_depth){
         this.board = new Board();
-        this.engine = new Engine(engine_depth);
+        this.engine = Engine.getInstance();
         this.moveLog = new MoveLog();
 
         // Init Players
@@ -40,7 +41,24 @@ public class Game {
         this.gameDate = LocalDateTime.now();
         this.gameLocation = "Online";
         this.gameEvent = "AOChess Engine Friendly";
+    }
 
+    public Game(Game old_game){
+        this.board = new Board();
+        this.engine = Engine.getInstance();
+        this.moveLog = new MoveLog();
+
+        // Init Players
+        this.whitePlayer = new Player(Side.WHITE, old_game.getPlayerType(Side.WHITE), old_game.getPlayerName(Side.WHITE));
+        this.blackPlayer = new Player(Side.BLACK, old_game.getPlayerType(Side.BLACK), old_game.getPlayerName(Side.BLACK));
+        this.curPlayer = this.whitePlayer;
+
+        this.isGameOver = false;
+        this.gameDate = LocalDateTime.now();
+        this.gameLocation = "Online";
+        this.gameEvent = "AOChess Engine Friendly";
+
+        this.engine.reset();
     }
 
     // ----------- Getters -------------
@@ -70,6 +88,14 @@ public class Game {
             return whitePlayer.getName();
         } else {
             return blackPlayer.getName();
+        }
+    }
+
+    public PlayerType getPlayerType(Side side){
+        if (side == Side.WHITE) {
+            return whitePlayer.getPlayerType();
+        } else {
+            return blackPlayer.getPlayerType();
         }
     }
 

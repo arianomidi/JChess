@@ -3,6 +3,7 @@ package aomidi.chess.ai.model;
 import aomidi.chess.ai.openingbook.OpeningBookEncoder;
 import aomidi.chess.ai.openingbook.OpeningBook;
 import aomidi.chess.ai.openingbook.OpeningBookParser;
+import aomidi.chess.gui.Table;
 import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
@@ -20,7 +21,8 @@ public class Engine {
     private int positionCount;
     private OpeningBook openingBook;
     private boolean out_of_opening_book = false;
-    //    private HashMap<Move, Double> moveEvals;
+
+    private static final Engine INSTANCE = new Engine(5);
 
     public Engine(int depth){
         this.depth = depth;
@@ -28,6 +30,10 @@ public class Engine {
     }
 
     // ----------- Getters -------------
+
+    public static Engine getInstance(){
+        return INSTANCE;
+    }
 
     public OpeningBook getOpeningBook(){
         return openingBook;

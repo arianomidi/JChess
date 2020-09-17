@@ -1,8 +1,8 @@
 package aomidi.chess.gui;
 
 import aomidi.chess.model.Game;
-import aomidi.chess.model.PGNHandler;
-import aomidi.chess.model.PGNHolder;
+import aomidi.chess.model.pgn.PGNHandler;
+import aomidi.chess.model.pgn.PGNHolder;
 import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
 import com.github.bhlangonijr.chesslib.move.Move;
@@ -24,7 +24,7 @@ import static javax.swing.SwingUtilities.isLeftMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
 public class Table extends Observable {
-    private final Game game;
+    private Game game;
     private boolean player_move_made;
 
     private final JFrame gameFrame;
@@ -65,7 +65,7 @@ public class Table extends Observable {
         this.gameFrame.setLayout(new BorderLayout());
         this.gameFrame.setSize(FRAME_DIMENSION);
         this.gameFrame.setJMenuBar(populateMenuBar());
-        this.gameSetup = new GameSetup(this.game, this.gameFrame, true);
+        this.gameSetup = new GameSetup(this.gameFrame, true);
 
         this.gameHistoryPanel = new GameHistoryPanel();
         this.takenPiecesPanel = new TakenPiecesPanel();
@@ -116,7 +116,7 @@ public class Table extends Observable {
         return this.gameFrame;
     }
 
-    private Game getGame() {
+    public Game getGame() {
         return this.game;
     }
 
@@ -134,10 +134,6 @@ public class Table extends Observable {
 
     private GameSetup getGameSetup() {
         return this.gameSetup;
-    }
-
-    private boolean getHighlightLegalMoves() {
-        return this.highlightLegalMoves;
     }
 
     private void setupUpdate(GameSetup gameSetup){
@@ -159,7 +155,7 @@ public class Table extends Observable {
     private JMenu createFileMenu() {
         final JMenu fileMenu = new JMenu("File");
 
-        final JMenuItem savePGN = new JMenuItem("Save PGN", KeyEvent.VK_S);
+        final JMenuItem savePGN = new JMenuItem("Save PGN File", KeyEvent.VK_S);
         savePGN.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             chooser.setCurrentDirectory(new java.io.File("./resources/pgns/"));
@@ -194,7 +190,7 @@ public class Table extends Observable {
         openFEN.addActionListener(e -> {
             String fenString = JOptionPane.showInputDialog("Input FEN");
             if(fenString != null) {
-                this.game.newGame();
+                this.game = new Game(game);
                 game.getBoard().loadFromFen(fenString);
                 redraw();
             }
@@ -360,7 +356,7 @@ public class Table extends Observable {
 
         final JMenuItem resetMenuItem = new JMenuItem("New Game", KeyEvent.VK_P);
         resetMenuItem.addActionListener(e -> {
-            this.game.newGame();
+            this.game = new Game(game);
             redraw();
         });
         optionsMenu.add(resetMenuItem);
