@@ -1,8 +1,6 @@
 package aomidi.chess.gui;
 
 
-import aomidi.chess.model.Game;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -48,9 +46,9 @@ class GameSetup extends JDialog {
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Table.get().getGame().setWhitePlayer(whiteComputerButton.isSelected());
-                Table.get().getGame().setBlackPlayer(blackComputerButton.isSelected());
-                Table.get().getGame().setEngineDepth((Integer)searchDepthSpinner.getValue());
+                ChessFrame.get().getGame().setWhitePlayer(whiteComputerButton.isSelected());
+                ChessFrame.get().getGame().setBlackPlayer(blackComputerButton.isSelected());
+                ChessFrame.get().getGame().setEngineDepth((Integer)searchDepthSpinner.getValue());
 
                 GameSetup.this.setVisible(false);
             }

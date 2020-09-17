@@ -1,8 +1,8 @@
-import aomidi.chess.gui.Table;
+import aomidi.chess.gui.ChessFrame;
 
 public class JChess {
 
     public static void main(String[] args) {
-        Table.get().show();
+        ChessFrame.get().show();
     }
 }

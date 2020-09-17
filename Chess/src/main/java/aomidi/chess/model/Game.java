@@ -7,10 +7,9 @@ import com.github.bhlangonijr.chesslib.*;
 import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.game.PlayerType;
 import com.github.bhlangonijr.chesslib.move.*;
-import sun.jvm.hotspot.code.Location;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
 
 public class Game {
     private Board board;
@@ -20,14 +19,14 @@ public class Game {
     private Player whitePlayer;
     private Player blackPlayer;
     private Player curPlayer;
-    private boolean isGameOver;
 
-    private final LocalDateTime gameDate;
-    private final String gameLocation;
-    private final String gameEvent;
+    private String gameDate;
+    private String gameTime;
+    private String gameLocation;
+    private String gameEvent;
 
     // ----------- Constructors -------------
-    public Game(int engine_depth){
+    public Game(){
         this.board = new Board();
         this.engine = Engine.getInstance();
         this.moveLog = new MoveLog();
@@ -37,8 +36,11 @@ public class Game {
         this.blackPlayer = new Player(Side.BLACK, PlayerType.HUMAN);
         this.curPlayer = this.whitePlayer;
 
-        this.isGameOver = false;
-        this.gameDate = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        DateTimeFormatter dtf_time = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        this.gameDate = dtf.format(LocalDateTime.now());
+        this.gameTime = dtf_time.format(LocalDateTime.now());
         this.gameLocation = "Online";
         this.gameEvent = "AOChess Engine Friendly";
     }
@@ -53,8 +55,11 @@ public class Game {
         this.blackPlayer = new Player(Side.BLACK, old_game.getPlayerType(Side.BLACK), old_game.getPlayerName(Side.BLACK));
         this.curPlayer = this.whitePlayer;
 
-        this.isGameOver = false;
-        this.gameDate = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        DateTimeFormatter dtf_time = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        this.gameDate = dtf.format(LocalDateTime.now());
+        this.gameTime = dtf_time.format(LocalDateTime.now());
         this.gameLocation = "Online";
         this.gameEvent = "AOChess Engine Friendly";
 
@@ -99,8 +104,12 @@ public class Game {
         }
     }
 
-    public LocalDateTime getDate(){
+    public String getDate(){
         return gameDate;
+    }
+
+    public String getTime() {
+        return gameTime;
     }
 
     public String getSite(){
@@ -142,12 +151,30 @@ public class Game {
             setBlackPlayer(isAI);
     }
 
+    public void setPlayerName(Side color, String name){
+        if (color == Side.WHITE)
+            whitePlayer.setName(name);
+        else
+            blackPlayer.setName(name);
+    }
+
+    public void setDate(String gameDate) {
+        this.gameDate = gameDate;
+    }
+
+    public void setTime(String gameTime) {
+        this.gameTime = gameTime;
+    }
+
+    public void setGameEvent(String gameEvent) {
+        this.gameEvent = gameEvent;
+    }
+
+    public void setSite(String gameLocation) {
+        this.gameLocation = gameLocation;
+    }
 
     // ----------- Checkers -------------
-
-    public boolean isGameOver() {
-        return isGameOver;
-    }
 
     public boolean isCurPlayerAI(){
         return curPlayer.getPlayerType() == PlayerType.ENGINE;
@@ -156,9 +183,7 @@ public class Game {
     public boolean isPlayerAI(Side color){
         if (color == Side.WHITE && whitePlayer.getPlayerType() == PlayerType.ENGINE)
             return true;
-        else if (color == Side.BLACK && blackPlayer.getPlayerType() == PlayerType.ENGINE)
-            return true;
-        return false;
+        else return color == Side.BLACK && blackPlayer.getPlayerType() == PlayerType.ENGINE;
     }
 
     // ----------- Actions -------------
@@ -204,15 +229,6 @@ public class Game {
         }
     }
 
-    public void newGame(){
-        this.board = new Board();
-        this.engine.reset();
-        this.moveLog = new MoveLog();
-
-        this.curPlayer = this.whitePlayer;
-        this.isGameOver = false;
-    }
-
     // ----------- Game Status -------------
 
     public enum GameStatus{
@@ -243,7 +259,7 @@ public class Game {
 
     // ----------- Game Results ------------- //
 
-    // todo: Add resignation method
+    // todo: Add resignation method (Also for PGN loader)
     public String getGameResult(){
         if (getGameStatus() == GameStatus.Checkmate){
             if (board.getSideToMove() == Side.WHITE){

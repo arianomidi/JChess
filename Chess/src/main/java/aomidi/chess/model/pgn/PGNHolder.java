@@ -16,6 +16,11 @@ public class PGNHolder {
         this.pgnFile = file;
     }
 
+    public PGNHolder(File file){
+        this.pgnFile = file;
+        this.game = new Game();
+    }
+
     public File getPGNFile() {
         return pgnFile;
     }
@@ -29,8 +34,8 @@ public class PGNHolder {
         // PGN Tags
         sb.append("[Event \"" + game.getGameEvent() + "\"]\n");
         sb.append("[Site \"" + game.getSite() + "\"]\n");
-        sb.append("[Date \"" + dtf.format(game.getDate()) + "\"]\n");
-        sb.append("[Date \"" + dtf_time.format(game.getDate()) + "\"]\n");
+        sb.append("[Date \"" + game.getDate() + "\"]\n");
+        sb.append("[Time \"" + game.getTime() + "\"]\n");
         sb.append("[White \"" + game.getPlayerName(Side.WHITE) + "\"]\n");
         sb.append("[Black \"" + game.getPlayerName(Side.BLACK) + "\"]\n");
         sb.append("[Result \"" + game.getGameResult() + "\"]\n");
@@ -48,5 +53,6 @@ public class PGNHolder {
 
         return sb.toString();
     }
+
 
 }
