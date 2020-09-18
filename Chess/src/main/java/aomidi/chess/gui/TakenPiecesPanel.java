@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static aomidi.chess.model.Util.getPieceValue;
+import static aomidi.chess.ai.model.BoardEvaluator.getPieceValue;
 
 public class TakenPiecesPanel extends JPanel {
 

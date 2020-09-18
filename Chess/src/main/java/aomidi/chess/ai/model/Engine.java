@@ -22,7 +22,7 @@ public class Engine {
 
     private double moveTime;
     private int depth;
-    private int positionCount;
+    private AlphaBeta alphaBeta;
     private OpeningBook openingBook;
     private boolean out_of_opening_book = false;
 
@@ -31,6 +31,7 @@ public class Engine {
     public Engine(int depth){
         this.depth = depth;
         this.openingBook = OpeningBookEncoder.getSavedOpeningBook();
+        this.alphaBeta = new AlphaBeta();
     }
 
     // ----------- Getters -------------
@@ -48,7 +49,7 @@ public class Engine {
     }
 
     public int getPositionCount() {
-        return positionCount;
+        return alphaBeta.getPositionCount();
     }
 
     public double getMoveTime() {
@@ -97,7 +98,7 @@ public class Engine {
 
         try {
             long t1 = new Date().getTime();
-            Move bestMove = miniMaxRoot(board.clone());
+            Move bestMove = alphaBeta.execute(board.clone(), depth);
             long t2 = new Date().getTime();
             moveTime = (t2 - t1)/1000.0;
 
@@ -154,11 +155,6 @@ public class Engine {
         return true;
     }
 
-    private OpeningBook runOpeningBookParser(){
-        OpeningBookParser.parseFile();
-        return OpeningBookParser.getOpeningBook();
-    }
-
     public String getOpeningName(Board board){
         openingBook.reset();
         LinkedList<MoveBackup> movesPlayed = board.getBackup();
@@ -179,154 +175,5 @@ public class Engine {
         out_of_opening_book = false;
         prev_move_times.clear();
     }
-
-    // --- MinMax --- //
-
-    public Move miniMaxRoot(Board board) throws MoveGeneratorException {
-        positionCount = 0;
-//        resetMoveEvals();
-
-        MoveList moves = MoveGenerator.generateLegalMoves(board);
-        Move bestMoveFound = moves.get(0);
-        double bestMove;
-
-        if (board.getSideToMove() == Side.WHITE){
-            bestMove = -10000;
-            for (Move move : moves) {
-                board.doMove(move);
-                double value = miniMax(depth - 1, board, -10000, 10000, false);
-                board.undoMove();
-
-                if (value >= bestMove) {
-                    bestMove = value;
-                    bestMoveFound = move;
-                }
-
-//                addMove(move, value);
-            }
-        } else {
-            bestMove = 10000;
-            for (Move move : moves) {
-                board.doMove(move);
-                double value = miniMax(depth - 1, board, -10000, 10000, true);
-                board.undoMove();
-
-                if (value <= bestMove) {
-                    bestMove = value;
-                    bestMoveFound = move;
-                }
-
-//                addMove(move, value);
-            }
-        }
-
-        return bestMoveFound;
-    }
-
-
-    private double miniMax(int depth, Board board, double alpha, double beta, boolean isMaximisingPlayer) throws MoveGeneratorException {
-        positionCount++;
-
-        if (depth == 0)
-            return evaluateBoard(board);
-
-        MoveList moves = MoveGenerator.generateLegalMoves(board);
-
-        if (isMaximisingPlayer){
-            double bestMove = -10000;
-            for (Move move : moves) {
-                board.doMove(move);
-                bestMove = Math.max(bestMove, miniMax(depth - 1, board, alpha, beta, false));
-                board.undoMove();
-
-                alpha = Math.max(alpha, bestMove);
-                if (beta <= alpha)
-                    return bestMove;
-            }
-            return bestMove;
-        } else {
-            double bestMove = 10000;
-            for (Move move : moves) {
-                board.doMove(move);
-                bestMove = Math.min(bestMove, miniMax(depth - 1, board, alpha, beta, true));
-                board.undoMove();
-
-                beta = Math.min(beta, bestMove);
-                if (beta <= alpha)
-                    return bestMove;
-            }
-            return bestMove;
-        }
-    }
-
-    // ----------- Board Evaluation ------------- //
-
-    public static double evaluateBoard(Board board){
-        double eval = 0.0;
-
-        // TODO EFFEICENT DRAW CHECKER
-//        if (board.isDraw() || board.isStaleMate())
-//            return eval;
-
-        Square[] squares = Square.values();
-
-        for (int i = 0; i < 64; i++) {
-            Piece piece = board.getPiece(squares[i]);
-            if (piece != Piece.NONE) {
-                eval += getPieceValue(piece) + getEvalFactor(piece, squares[i]);
-            }
-        }
-
-        return eval;
-    }
-
-    // ----------- Move Map Functions -------------
-
-//    public HashMap<Move, Double> getMoveEvals() {
-//        return moveEvals;
-//    }
-//
-//    public void setMoveEvals(HashMap<Move, Double> moveEvals) {
-//        this.moveEvals = moveEvals;
-//    }
-//
-//    public void resetMoveEvals() {
-//        moveEvals = new HashMap<>();
-//    }
-//    public void addMove(Move move, Double eval){
-//        moveEvals.put(move, eval);
-//    }
-//
-//    private void sortMoveMap(){
-//        HashMap<Move, Double> tmp;
-//
-//        if (side == Side.WHITE) {
-//            tmp = moveEvals.entrySet()
-//                    .stream()
-//                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-//                    .collect(Collectors.toMap(
-//                            Map.Entry::getKey,
-//                            Map.Entry::getValue,
-//                            (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-//        } else {
-//            tmp = moveEvals.entrySet()
-//                    .stream()
-//                    .sorted(Map.Entry.comparingByValue())
-//                    .collect(Collectors.toMap(
-//                            Map.Entry::getKey,
-//                            Map.Entry::getValue,
-//                            (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-//        }
-//
-//        moveEvals = tmp;
-//    }
-//
-//    public void printLegalMovesEvals() {
-//        sortMoveMap();
-//        System.out.print("\033[1mLegal moves: \033[0m");
-//        moveEvals.forEach((key, value) -> System.out.print(key + ":" + value + ", "));
-//        System.out.print("\n");
-//    }
-
 
 }
