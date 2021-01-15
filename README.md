@@ -2,6 +2,8 @@
 
 An application to play chess against a friend or a Chess AI that is implemented with a min-max algorithm with alpha-beta pruning and quiescence searching. You can also load positions from FEN or PGN and test the strength of the Engine!
 
+![Alt text](./Chess/resources/screenshots/JChess_TheOperaGame.png?raw=true "The Opera Game")
+
 ## Usage
 
 Manual for JChess
