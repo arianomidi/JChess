@@ -1,6 +1,6 @@
 # JChess
 
-An application to play chess against a friend or the JChess AI - implemented with a min-max algorithm with alpha-beta pruning and quiescence searching, rated at over 1900 ELO. You can also load positions from FEN or PGN and test the strength of the Engine!
+An application to play chess against a friend or the JChess AI - implemented with a min-max algorithm with alpha-beta pruning and quiescence searching - rated at over 1900 ELO. You can also load positions from FEN or PGN and test the strength of the Engine!
 
 <img src="./Chess/resources/screenshots/JChess_TheOperaGame.png?raw=true" height="400">
 
