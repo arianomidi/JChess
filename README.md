@@ -81,74 +81,28 @@ Change Board Colors
 Menu->Preferences->Choose Board Colors
 ```
 
-### Installing
+## Opening Move Database
 
-A step by step series of examples that tell you how to get a development env running
+The opening move database (Opening Book) contains over 2000 openings, persisted as a tree data structure - each move coresponding to a node. Each node has a weight coresponding to the amount of times the opening has been played in Master Games, indicating the lines strength. The AI selects a line from a randomizing function which depends on the players moves, the weight, and the depth (strength) setting. The opening book structure is persisted in ./resources/structures/opening_book.txt
 
-Say what the step will be
+### Add Openings
 
-```
-Give the example
-```
-
-And repeat
+Write new openings to a .cvs file in the following format
 
 ```
-until finished
+A04    Reti: King's Indian Attack
+1.Nf3 g6 2.g3 Bg7 3.Bg2 e5 4.O-O Nc6 5.e4 d6 6.d3 Nge7 7.c3 O-O 8.Nbd2 h6 9.b4 1/2
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+Then run OpeningBookParser.java with the file as an argument
 
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Arian Omidi** - https://github.com/ArianOmidi
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+* Thanks to https://github.com/bhlangonijr for the initial chess library and https://github.com/amir650 for the Java Swing GUI tutorial
+* Inspiration for Board and Piece design from Lichess.org
