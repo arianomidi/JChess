@@ -12,7 +12,6 @@ Select game mode
 
 ```
 Menu->Options->Setup Game
-
 Select White Player Type
 Select Black Player Type
 Select Search Depth (recommended 4)
@@ -22,7 +21,6 @@ Toggle Opening Move Database
 
 ```
 Menu->Options
-
 Use Book Moves
 ```
 
@@ -30,8 +28,6 @@ Use Book Moves
 
 ```
 Menu->Options->New Game
-Select Black Player Type
-Select Search Depth (recommended 4)
 ```
 
 ### Load Game
