@@ -35,17 +35,6 @@ public class OpeningBook {
         return false;
     }
 
-    public boolean doMove(MoveNode moveNode){
-        MoveNode new_move = cur_move.getMoveNode(moveNode.getMove());
-
-        if (new_move != null) {
-            cur_move = new_move;
-            return true;
-        }
-
-        return false;
-    }
-
     public boolean undoMove(){
         if (cur_move.getParent() != null) {
             cur_move = cur_move.getParent();
@@ -91,39 +80,22 @@ public class OpeningBook {
     }
 
     public boolean equals(OpeningBook openingBook){
-        return equals(root, openingBook.getRoot());
+        return recEquals(root, openingBook.getRoot());
     }
 
-    private boolean equals(MoveNode cur_node, MoveNode cur_node_1){
+    private boolean recEquals(MoveNode cur_node, MoveNode cur_node_1){
         if (cur_node.getParent() != null && !cur_node.equals(cur_node_1))
             return false;
         else if (cur_node.getMovesList().size() != cur_node_1.getMovesList().size())
             return false;
 
         for(int i = 0; i < cur_node.getMovesList().size(); i++){
-            if (!equals(cur_node.getMovesList().get(i), cur_node_1.getMovesList().get(i)))
+            if (!recEquals(cur_node.getMovesList().get(i), cur_node_1.getMovesList().get(i)))
                 return false;
         }
 
         return true;
     }
-
-    public int nodeNumber(MoveNode node){
-        int total = 1;
-        for (MoveNode node1: node.getMovesList()){
-            total += nodeNumber(node1);
-        }
-        return total;
-    }
-
-    public int sumOfWeights(MoveNode node){
-        int total = node.getWeight();
-        for (MoveNode node1: node.getMovesList()){
-            total += sumOfWeights(node1);
-        }
-        return total;
-    }
-
 
 }
 

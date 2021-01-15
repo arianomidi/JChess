@@ -3,7 +3,7 @@
 build(){
 	curdir=`pwd`
 
-	cd /Users/arianomidi/Dropbox/Personal/Code/Java/JChess/Chess
+	cd /Users/arianomidi/Dropbox/Personal/Code/Java/ChessApplication/Chess
 	
 	#if [[ -d build ]]; then
 	#	rm -r build
@@ -21,7 +21,7 @@ build(){
 chess(){
 	curdir=`pwd`
 
-	cd /Users/arianomidi/Dropbox/Personal/Code/Java/JChess/Chess/build
+	cd /Users/arianomidi/Dropbox/Personal/Code/Java/ChessApplication/Chess/build
 
 	java JChess
 	
